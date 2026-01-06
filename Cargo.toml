@@ -1,0 +1,12 @@
+[package]
+name = "display-driver"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bitfield-struct = "0.12.1"
+display-interface = { version = "0.5", optional = true }
+embedded-hal-async = "1.0.0"
+
+[features]
+default = ["display-interface"]
