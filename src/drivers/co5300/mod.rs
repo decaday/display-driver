@@ -1,10 +1,9 @@
-// #![no_std]
-
 use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
-use crate::display_bus::{DisplayBus, Flags};
-use crate::panel::{sequenced_init, InitStep, LCDResetOption, LCDReseter, Panel};
+use crate::display_bus::{DisplayBus, Metadata};
+use crate::panel::{InitStep, LCDResetOption, LCDReseter, Orientation, Panel, sequenced_init};
+use crate::{ColorFormat, DisplayError};
 
 pub mod consts;
 pub mod spec;
@@ -13,47 +12,34 @@ use spec::DisplaySpec;
 use consts::*;
 
 /// CO5300 LCD Driver.
-pub struct Co5300<Spec, RST>
-where
-    RST: OutputPin,
-{
-    reset_pin: LCDResetOption<RST>,
-    _spec: core::marker::PhantomData<Spec>,
-}
-
-impl<Spec, RST> Co5300<Spec, RST>
+pub struct Co5300<Spec, RST, B>
 where
     Spec: DisplaySpec,
     RST: OutputPin,
+    B: DisplayBus,
+{
+    reset_pin: LCDResetOption<RST>,
+    _spec: core::marker::PhantomData<Spec>,
+    _bus: core::marker::PhantomData<B>,
+}
+
+impl<Spec, RST, B> Co5300<Spec, RST, B>
+where
+    Spec: DisplaySpec,
+    RST: OutputPin,
+    B: DisplayBus,
 {
     /// Creates a new driver instance.
     pub fn new(reset_pin: LCDResetOption<RST>) -> Self {
         Self {
             reset_pin,
             _spec: core::marker::PhantomData,
+            _bus: core::marker::PhantomData,
         }
-    }
-
-    /// Sets the display brightness (0-255).
-    pub async fn set_brightness<B>(&mut self, bus: &mut B, value: u8) -> Result<(), B::Error>
-    where
-        B: DisplayBus,
-    {
-        bus.write_cmd_with_params(&[WBRIGHT], Flags::default(), &[value])
-            .await
-    }
-
-    /// Sets the color mode (RGB565 or RGB888).
-    pub async fn set_color_mode<B>(&mut self, bus: &mut B, mode: ColorMode) -> Result<(), B::Error>
-    where
-        B: DisplayBus,
-    {
-        bus.write_cmd_with_params(&[COLOR_MODE], Flags::default(), &[mode as u8])
-            .await
     }
 }
 
-impl<Spec, RST, B> Panel<B> for Co5300<Spec, RST>
+impl<Spec, RST, B> Panel<B> for Co5300<Spec, RST, B>
 where
     Spec: DisplaySpec,
     RST: OutputPin,
@@ -77,13 +63,10 @@ where
             // Configuration
             InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[0x00])),
             InitStep::CommandWithParams((SPI_MODE, &[0x80])),
-            InitStep::CommandWithParams((COLOR_MODE, &[0x55])),
+            InitStep::CommandWithParams((COLOR_MODE, &[0x55])), // Default to RGB565
             InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
             InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
             InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
-            // Address Window Setup
-            // InitStep::CommandWithParams((CASET, &x_buf)),
-            // InitStep::CommandWithParams((RASET, &y_buf)),
             // Power On
             InitStep::SingleCommand(SLEEP_OUT),
             InitStep::DelayMs(120),
@@ -92,7 +75,9 @@ where
         ];
 
         // 4. Execute Sequence
-        sequenced_init(steps.into_iter(), &mut delay, bus, Flags::default()).await
+        sequenced_init(steps.into_iter(), &mut delay, bus).await?;
+
+        self.set_full_window(bus).await
     }
 
     fn size(&self) -> (u16, u16) {
@@ -126,15 +111,75 @@ where
             (y_end & 0xFF) as u8,
         ];
 
-        let flags = Flags::default();
-        bus.write_cmd_with_params(&[CASET], flags, &x_buf).await?;
-        bus.write_cmd_with_params(&[RASET], flags, &y_buf).await?;
+        bus.write_cmd_with_params(&[CASET], &x_buf).await?;
+        bus.write_cmd_with_params(&[RASET], &y_buf).await?;
 
         Ok(())
     }
 
-    async fn start_write_pixels(&mut self, bus: &mut B) -> Result<(), B::Error> {
-        let flags = Flags::default().with_bulk(true);
-        bus.write_cmd(&[WRITE_RAM], flags, true).await
+    async fn write_pixels(
+        &mut self,
+        bus: &mut B,
+        x0: u16,
+        y0: u16,
+        x1: u16,
+        y1: u16,
+        buffer: &[u8],
+    ) -> Result<(), B::Error> {
+        self.set_window(bus, x0, y0, x1, y1).await?;
+
+        let metadata = Metadata {
+            width: x1 - x0 + 1,
+            height: y1 - y0 + 1,
+        };
+
+        // Delegate to the bus implementation to handle the transfer
+        bus.write_pixels(&[WRITE_RAM], &[], buffer, metadata)
+            .await
+            .map_err(|e| match e {
+                DisplayError::BusError(be) => be,
+                _ => panic!("Unsupported display bus operation during write_pixels"),
+            })
+    }
+
+    async fn set_color_format(
+        &mut self,
+        bus: &mut B,
+        color_format: ColorFormat,
+    ) -> Result<(), DisplayError<B::Error>> {
+        let param = match color_format {
+            ColorFormat::RGB565 => ColorMode::RGB565,
+            ColorFormat::RGB666 => ColorMode::RGB666,
+            _ => return Err(DisplayError::Unsupported),
+        };
+
+        bus.write_cmd_with_params(&[COLOR_MODE], &[param as u8])
+            .await
+            .map_err(DisplayError::BusError)
+    }
+
+    /// Sets the display brightness (0-255).
+    async fn set_brightness(&mut self, bus: &mut B, value: u8) -> Result<(), DisplayError<B::Error>> {
+        bus.write_cmd_with_params(&[WBRIGHT], &[value]).await.map_err(DisplayError::BusError)
+    }
+
+    async fn set_orientation(&mut self, 
+            _bus: &mut B,
+            orientation: Orientation,
+        ) -> Result<(), DisplayError<B::Error>> {
+        let _orientation = match orientation {
+            Orientation::Deg0 => Some(REG_ORIENTATION_PORTRAIT),
+            Orientation::Deg90 => Some(REG_ORIENTATION_LANDSCAPE),
+            Orientation::Deg180 => Some(REG_ORIENTATION_LANDSCAPE_ROT180),
+            Orientation::Deg270 => None,
+        };
+        // if let Some(orientation) = orientation {
+        //     bus.write_cmd_with_params(&[todo!()], &[orientation])
+        //     .await
+        //         .map_err(DisplayError::BusError)
+        // } else {
+        //     Err(DisplayError::Unsupported)
+        // }
+        Err(DisplayError::Unsupported)
     }
 }

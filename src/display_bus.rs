@@ -1,66 +1,117 @@
-use bitfield_struct::bitfield;
+use crate::{DisplayError, ColorFormat};
 
-#[bitfield(u32)]
-pub struct Flags {
-    #[bits(1, default = false)]
-    pub lsb_first: bool,
-    #[bits(1, default = false)]
-    pub le: bool,
-    #[bits(1, default = false)]
-    pub bulk: bool,
-    #[bits(29)]
-    reserved: u32,
+pub struct Config {
+    pub screen_width: u16,
+    pub screen_height: u16,
+
+    pub pixel_bpp: u8,
+    pub color_format: ColorFormat,
+    pub cmd_size_bytes: u8,
+    // msb: bool
+}
+
+#[allow(async_fn_in_trait)]
+pub trait SimpleDisplayBus {
+    type Error;
+
+    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
+        let _ = config;
+        Ok(())
+    }
+
+    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
+
+    async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error>;
+
+    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
+        self.write_cmds(cmd).await?;
+        self.write_data(params).await
+    }
+
+    async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
+        let (_, _, _) = (cmd, params, buffer);
+        Err(DisplayError::Unsupported)
+    }
+
+    fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
+        let _ = reset;
+        Err(DisplayError::Unsupported)
+    }
+}
+
+pub struct Metadata {
+    pub width: u16,
+    pub height: u16,
 }
 
 #[allow(async_fn_in_trait)]
 pub trait DisplayBus {
     type Error;
 
-    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags, continuous: bool) -> Result<(), Self::Error>;
+    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>>;
 
-    async fn write_data(&mut self, data: &[u8], continuous: bool) -> Result<(), Self::Error>;
+    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 
-    async fn write_cmd_with_params(&mut self, cmd: &[u8], flags: Flags, params: &[u8]) -> Result<(), Self::Error> {
-        self.write_cmd(cmd, flags, true).await?;
-        self.write_data(params, false).await
+    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error>;
+
+    async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
+
+    async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
+        let (_, _, _) = (cmd, params, buffer);
+        Err(DisplayError::Unsupported)
     }
 
-    async fn write_pixels(&mut self,
-        x0: u16,
-        y0: u16,
-        x1: u16,
-        y1: u16,
-        pixels: &[u8],
-    ) -> Result<(), Self::Error> {
-        let (_, _ , _ , _ ) = (x0, y0, x1, y1);
-        self.write_data(pixels, false).await
-    }
-
-    async fn read_data(&mut self, cmd: &[u8], flags: Flags, buffer: &mut [u8]) -> Option<Result<(), Self::Error>> {
-        let (_, _, _) = (cmd, flags, buffer);
-        None
-    }
-
-    fn set_reset(&mut self, reset: bool) -> Option<Result<(), Self::Error>> {
+    fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         let _ = reset;
-        None
+        Err(DisplayError::Unsupported)
     }
 }
 
-pub struct QspiMmioBus<DB: DisplayBus> {
-    inner: DB
+impl<T: SimpleDisplayBus> DisplayBus for T {
+    type Error = T::Error;
+
+    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
+        T::configure(self, config)
+    }
+
+    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
+        T::write_cmds(self, cmd).await
+    }
+
+    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
+        T::write_cmd_with_params(self, cmd, params).await
+    }
+
+    async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], _metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+        self.write_cmds(cmd).await.map_err(DisplayError::BusError)?;
+        self.write_data(params).await.map_err(DisplayError::BusError)?;
+        self.write_data(buffer).await.map_err(DisplayError::BusError)
+    }
+
+    async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
+        T::read_data(self, cmd, params, buffer).await
+    }
+
+    fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
+        T::set_reset(self, reset)
+    }
 }
-impl<DB: DisplayBus> QspiMmioBus<DB> {
+
+pub struct QspiFlashBus<DB: DisplayBus> {
+    inner: DB,
+}
+
+impl<DB: DisplayBus> QspiFlashBus<DB> {
     pub fn new(inner: DB) -> Self {
         Self { inner }
     }
 
-    pub fn to_cmd_and_addr(&self, cmd: &[u8], flags: Flags) -> [u8; 4] {
+    pub fn to_cmd_and_addr(&self, cmd: &[u8], pixel_data: bool) -> [u8; 4] {
         if cmd.len() != 1 {
             panic!()
         }
 
-        let flash_command: u8 = if flags.bulk() {
+        let flash_command: u8 = if pixel_data {
             0x32
         } else {
             0x02
@@ -70,29 +121,36 @@ impl<DB: DisplayBus> QspiMmioBus<DB> {
     }
 }
 
-impl<DB: DisplayBus> DisplayBus for QspiMmioBus<DB> {
+impl<DB: DisplayBus> DisplayBus for QspiFlashBus<DB> {
     type Error = DB::Error;
 
-    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags, continuous: bool) -> Result<(), Self::Error> {
-        let cmd = self.to_cmd_and_addr(cmd, flags);
-        self.inner.write_cmd(&cmd, flags, continuous).await
+    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
+        let mut config = config;
+        config.cmd_size_bytes = 4;
+        self.inner.configure(config)
     }
 
-    async fn write_data(&mut self, data: &[u8], continuous: bool) -> Result<(), Self::Error> {
-        self.inner.write_data(data, continuous).await
+    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
+        let cmd = self.to_cmd_and_addr(cmd, false);
+        self.inner.write_cmds(&cmd).await
     }
 
-    async fn write_cmd_with_params(&mut self, cmd: &[u8], flags: Flags, params: &[u8]) -> Result<(), Self::Error> {
-        let cmd = self.to_cmd_and_addr(cmd, flags);
-        self.inner.write_cmd_with_params(&cmd, flags, params).await
+    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
+        let cmd = self.to_cmd_and_addr(cmd, false);
+        self.inner.write_cmd_with_params(&cmd, params).await
     }
 
-    async fn write_pixels(&mut self, x0: u16, y0: u16, x1: u16, y1: u16, pixels: &[u8]) -> Result<(), Self::Error> {
-        self.inner.write_pixels(x0, y0, x1, y1, pixels).await
+    async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+        let cmd = self.to_cmd_and_addr(cmd, true);
+        self.inner.write_pixels(&cmd, params, buffer, metadata).await
     }
 
-    async fn read_data(&mut self, cmd: &[u8], flags: Flags, buffer: &mut [u8]) -> Option<Result<(), Self::Error>> {
-        let cmd = self.to_cmd_and_addr(cmd, flags);
-        self.inner.read_data(&cmd, flags, buffer).await
+    async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
+        let cmd = self.to_cmd_and_addr(cmd, false);
+        self.inner.read_data(&cmd, params, buffer).await
+    }
+
+    fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
+        self.inner.set_reset(reset)
     }
 }

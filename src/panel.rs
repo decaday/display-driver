@@ -1,12 +1,7 @@
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 
-use crate::display_bus::{DisplayBus, Flags};
-
-pub enum PanelError<E> {
-    BusError(E),
-    Unsupported,
-}
+use crate::{DisplayError, ColorFormat, DisplayBus};
 
 pub enum Orientation {
     Deg0,
@@ -31,35 +26,54 @@ pub trait Panel<B: DisplayBus> {
         y1: u16,
     ) -> Result<(), B::Error>;
 
-    async fn start_write_pixels(&mut self, 
-        bus: &mut B,
-    ) -> Result<(), B::Error>;
+    async fn set_full_window(&mut self, bus: &mut B,) -> Result<(), B::Error> {
+        let (x1, y1) = self.size();
+        self.set_window(bus, 0, 0, x1 - 1, y1 - 1).await
+    }
 
-    async fn end_write_pixels(&mut self, 
+    async fn write_pixels(&mut self, 
         bus: &mut B,
-    ) -> Result<(), B::Error> { Ok(()) }
+        x0: u16,
+        y0: u16,
+        x1: u16,
+        y1: u16,
+        buffer: &[u8],
+    ) -> Result<(), B::Error>;
 
     async fn verify_id(&mut self, 
         bus: &mut B,
-    ) -> Result<bool, PanelError<B::Error>> {
+    ) -> Result<bool, DisplayError<B::Error>> {
         let _ = bus;
-        Err(PanelError::Unsupported)
+        Err(DisplayError::Unsupported)
     }
 
     async fn set_orientation(&mut self, 
         bus: &mut B,
         orientation: Orientation,
-    ) -> Result<(), PanelError<B::Error>> {
+    ) -> Result<(), DisplayError<B::Error>> {
         let _ = (bus, orientation);
-        Err(PanelError::Unsupported)
+        Err(DisplayError::Unsupported)
+    }
+
+    async fn set_color_format(&mut self, 
+        bus: &mut B,
+        color_format: ColorFormat,
+    ) -> Result<(), DisplayError<B::Error>>;
+
+    async fn set_brightness(&mut self, 
+        bus: &mut B,
+        brightness: u8,
+    ) -> Result<(), DisplayError<B::Error>> {
+        let _ = (bus, brightness);
+        Err(DisplayError::Unsupported)
     }
 
     // async fn set_rgb_order(&mut self, 
     //     bus: &mut B,
     //     rgb_order: bool,
-    // ) -> Result<(), PanelError<B::Error>> {
+    // ) -> Result<(), DisplayError<B::Error>> {
     //     let _ = (bus, rgb_order);
-    //     Err(PanelError::Unsupported)
+    //     Err(DisplayError::Unsupported)
     // }
 }
 
@@ -73,16 +87,14 @@ pub struct SequencedInit<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = Init
     steps: I,
     delay: &'a mut D,
     display_bus: &'a mut DB,
-    flags: Flags,
 }
 
 impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedInit<'a, D, DB, I> {
-    pub fn new(steps: I, delay: &'a mut D, display_bus: &'a mut DB, flags: Flags) -> Self {
+    pub fn new(steps: I, delay: &'a mut D, display_bus: &'a mut DB) -> Self {
         Self {
             steps,
             delay,
             display_bus,
-            flags,
         }
     }
 
@@ -90,10 +102,10 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
         while let Some(step) = self.steps.next() {
             match step {
                 InitStep::SingleCommand(cmd) => {
-                    self.display_bus.write_cmd(&[cmd], self.flags, false).await?
+                    self.display_bus.write_cmds(&[cmd]).await?
                 },
                 InitStep::CommandWithParams((cmd, data)) => {
-                    self.display_bus.write_cmd_with_params(&[cmd], self.flags, data).await?
+                    self.display_bus.write_cmd_with_params(&[cmd], data).await?
                 },
                 InitStep::DelayMs(ms) => self.delay.delay_ms(ms as u32).await,
             }
@@ -103,8 +115,8 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
     }
 }
 
-pub async fn sequenced_init<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>>(steps: I, delay: &'a mut D, display_bus: &'a mut DB, flags: Flags) -> Result<(), DB::Error> {
-    SequencedInit::new(steps, delay, display_bus, flags).sequenced_init().await
+pub async fn sequenced_init<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>>(steps: I, delay: &'a mut D, display_bus: &'a mut DB) -> Result<(), DB::Error> {
+    SequencedInit::new(steps, delay, display_bus).sequenced_init().await
 }
 
 
@@ -199,7 +211,11 @@ impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
                 }
             },
             LCDResetOption::Bus => {
-                self.bus.set_reset(reset).expect("Bus cannot reset")
+                self.bus.set_reset(reset).map_err(|err| match err {
+                    DisplayError::BusError(e) => e,
+                    DisplayError::Unsupported => panic!("Bus cannot reset"),
+                    _ => unreachable!(),
+                }) 
             },
             LCDResetOption::None => Ok(()),
         }
