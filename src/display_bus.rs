@@ -3,14 +3,12 @@ use bitfield_struct::bitfield;
 #[bitfield(u32)]
 pub struct Flags {
     #[bits(1, default = false)]
-    pub continuous: bool,
-    #[bits(1, default = false)]
     pub lsb_first: bool,
     #[bits(1, default = false)]
     pub le: bool,
     #[bits(1, default = false)]
     pub bulk: bool,
-    #[bits(28)]
+    #[bits(29)]
     reserved: u32,
 }
 
@@ -18,16 +16,13 @@ pub struct Flags {
 pub trait DisplayBus {
     type Error;
 
-    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags) -> Result<(), Self::Error>;
+    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags, continuous: bool) -> Result<(), Self::Error>;
 
-    async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error>;
-
-    async fn end_write(&mut self) -> Result<(), Self::Error> { Ok(()) }
+    async fn write_data(&mut self, data: &[u8], continuous: bool) -> Result<(), Self::Error>;
 
     async fn write_cmd_with_params(&mut self, cmd: &[u8], flags: Flags, params: &[u8]) -> Result<(), Self::Error> {
-        self.write_cmd(cmd, flags.with_continuous(true)).await?;
-        self.write_data(params).await?;
-        self.end_write().await
+        self.write_cmd(cmd, flags, true).await?;
+        self.write_data(params, false).await
     }
 
     async fn write_pixels(&mut self,
@@ -38,11 +33,16 @@ pub trait DisplayBus {
         pixels: &[u8],
     ) -> Result<(), Self::Error> {
         let (_, _ , _ , _ ) = (x0, y0, x1, y1);
-        self.write_data(pixels).await
+        self.write_data(pixels, false).await
     }
 
     async fn read_data(&mut self, cmd: &[u8], flags: Flags, buffer: &mut [u8]) -> Option<Result<(), Self::Error>> {
         let (_, _, _) = (cmd, flags, buffer);
+        None
+    }
+
+    fn set_reset(&mut self, reset: bool) -> Option<Result<(), Self::Error>> {
+        let _ = reset;
         None
     }
 }
@@ -73,17 +73,13 @@ impl<DB: DisplayBus> QspiMmioBus<DB> {
 impl<DB: DisplayBus> DisplayBus for QspiMmioBus<DB> {
     type Error = DB::Error;
 
-    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags) -> Result<(), Self::Error> {
+    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags, continuous: bool) -> Result<(), Self::Error> {
         let cmd = self.to_cmd_and_addr(cmd, flags);
-        self.inner.write_cmd(&cmd, flags).await
+        self.inner.write_cmd(&cmd, flags, continuous).await
     }
 
-    async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error> {
-        self.inner.write_data(data).await
-    }
-
-    async fn end_write(&mut self) -> Result<(), Self::Error> {
-        self.inner.end_write().await
+    async fn write_data(&mut self, data: &[u8], continuous: bool) -> Result<(), Self::Error> {
+        self.inner.write_data(data, continuous).await
     }
 
     async fn write_cmd_with_params(&mut self, cmd: &[u8], flags: Flags, params: &[u8]) -> Result<(), Self::Error> {

@@ -4,7 +4,7 @@ use crate::display_bus::{DisplayBus, Flags};
 impl<DI: AsyncWriteOnlyDataCommand + Send> DisplayBus for DI {
     type Error = DisplayError;
 
-    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags) -> Result<(), Self::Error> {
+    async fn write_cmd(&mut self, cmd: &[u8], flags: Flags, _continuous: bool) -> Result<(), Self::Error> {
         match cmd.len() {
             1 => {
                 self.send_commands(DataFormat::U8(cmd)).await
@@ -24,7 +24,7 @@ impl<DI: AsyncWriteOnlyDataCommand + Send> DisplayBus for DI {
         }
     }
 
-    async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error> {
+    async fn write_data(&mut self, data: &[u8], _continuous: bool) -> Result<(), Self::Error> {
         self.send_data(DataFormat::U8(data)).await
     }
 }

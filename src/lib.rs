@@ -2,6 +2,8 @@
 
 pub mod panel;
 pub mod display_bus;
+pub mod mipidcs;
+pub mod drivers;
 #[cfg(feature = "display-interface")]
 pub mod di;
 
@@ -25,7 +27,8 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
         y1: u16,
         pixels: &[u8]
     ) -> Result<(), B::Error> {
-        self.panel.start_write_pixels(&mut self.bus, x0, y0, x1, y1).await?;
+        self.panel.set_window(&mut self.bus, x0, y0, x1, y1).await?;
+        self.panel.start_write_pixels(&mut self.bus).await?;
         self.bus.write_pixels(x0, y0, x1, y1, pixels).await?;
         self.panel.end_write_pixels(&mut self.bus).await
     }

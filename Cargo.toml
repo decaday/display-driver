@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 bitfield-struct = "0.12.1"
 display-interface = { version = "0.5", optional = true }
+embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
 
 [features]
