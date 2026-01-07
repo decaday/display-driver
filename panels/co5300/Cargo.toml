@@ -1,0 +1,11 @@
+[package]
+name = "dd-co5300"
+version = "0.1.0"
+edition = "2021"
+description = "Display driver for CO5300 panel"
+license = "Apache-2.0"
+
+[dependencies]
+display-driver = { path = "../../display-driver" }
+embedded-hal = "1.0.0"
+embedded-hal-async = "1.0.0"

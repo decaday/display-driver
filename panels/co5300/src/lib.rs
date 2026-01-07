@@ -1,9 +1,11 @@
+#![no_std]
+
 use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
-use crate::display_bus::{DisplayBus, Metadata};
-use crate::panel::{InitStep, LCDResetOption, LCDReseter, Orientation, Panel, sequenced_init};
-use crate::{ColorFormat, DisplayError};
+use display_driver::display_bus::{DisplayBus, Metadata};
+use display_driver::panel::{InitStep, LCDResetOption, LCDReseter, Orientation, Panel, sequenced_init};
+use display_driver::{ColorFormat, DisplayError};
 
 pub mod consts;
 pub mod spec;

@@ -1,0 +1,9 @@
+[package]
+name = "dd-mipidsi"
+version = "0.1.0"
+edition = "2021"
+description = "MIPI DCS support for display drivers"
+license = "Apache-2.0"
+
+[dependencies]
+display-driver = { path = "../../display-driver" }

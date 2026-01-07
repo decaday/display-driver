@@ -14,10 +14,10 @@ pub struct Config {
 pub trait SimpleDisplayBus {
     type Error;
 
-    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
-        let _ = config;
-        Ok(())
-    }
+    // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
+    //     let _ = config;
+    //     Ok(())
+    // }
 
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 

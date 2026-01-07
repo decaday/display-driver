@@ -2,8 +2,6 @@
 
 pub mod panel;
 pub mod display_bus;
-pub mod mipidcs;
-pub mod drivers;
 #[cfg(feature = "display-interface")]
 pub mod di;
 
