@@ -1,17 +1,23 @@
-use crate::{DisplayError, ColorFormat};
+use crate::DisplayError;
 
-pub struct Config {
-    pub screen_width: u16,
-    pub screen_height: u16,
+// /// Configuration for the display bus.
+// pub struct Config {
+//     /// Screen width in pixels.
+//     pub screen_width: u16,
+//     /// Screen height in pixels.
+//     pub screen_height: u16,
 
-    pub pixel_bpp: u8,
-    pub color_format: ColorFormat,
-    pub cmd_size_bytes: u8,
-    // msb: bool
-}
+//     /// Color format (e.g., RGB565).
+//     pub color_format: ColorFormat,
+//     /// Command size in bytes (usually 1).
+//     pub cmd_size_bytes: u8,
+//     // msb: bool
+// }
 
 #[allow(async_fn_in_trait)]
+/// A simplified interface for display buses (e.g., SPI, I2C).
 pub trait SimpleDisplayBus {
+    /// Error type for bus operations.
     type Error;
 
     // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
@@ -19,48 +25,63 @@ pub trait SimpleDisplayBus {
     //     Ok(())
     // }
 
+    /// Writes a sequence of commands.
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 
+    /// Writes data bytes.
     async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 
+    /// Writes a command followed by its parameters.
     async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
         self.write_cmds(cmd).await?;
         self.write_data(params).await
     }
 
+    /// Reads data from the display (optional).
     async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
         let (_, _, _) = (cmd, params, buffer);
         Err(DisplayError::Unsupported)
     }
 
+    /// Sets the hardware reset state (optional).
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         let _ = reset;
         Err(DisplayError::Unsupported)
     }
 }
 
+/// Metadata about the pixel data transfer.
 pub struct Metadata {
+    /// Width of the area being written.
     pub width: u16,
+    /// Height of the area being written.
     pub height: u16,
 }
 
 #[allow(async_fn_in_trait)]
+/// Core trait for display bus implementations.
 pub trait DisplayBus {
+    /// Error type for bus operations.
     type Error;
 
     // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>>;
 
+    /// Writes a sequence of commands.
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 
+    /// Writes a command followed by its parameters.
     async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error>;
 
+    /// Writes pixel data to the display.
     async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
 
+    /// Reads data from the display (optional).
     async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
         let (_, _, _) = (cmd, params, buffer);
         Err(DisplayError::Unsupported)
     }
 
+    /// Sets the hardware reset state (optional).
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         let _ = reset;
         Err(DisplayError::Unsupported)
@@ -97,15 +118,18 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
     }
 }
 
+/// Adapter for QSPI buses that require command formatting for flash-like interfaces.
 pub struct QspiFlashBus<DB: DisplayBus> {
     inner: DB,
 }
 
 impl<DB: DisplayBus> QspiFlashBus<DB> {
+    /// Creates a new QspiFlashBus wrapper.
     pub fn new(inner: DB) -> Self {
         Self { inner }
     }
 
+    /// Formats the command and address for QSPI transfer.
     pub fn to_cmd_and_addr(&self, cmd: &[u8], pixel_data: bool) -> [u8; 4] {
         if cmd.len() != 1 {
             panic!()

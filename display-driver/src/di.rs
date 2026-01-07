@@ -1,3 +1,5 @@
+//! Implementation of `SimpleDisplayBus` for `display-interface` traits.
+
 use display_interface::{AsyncWriteOnlyDataCommand, DisplayError, DataFormat};
 use crate::display_bus::SimpleDisplayBus;
 

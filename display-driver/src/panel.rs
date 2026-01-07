@@ -3,6 +3,7 @@ use embedded_hal::digital::OutputPin;
 
 use crate::{DisplayError, ColorFormat, DisplayBus};
 
+/// Display orientation.
 pub enum Orientation {
     Deg0,
     Deg90,
@@ -11,13 +12,17 @@ pub enum Orientation {
 }
 
 #[allow(async_fn_in_trait)]
+/// Trait for display panels.
 pub trait Panel<B: DisplayBus> {
+    /// Initializes the panel.
     async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;
 
+    /// Returns the panel resolution (width, height).
     fn size(&self) -> (u16, u16);
 
     // fn offset(&self) -> (u16, u16);
 
+    /// Sets the active window for pixel writing.
     async fn set_window(&mut self, 
         bus: &mut B,
         x0: u16,
@@ -26,11 +31,13 @@ pub trait Panel<B: DisplayBus> {
         y1: u16,
     ) -> Result<(), B::Error>;
 
+    /// Sets the window to the full screen size.
     async fn set_full_window(&mut self, bus: &mut B,) -> Result<(), B::Error> {
         let (x1, y1) = self.size();
         self.set_window(bus, 0, 0, x1 - 1, y1 - 1).await
     }
 
+    /// Writes pixels to the specified window.
     async fn write_pixels(&mut self, 
         bus: &mut B,
         x0: u16,
@@ -40,6 +47,7 @@ pub trait Panel<B: DisplayBus> {
         buffer: &[u8],
     ) -> Result<(), B::Error>;
 
+    /// Verifies the panel ID (if supported).
     async fn verify_id(&mut self, 
         bus: &mut B,
     ) -> Result<bool, DisplayError<B::Error>> {
@@ -47,6 +55,7 @@ pub trait Panel<B: DisplayBus> {
         Err(DisplayError::Unsupported)
     }
 
+    /// Sets the display orientation.
     async fn set_orientation(&mut self, 
         bus: &mut B,
         orientation: Orientation,
@@ -55,11 +64,13 @@ pub trait Panel<B: DisplayBus> {
         Err(DisplayError::Unsupported)
     }
 
+    /// Sets the color format.
     async fn set_color_format(&mut self, 
         bus: &mut B,
         color_format: ColorFormat,
     ) -> Result<(), DisplayError<B::Error>>;
 
+    /// Sets the brightness (0-255).
     async fn set_brightness(&mut self, 
         bus: &mut B,
         brightness: u8,
@@ -77,12 +88,17 @@ pub trait Panel<B: DisplayBus> {
     // }
 }
 
+/// A step in the initialization sequence.
 pub enum InitStep<'a> {
+    /// Single byte command.
     SingleCommand(u8),
+    /// Command with parameters.
     CommandWithParams((u8, &'a [u8])),
+    /// Delay in milliseconds.
     DelayMs(u8),
 }
 
+/// Helper to execute initialization steps.
 pub struct SequencedInit<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> {
     steps: I,
     delay: &'a mut D,
@@ -90,6 +106,7 @@ pub struct SequencedInit<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = Init
 }
 
 impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedInit<'a, D, DB, I> {
+    /// Creates a new SequencedInit instance.
     pub fn new(steps: I, delay: &'a mut D, display_bus: &'a mut DB) -> Self {
         Self {
             steps,
@@ -98,6 +115,7 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
         }
     }
 
+    /// Executes the initialization sequence.
     pub async fn sequenced_init(&mut self) -> Result<(), DB::Error> {
         while let Some(step) = self.steps.next() {
             match step {
@@ -115,11 +133,13 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
     }
 }
 
+/// Convenience function to run an initialization sequence.
 pub async fn sequenced_init<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>>(steps: I, delay: &'a mut D, display_bus: &'a mut DB) -> Result<(), DB::Error> {
     SequencedInit::new(steps, delay, display_bus).sequenced_init().await
 }
 
 
+/// Dummy pin implementation for when no reset pin is used.
 pub struct NoResetPin {}
 impl embedded_hal::digital::ErrorType for NoResetPin {
     type Error = core::convert::Infallible;
@@ -136,18 +156,25 @@ impl embedded_hal::digital::OutputPin for NoResetPin {
 }
 
 #[derive(PartialEq, Eq)]
+/// Option for LCD reset control.
 pub enum LCDResetOption<P: OutputPin> {
+    /// Reset via a GPIO pin (active high).
     PinHigh(P),
+    /// Reset via a GPIO pin (active low).
     PinLow(P),
+    /// Reset via the display bus.
     Bus,
+    /// No hardware reset.
     None
 }
 
 impl<P: OutputPin> LCDResetOption<P> {
+    /// Creates a new PinLow reset option.
     pub fn new_pin(pin: P) -> Self {
         Self::PinLow(pin)
     }
 
+    /// Creates a new reset option with specified active level.
     pub fn new_pin_with_level(pin: P, reset_level: bool) -> Self {
         if reset_level {
             Self::PinHigh(pin)
@@ -156,6 +183,7 @@ impl<P: OutputPin> LCDResetOption<P> {
         }
     }
 
+    /// Releases the pin if held.
     pub fn release(self) -> Option<P> {
         match self {
             Self::PinHigh(pin) => Some(pin),
@@ -167,16 +195,19 @@ impl<P: OutputPin> LCDResetOption<P> {
 }
 
 impl LCDResetOption<NoResetPin> {
+    /// Creates a Bus reset option.
     pub fn new_bus() -> Self {
         Self::Bus
     }
 
+    /// Creates a None reset option.
     pub fn none() -> Self {
         Self::None
     }
 }
 
 
+/// Helper to handle LCD hardware reset.
 pub struct LCDReseter<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> {
     option: &'a mut LCDResetOption<P>,
     bus: &'a mut DB,
@@ -185,6 +216,7 @@ pub struct LCDReseter<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> {
 }
 
 impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
+    /// Creates a new LCDReseter.
     pub fn new(option: &'a mut LCDResetOption<P>, bus: &'a mut DB, delay: &'a mut D, gap_ms: u8) -> Self {
         Self {
             option,
@@ -194,6 +226,7 @@ impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
         }
     }
 
+    /// Sets the reset state.
     pub fn set_reset(&mut self, reset: bool) -> Result<(), DB::Error> {
         match *self.option {
             LCDResetOption::PinHigh(ref mut pin) => {
@@ -221,6 +254,7 @@ impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
         }
     }
 
+    /// Performs the reset sequence: assert -> wait -> release -> wait.
     pub async fn reset(&mut self) -> Result<(), DB::Error> {
         self.set_reset(false)?;
         self.delay.delay_ms(self.gap_ms as u32).await;

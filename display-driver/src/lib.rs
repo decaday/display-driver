@@ -8,17 +8,26 @@ pub mod di;
 use display_bus::{DisplayBus};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
+/// Color format used by the display.
 pub enum ColorFormat {
+    /// 1-bit per pixel (Monochrome).
     Binary,
+    /// 2-bit grayscale.
     Gray2,
+    /// 4-bit grayscale.
     Gray4,
+    /// 8-bit grayscale.
     Gray8,
+    /// 16-bit RGB565.
     RGB565,
+    /// 18-bit RGB666.
     RGB666,
+    /// 24-bit RGB888.
     RGB888,
 }
 
 impl ColorFormat {
+    /// Returns the number of bits per pixel for this format.
     pub fn size_bits(self) -> u8 {
         match self {
             ColorFormat::Binary => 1,
@@ -33,9 +42,13 @@ impl ColorFormat {
 }
 
 #[derive(Debug)]
+/// Common errors that can occur during display operations.
 pub enum DisplayError<E> {
+    /// Error propagated from the underlying bus.
     BusError(E),
+    /// The requested operation is not supported by the display or driver.
     Unsupported,
+    /// Parameter is out of valid range.
     OutOfRange,
 }
 
