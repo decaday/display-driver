@@ -48,7 +48,7 @@ pub struct Metadata {
 pub trait DisplayBus {
     type Error;
 
-    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>>;
+    // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>>;
 
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 
@@ -70,9 +70,9 @@ pub trait DisplayBus {
 impl<T: SimpleDisplayBus> DisplayBus for T {
     type Error = T::Error;
 
-    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
-        T::configure(self, config)
-    }
+    // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
+    //     T::configure(self, config)
+    // }
 
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
         T::write_cmds(self, cmd).await
@@ -124,11 +124,11 @@ impl<DB: DisplayBus> QspiFlashBus<DB> {
 impl<DB: DisplayBus> DisplayBus for QspiFlashBus<DB> {
     type Error = DB::Error;
 
-    fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
-        let mut config = config;
-        config.cmd_size_bytes = 4;
-        self.inner.configure(config)
-    }
+    // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
+    //     let mut config = config;
+    //     config.cmd_size_bytes = 4;
+    //     self.inner.configure(config)
+    // }
 
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
         let cmd = self.to_cmd_and_addr(cmd, false);
