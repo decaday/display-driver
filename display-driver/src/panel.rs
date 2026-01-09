@@ -89,6 +89,7 @@ pub trait Panel<B: DisplayBus> {
 }
 
 /// A step in the initialization sequence.
+#[derive(Clone, Copy)] 
 pub enum InitStep<'a> {
     /// Single byte command.
     SingleCommand(u8),
@@ -96,6 +97,12 @@ pub enum InitStep<'a> {
     CommandWithParams((u8, &'a [u8])),
     /// Delay in milliseconds.
     DelayMs(u8),
+    /// No Operation. Useful for placeholders or conditional logic.
+    Nop,
+    /// Nested sequence. 
+    /// NOTE: Only supports one level of nesting (cannot nest a Nested inside a Nested)
+    /// to avoid recursion issues in async no_std environments.
+    Nested(&'a [InitStep<'a>]),
 }
 
 /// Helper to execute initialization steps.
@@ -115,17 +122,40 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
         }
     }
 
+    /// Helper function to execute a single atomic step.
+    /// Does not handle recursion; ignores Nested variants if passed directly.
+    async fn exec_atomic_step(&mut self, step: InitStep<'a>) -> Result<(), DB::Error> {
+        match step {
+            InitStep::SingleCommand(cmd) => {
+                self.display_bus.write_cmds(&[cmd]).await
+            },
+            InitStep::CommandWithParams((cmd, data)) => {
+                self.display_bus.write_cmd_with_params(&[cmd], data).await
+            },
+            InitStep::DelayMs(ms) => {
+                self.delay.delay_ms(ms as u32).await;
+                Ok(())
+            },
+            InitStep::Nop => Ok(()),
+            InitStep::Nested(_) => {
+                panic!("We only support 1 level in InitStep.");
+            }
+        }
+    }
+
     /// Executes the initialization sequence.
     pub async fn sequenced_init(&mut self) -> Result<(), DB::Error> {
         while let Some(step) = self.steps.next() {
             match step {
-                InitStep::SingleCommand(cmd) => {
-                    self.display_bus.write_cmds(&[cmd]).await?
+                // If the step is a Nested sequence, unroll it here (1 level deep)
+                InitStep::Nested(sub_steps) => {
+                    for sub_step in sub_steps.iter() {
+                        // We use *sub_step because we derived Copy
+                        self.exec_atomic_step(*sub_step).await?;
+                    }
                 },
-                InitStep::CommandWithParams((cmd, data)) => {
-                    self.display_bus.write_cmd_with_params(&[cmd], data).await?
-                },
-                InitStep::DelayMs(ms) => self.delay.delay_ms(ms as u32).await,
+                // Otherwise, execute the step directly
+                _ => self.exec_atomic_step(step).await?,
             }
         }
 
