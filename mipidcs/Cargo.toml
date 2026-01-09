@@ -8,3 +8,5 @@ license = "Apache-2.0"
 [dependencies]
 bitflags = "2.10.0"
 display-driver = { path = "../display-driver" }
+embedded-hal = "1.0.0"
+embedded-hal-async = "1.0.0"

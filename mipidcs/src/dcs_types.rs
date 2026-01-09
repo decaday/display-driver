@@ -40,8 +40,8 @@ pub enum PixelFormatType {
 
 impl PixelFormatType {
     /// Convert a raw bit count (e.g., 16) into the corresponding enum variant.
-    pub fn from_bits(bits: u8) -> Option<Self> {
-        match bits {
+    pub const fn from_bit_count(bit_count: u8) -> Option<Self> {
+        match bit_count {
             3 => Some(Self::Bits3),
             8 => Some(Self::Bits8),
             12 => Some(Self::Bits12),
@@ -57,15 +57,15 @@ impl PixelFormatType {
 pub struct PixelFormat(pub u8);
 
 impl PixelFormat {
-    pub fn dbi_only(value: PixelFormatType) -> Self {
+    pub const fn dbi_only(value: PixelFormatType) -> Self {
         Self(value as u8)
     }
 
-    pub fn dpi_only(value: PixelFormatType) -> Self {
+    pub const fn dpi_only(value: PixelFormatType) -> Self {
         Self((value as u8) << 4)
     }
 
-    pub fn dbi_and_dpi(value: PixelFormatType) -> Self {
+    pub const fn dbi_and_dpi(value: PixelFormatType) -> Self {
         Self(((value as u8) << 4) | (value as u8))
     }
 }
@@ -148,10 +148,10 @@ impl AddressMode {
     /// This mimics the old constructor for easier migration.
     pub fn new_simple(mx: bool, my: bool, mv: bool, bgr: bool) -> Self {
         let mut mode = Self::empty();
-        if mx { mode |= Self::MX; }
-        if my { mode |= Self::MY; }
-        if mv { mode |= Self::MV; }
-        if bgr { mode |= Self::BGR; }
+        mode.set(AddressMode::MX, mx);
+        mode.set(AddressMode::MY, my);
+        mode.set(AddressMode::MV, mv);
+        mode.set(AddressMode::BGR, bgr);
         mode
     }
 }
