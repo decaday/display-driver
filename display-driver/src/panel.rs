@@ -106,15 +106,15 @@ pub enum InitStep<'a> {
 }
 
 /// Helper to execute initialization steps.
-pub struct SequencedInit<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> {
+pub struct SequencedInit<'a, D: DelayNs, B: DisplayBus, I: Iterator<Item = InitStep<'a>>> {
     steps: I,
     delay: &'a mut D,
-    display_bus: &'a mut DB,
+    display_bus: &'a mut B,
 }
 
-impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedInit<'a, D, DB, I> {
+impl<'a, D: DelayNs, B: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedInit<'a, D, B, I> {
     /// Creates a new SequencedInit instance.
-    pub fn new(steps: I, delay: &'a mut D, display_bus: &'a mut DB) -> Self {
+    pub fn new(steps: I, delay: &'a mut D, display_bus: &'a mut B) -> Self {
         Self {
             steps,
             delay,
@@ -124,7 +124,7 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
 
     /// Helper function to execute a single atomic step.
     /// Does not handle recursion; ignores Nested variants if passed directly.
-    async fn exec_atomic_step(&mut self, step: InitStep<'a>) -> Result<(), DB::Error> {
+    async fn exec_atomic_step(&mut self, step: InitStep<'a>) -> Result<(), B::Error> {
         match step {
             InitStep::SingleCommand(cmd) => {
                 self.display_bus.write_cmds(&[cmd]).await
@@ -144,7 +144,7 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
     }
 
     /// Executes the initialization sequence.
-    pub async fn sequenced_init(&mut self) -> Result<(), DB::Error> {
+    pub async fn sequenced_init(&mut self) -> Result<(), B::Error> {
         while let Some(step) = self.steps.next() {
             match step {
                 // If the step is a Nested sequence, unroll it here (1 level deep)
@@ -164,7 +164,7 @@ impl<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>> Sequenced
 }
 
 /// Convenience function to run an initialization sequence.
-pub async fn sequenced_init<'a, D: DelayNs, DB: DisplayBus, I: Iterator<Item = InitStep<'a>>>(steps: I, delay: &'a mut D, display_bus: &'a mut DB) -> Result<(), DB::Error> {
+pub async fn sequenced_init<'a, D: DelayNs, B: DisplayBus, I: Iterator<Item = InitStep<'a>>>(steps: I, delay: &'a mut D, display_bus: &'a mut B) -> Result<(), B::Error> {
     SequencedInit::new(steps, delay, display_bus).sequenced_init().await
 }
 
@@ -238,16 +238,16 @@ impl LCDResetOption<NoResetPin> {
 
 
 /// Helper to handle LCD hardware reset.
-pub struct LCDReseter<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> {
+pub struct LCDReseter<'a, P: OutputPin, B: DisplayBus, D: DelayNs> {
     option: &'a mut LCDResetOption<P>,
-    bus: &'a mut DB,
+    bus: &'a mut B,
     delay: &'a mut D,
     gap_ms: u8,
 }
 
-impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
+impl<'a, P: OutputPin, B: DisplayBus, D: DelayNs> LCDReseter<'a, P, B, D> {
     /// Creates a new LCDReseter.
-    pub fn new(option: &'a mut LCDResetOption<P>, bus: &'a mut DB, delay: &'a mut D, gap_ms: u8) -> Self {
+    pub fn new(option: &'a mut LCDResetOption<P>, bus: &'a mut B, delay: &'a mut D, gap_ms: u8) -> Self {
         Self {
             option,
             bus,
@@ -257,7 +257,7 @@ impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
     }
 
     /// Sets the reset state.
-    pub fn set_reset(&mut self, reset: bool) -> Result<(), DB::Error> {
+    pub fn set_reset(&mut self, reset: bool) -> Result<(), B::Error> {
         match *self.option {
             LCDResetOption::PinHigh(ref mut pin) => {
                 if reset {
@@ -285,7 +285,7 @@ impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
     }
 
     /// Performs the reset sequence: assert -> wait -> release -> wait.
-    pub async fn reset(&mut self) -> Result<(), DB::Error> {
+    pub async fn reset(&mut self) -> Result<(), B::Error> {
         self.set_reset(false)?;
         self.delay.delay_ms(self.gap_ms as u32).await;
         self.set_reset(true)?;

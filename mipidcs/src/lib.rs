@@ -18,21 +18,21 @@ use crate::spec::DisplaySpec;
 /// Generic MIPI DCS display driver.
 ///
 /// This driver uses standard MIPI DCS commands to control the display.
-pub struct GenericMipidcs<DI, Spec, RST>
+pub struct GenericMipidcs<B, Spec, RST>
 where
-    DI: DisplayBus,
+    B: DisplayBus,
     Spec: DisplaySpec,
     RST: OutputPin,
 {
     reset_pin: LCDResetOption<RST>,
     /// The current Address Mode (MADCTL) setting.
     pub address_mode: AddressMode,
-    _phantom: PhantomData<(DI, Spec)>,
+    _phantom: PhantomData<(B, Spec)>,
 }
 
-impl<DI, Spec, RST> GenericMipidcs<DI, Spec, RST>
+impl<B, Spec, RST> GenericMipidcs<B, Spec, RST>
 where
-    DI: DisplayBus,
+    B: DisplayBus,
     Spec: DisplaySpec,
     RST: OutputPin,
 {
@@ -46,37 +46,37 @@ where
     }
 
     /// Software reset on the display controller (Command 0x01).
-    pub async fn soft_reset(&self, bus: &mut DI) -> Result<(), DI::Error> {
+    pub async fn soft_reset(&self, bus: &mut B) -> Result<(), B::Error> {
         bus.write_cmds(&[SOFT_RESET]).await
     }
 
     /// Enter Sleep Mode (Command 0x10).
-    pub async fn enter_sleep_mode(&self, bus: &mut DI) -> Result<(), DI::Error> {
+    pub async fn enter_sleep_mode(&self, bus: &mut B) -> Result<(), B::Error> {
         bus.write_cmds(&[ENTER_SLEEP_MODE]).await
     }
 
     /// Exit Sleep Mode (Command 0x11).
-    pub async fn exit_sleep_mode(&self, bus: &mut DI) -> Result<(), DI::Error> {
+    pub async fn exit_sleep_mode(&self, bus: &mut B) -> Result<(), B::Error> {
         bus.write_cmds(&[EXIT_SLEEP_MODE]).await
     }
 
     /// Turn the display panel OFF (Command 0x28).
-    pub async fn set_display_off(&self, bus: &mut DI) -> Result<(), DI::Error> {
+    pub async fn set_display_off(&self, bus: &mut B) -> Result<(), B::Error> {
         bus.write_cmds(&[SET_DISPLAY_OFF]).await
     }
 
     /// Turn the display panel ON (Command 0x29).
-    pub async fn set_display_on(&self, bus: &mut DI) -> Result<(), DI::Error> {
+    pub async fn set_display_on(&self, bus: &mut B) -> Result<(), B::Error> {
         bus.write_cmds(&[SET_DISPLAY_ON]).await
     }
 
     /// Set the column address window (Command 0x2A).
     pub async fn set_column_address(
         &self,
-        bus: &mut DI,
+        bus: &mut B,
         start: u16,
         end: u16,
-    ) -> Result<(), DI::Error> {
+    ) -> Result<(), B::Error> {
         let params = AddressRange::new(start + Spec::COL_OFFSET, end + Spec::COL_OFFSET);
         bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], &params.0)
             .await
@@ -85,23 +85,23 @@ where
     /// Set the page (row) address window (Command 0x2B).
     pub async fn set_page_address(
         &self,
-        bus: &mut DI,
+        bus: &mut B,
         start: u16,
         end: u16,
-    ) -> Result<(), DI::Error> {
+    ) -> Result<(), B::Error> {
         let params = AddressRange::new(start + Spec::ROW_OFFSET, end + Spec::ROW_OFFSET);
         bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], &params.0)
             .await
     }
 
     /// Set the Address Mode (Memory Data Access Control, aka. MADCTL - Command 0x36).
-    pub async fn set_address_mode(&self, bus: &mut DI, mode: AddressMode) -> Result<(), DI::Error> {
+    pub async fn set_address_mode(&self, bus: &mut B, mode: AddressMode) -> Result<(), B::Error> {
         bus.write_cmd_with_params(&[SET_ADDRESS_MODE], &[mode.bits()])
             .await
     }
 
     /// Set the Pixel Format (Command 0x3A).
-    pub async fn set_pixel_format(&self, bus: &mut DI, mode: PixelFormat) -> Result<(), DI::Error> {
+    pub async fn set_pixel_format(&self, bus: &mut B, mode: PixelFormat) -> Result<(), B::Error> {
         bus.write_cmd_with_params(&[SET_PIXEL_FORMAT], &[mode.0])
             .await
     }
@@ -109,7 +109,7 @@ where
     /// Set Inversion Mode (Command 0x20 / 0x21).
     ///
     /// `true` enters Invert Mode (0x21), `false` exits Invert Mode (0x20).
-    pub async fn set_invert_mode(&self, bus: &mut DI, inverted: bool) -> Result<(), DI::Error> {
+    pub async fn set_invert_mode(&self, bus: &mut B, inverted: bool) -> Result<(), B::Error> {
         match inverted {
             true => bus.write_cmds(&[ENTER_INVERT_MODE]).await,
             false => bus.write_cmds(&[EXIT_INVERT_MODE]).await,
@@ -129,13 +129,13 @@ where
     ];
 }
 
-impl<DI, Spec, RST> Panel<DI> for GenericMipidcs<DI, Spec, RST>
+impl<B, Spec, RST> Panel<B> for GenericMipidcs<B, Spec, RST>
 where
-    DI: DisplayBus,
+    B: DisplayBus,
     Spec: DisplaySpec,
     RST: OutputPin,
 {
-    async fn init<D: DelayNs>(&mut self, bus: &mut DI, mut delay: D) -> Result<(), DI::Error> {
+    async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
         let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
         reseter.reset().await?;
@@ -150,12 +150,12 @@ where
 
     async fn set_window(
         &mut self,
-        bus: &mut DI,
+        bus: &mut B,
         x0: u16,
         y0: u16,
         x1: u16,
         y1: u16,
-    ) -> Result<(), DI::Error> {
+    ) -> Result<(), B::Error> {
         let x_start = x0 + Spec::COL_OFFSET;
         let x_end = x1 + Spec::COL_OFFSET;
         let y_start = y0 + Spec::ROW_OFFSET;
@@ -167,7 +167,7 @@ where
 
     async fn write_pixels(
         &mut self,
-        bus: &mut DI,
+        bus: &mut B,
         x0: u16,
         y0: u16,
         x1: u16,
@@ -186,9 +186,9 @@ where
 
 async fn set_color_format(
         &mut self,
-        bus: &mut DI,
+        bus: &mut B,
         color_format: ColorFormat,
-    ) -> Result<(), DisplayError<DI::Error>> {
+    ) -> Result<(), DisplayError<B::Error>> {
         let bits = color_format.size_bits();
         
         // Use from_bit_count as requested
@@ -205,9 +205,9 @@ async fn set_color_format(
 
     async fn set_orientation(
         &mut self,
-        bus: &mut DI,
+        bus: &mut B,
         orientation: Orientation,
-    ) -> Result<(), DisplayError<DI::Error>> {
+    ) -> Result<(), DisplayError<B::Error>> {
         let mut mode = self.address_mode;
         
         // Clean up ONLY orientation related bits, preserving others (like BGR, Flip, Latch Order)

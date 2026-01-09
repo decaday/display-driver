@@ -119,13 +119,13 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
 }
 
 /// Adapter for QSPI buses that require command formatting for flash-like interfaces.
-pub struct QspiFlashBus<DB: DisplayBus> {
-    inner: DB,
+pub struct QspiFlashBus<B: DisplayBus> {
+    inner: B,
 }
 
-impl<DB: DisplayBus> QspiFlashBus<DB> {
+impl<B: DisplayBus> QspiFlashBus<B> {
     /// Creates a new QspiFlashBus wrapper.
-    pub fn new(inner: DB) -> Self {
+    pub fn new(inner: B) -> Self {
         Self { inner }
     }
 
@@ -145,8 +145,8 @@ impl<DB: DisplayBus> QspiFlashBus<DB> {
     }
 }
 
-impl<DB: DisplayBus> DisplayBus for QspiFlashBus<DB> {
-    type Error = DB::Error;
+impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
+    type Error = B::Error;
 
     // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
     //     let mut config = config;
