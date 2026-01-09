@@ -7,5 +7,6 @@ license = "Apache-2.0"
 
 [dependencies]
 display-driver = { path = "../../display-driver" }
+mipidcs = { path = "../../mipidcs" }
 embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"

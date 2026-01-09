@@ -64,7 +64,7 @@ where
         bus.write_pixels(&[WRITE_MEMORY_START], &[], buffer, metadata).await
     }
 
-async fn set_color_format(
+    async fn set_color_format(
         &mut self,
         bus: &mut B,
         color_format: ColorFormat,

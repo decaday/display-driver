@@ -2,7 +2,7 @@
 name = "mipidcs"
 version = "0.1.0"
 edition = "2021"
-description = "MIPI DCS support for display drivers"
+description = "MIPI DCS for display-drivers"
 license = "Apache-2.0"
 
 [dependencies]
