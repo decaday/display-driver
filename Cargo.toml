@@ -2,6 +2,6 @@
 resolver = "2"
 members = [
     "display-driver",
+    "mipidcs",
     "panels/co5300",
-    "panels/mipidcs",
 ]

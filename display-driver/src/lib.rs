@@ -5,7 +5,8 @@ pub mod display_bus;
 #[cfg(feature = "display-interface")]
 pub mod di;
 
-use display_bus::{DisplayBus};
+pub use display_bus::DisplayBus;
+pub use panel::Panel;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 /// Color format used by the display.
