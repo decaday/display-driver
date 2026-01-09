@@ -4,7 +4,7 @@ use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
 use display_driver::display_bus::{DisplayBus, Metadata};
-use display_driver::panel::{InitStep, LCDResetOption, LCDReseter, Orientation, Panel, sequenced_init};
+use display_driver::panel::{InitStep, LCDResetOption, LCDReseter, Orientation, Panel, addres_window_param_u8, sequenced_init};
 use display_driver::{ColorFormat, DisplayError};
 
 pub mod consts;
@@ -39,21 +39,8 @@ where
             _bus: core::marker::PhantomData,
         }
     }
-}
 
-impl<Spec, RST, B> Panel<B> for Co5300<Spec, RST, B>
-where
-    Spec: DisplaySpec,
-    RST: OutputPin,
-    B: DisplayBus,
-{
-    async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
-        // 1. Hardware Reset
-        let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
-        reseter.reset().await?;
-
-        // 3. Define Initialization Sequence
-        let steps = [
+    const INIT_STEPS: [InitStep<'_>; 18] = [
             // Unlock Sequence
             InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[Spec::INIT_PAGE_PARAM])),
             InitStep::CommandWithParams((PASSWD1, &[0x5A])),
@@ -69,17 +56,29 @@ where
             InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
             InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
             InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
+            InitStep::CommandWithParams((CASET, &addres_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET))),
+            InitStep::CommandWithParams((RASET, &addres_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET))),
             // Power On
             InitStep::SingleCommand(SLEEP_OUT),
             InitStep::DelayMs(120),
             InitStep::SingleCommand(DISPLAY_ON),
             InitStep::DelayMs(70),
         ];
+}
 
-        // 4. Execute Sequence
-        sequenced_init(steps.into_iter(), &mut delay, bus).await?;
+impl<Spec, RST, B> Panel<B> for Co5300<Spec, RST, B>
+where
+    Spec: DisplaySpec,
+    RST: OutputPin,
+    B: DisplayBus,
+{
+    async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
+        // Hardware Reset
+        let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
+        reseter.reset().await?;
 
-        self.set_full_window(bus).await
+        // Execute Sequence
+        sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
     }
 
     fn size(&self) -> (u16, u16) {

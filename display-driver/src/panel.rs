@@ -32,7 +32,7 @@ pub trait Panel<B: DisplayBus> {
     ) -> Result<(), B::Error>;
 
     /// Sets the window to the full screen size.
-    async fn set_full_window(&mut self, bus: &mut B,) -> Result<(), B::Error> {
+    async fn set_full_window(&mut self, bus: &mut B) -> Result<(), B::Error> {
         let (x1, y1) = self.size();
         self.set_window(bus, 0, 0, x1 - 1, y1 - 1).await
     }
@@ -265,4 +265,10 @@ impl<'a, P: OutputPin, DB: DisplayBus, D: DelayNs> LCDReseter<'a, P, DB, D> {
 
         Ok(())
     }
+}
+
+pub const fn addres_window_param_u8(start: u16, end: u16, offset: u16) -> [u8; 4] {
+        let s = (start + offset).to_be_bytes();
+        let e = (end + offset).to_be_bytes();
+        [s[0], s[1], e[0], e[1]]
 }
