@@ -45,7 +45,7 @@ pub trait Panel<B: DisplayBus> {
         x1: u16,
         y1: u16,
         buffer: &[u8],
-    ) -> Result<(), B::Error>;
+    ) -> Result<(), DisplayError<B::Error>>;
 
     /// Verifies the panel ID (if supported).
     async fn verify_id(&mut self, 

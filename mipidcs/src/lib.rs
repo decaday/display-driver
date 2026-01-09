@@ -173,20 +173,15 @@ where
         x1: u16,
         y1: u16,
         buffer: &[u8],
-    ) -> Result<(), DI::Error> {
-        self.set_window(bus, x0, y0, x1, y1).await?;
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.set_window(bus, x0, y0, x1, y1).await.map_err(DisplayError::BusError)?;
 
         let metadata = Metadata {
             width: x1 - x0 + 1,
             height: y1 - y0 + 1,
         };
 
-        bus.write_pixels(&[WRITE_MEMORY_START], &[], buffer, metadata)
-            .await
-            .map_err(|e| match e {
-                DisplayError::BusError(be) => be,
-                _ => panic!("Unsupported display bus operation during write_pixels"),
-            })
+        bus.write_pixels(&[WRITE_MEMORY_START], &[], buffer, metadata).await
     }
 
 async fn set_color_format(
