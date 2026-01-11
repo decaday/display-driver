@@ -6,7 +6,7 @@ pub mod display_bus;
 
 use core::marker::PhantomData;
 use display_driver::display_bus::{DisplayBus};
-use display_driver::panel::{InitStep, LCDResetOption, addres_window_param_u8};
+use display_driver::panel::{InitStep, LCDResetOption, address_window_param_u8};
 use embedded_hal::digital::OutputPin;
 
 use crate::consts::*;
@@ -118,8 +118,8 @@ where
         InitStep::DelayMs(120),
         InitStep::SingleCommand(EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
-        InitStep::CommandWithParams((SET_COLUMN_ADDRESS, &addres_window_param_u8(0, S::WIDTH, S::COL_OFFSET))),
-        InitStep::CommandWithParams((SET_PAGE_ADDRESS, &addres_window_param_u8(0, S::HEIGHT, S::ROW_OFFSET))),
+        InitStep::CommandWithParams((SET_COLUMN_ADDRESS, &address_window_param_u8(0, S::WIDTH, S::COL_OFFSET))),
+        InitStep::CommandWithParams((SET_PAGE_ADDRESS, &address_window_param_u8(0, S::HEIGHT, S::ROW_OFFSET))),
         // Power On
         InitStep::SingleCommand(SET_DISPLAY_ON),
         InitStep::DelayMs(20),

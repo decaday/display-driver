@@ -1,4 +1,4 @@
-# display-bus
+# display-driver
 
 An Async display driver framework designed to provide a unified interface for various LCD panels.
 
@@ -6,8 +6,10 @@ This framework provides buffer-based (like framebuffer) operations for now, and 
 
 ## Display Panel Implementations
 
-- [co5300](./panels/co5300)
-- [mipidsi](./panels/mipics): Standard MIPI DCS (TODO).
+- [mipidcs](./panels/mipidcs): Common impl for standard MIPI DCS.
+
+- [co5300](./panels/co5300): CO5300, common used on AMOLED.
+
 
 ## License
 

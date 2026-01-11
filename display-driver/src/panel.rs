@@ -297,7 +297,7 @@ impl<'a, P: OutputPin, B: DisplayBus, D: DelayNs> LCDReseter<'a, P, B, D> {
     }
 }
 
-pub const fn addres_window_param_u8(start: u16, end: u16, offset: u16) -> [u8; 4] {
+pub const fn address_window_param_u8(start: u16, end: u16, offset: u16) -> [u8; 4] {
         let s = (start + offset).to_be_bytes();
         let e = (end + offset).to_be_bytes();
         [s[0], s[1], e[0], e[1]]

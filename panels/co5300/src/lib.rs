@@ -5,7 +5,7 @@ use embedded_hal_async::delay::DelayNs;
 
 use display_driver::display_bus::{DisplayBus};
 use display_driver::panel::{
-    addres_window_param_u8, sequenced_init, InitStep, LCDResetOption, LCDReseter, Orientation, Panel,
+    address_window_param_u8, sequenced_init, InitStep, LCDResetOption, LCDReseter, Orientation, Panel,
 };
 use display_driver::{ColorFormat, DisplayError};
 
@@ -63,8 +63,8 @@ where
             InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
         InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
         InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
-            InitStep::CommandWithParams((CASET, &addres_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET))),
-            InitStep::CommandWithParams((RASET, &addres_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET))),
+            InitStep::CommandWithParams((CASET, &address_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET))),
+            InitStep::CommandWithParams((RASET, &address_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET))),
         // Power On
             InitStep::SingleCommand(SLEEP_OUT),
         InitStep::DelayMs(120),
