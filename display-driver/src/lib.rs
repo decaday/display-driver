@@ -51,6 +51,8 @@ pub enum DisplayError<E> {
     Unsupported,
     /// Parameter is out of valid range.
     OutOfRange,
+    /// 
+    InvalidArgs,
 }
 
 // pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {

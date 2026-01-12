@@ -33,8 +33,8 @@ pub trait Panel<B: DisplayBus> {
 
     /// Sets the window to the full screen size.
     async fn set_full_window(&mut self, bus: &mut B) -> Result<(), DisplayError<B::Error>> {
-        let (x1, y1) = self.size();
-        self.set_window(bus, 0, 0, x1 - 1, y1 - 1).await
+        let (w, h) = self.size();
+        self.set_window(bus, 0, 0, w - 1, h - 1).await
     }
 
     /// Writes pixels to the specified area.
@@ -54,6 +54,21 @@ pub trait Panel<B: DisplayBus> {
         h: u16,
         buffer: &[u8],
     ) -> Result<(), DisplayError<B::Error>>;
+
+    async fn fill_solid(&mut self, 
+        bus: &mut B,
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
+        color: &[u8],
+    ) -> Result<(), DisplayError<B::Error>>;
+
+    /// Fills the entire screen with a solid color.
+    async fn fill_screen(&mut self, bus: &mut B, color: &[u8]) -> Result<(), DisplayError<B::Error>> {
+        let (w, h) = self.size();
+        self.fill_solid(bus, 0, 0, w - 1, h - 1, color).await
+    }
 
     /// Verifies the panel ID (if supported).
     async fn verify_id(&mut self, 

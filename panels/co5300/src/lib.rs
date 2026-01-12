@@ -116,6 +116,19 @@ where
             .write_pixels(bus, x, y, w, h, data)
             .await
     }
+    
+    async fn fill_solid(&mut self, 
+        bus: &mut B,
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
+        color: &[u8],
+    ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
+        self.inner
+            .fill_solid(bus, x, y, w, h, color)
+            .await
+    }
 
     async fn set_color_format(
         &mut self,

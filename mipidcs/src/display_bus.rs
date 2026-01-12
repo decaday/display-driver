@@ -68,6 +68,27 @@ where
         bus.write_pixels(&[WRITE_MEMORY_START], data, metadata).await
     }
 
+        async fn fill_solid(
+        &mut self,
+        bus: &mut B,
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
+        color: &[u8],
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.set_window(bus, x, y, x + w - 1, y + h - 1).await?;
+
+        let metadata = Metadata {
+            x,
+            y,
+            w,
+            h,
+        };
+
+        bus.fill_solid(&[WRITE_MEMORY_START], color, metadata).await
+    }
+
     async fn set_color_format(
         &mut self,
         bus: &mut B,
