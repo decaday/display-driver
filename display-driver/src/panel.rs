@@ -29,21 +29,29 @@ pub trait Panel<B: DisplayBus> {
         y0: u16,
         x1: u16,
         y1: u16,
-    ) -> Result<(), B::Error>;
+    ) -> Result<(), DisplayError<B::Error>>;
 
     /// Sets the window to the full screen size.
-    async fn set_full_window(&mut self, bus: &mut B) -> Result<(), B::Error> {
+    async fn set_full_window(&mut self, bus: &mut B) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = self.size();
         self.set_window(bus, 0, 0, x1 - 1, y1 - 1).await
     }
 
-    /// Writes pixels to the specified window.
+    /// Writes pixels to the specified area.
+    /// 
+    /// # Arguments
+    /// * `bus` - The display bus interface.
+    /// * `x` - Start X coordinate.
+    /// * `y` - Start Y coordinate.
+    /// * `w` - Width of the area.
+    /// * `h` - Height of the area.
+    /// * `buffer` - Pixel data.
     async fn write_pixels(&mut self, 
         bus: &mut B,
-        x0: u16,
-        y0: u16,
-        x1: u16,
-        y1: u16,
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
         buffer: &[u8],
     ) -> Result<(), DisplayError<B::Error>>;
 

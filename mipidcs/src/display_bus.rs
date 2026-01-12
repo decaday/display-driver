@@ -35,33 +35,37 @@ where
         y0: u16,
         x1: u16,
         y1: u16,
-    ) -> Result<(), B::Error> {
+    ) -> Result<(), DisplayError<B::Error>> {
         let x_start = x0 + S::COL_OFFSET;
         let x_end = x1 + S::COL_OFFSET;
         let y_start = y0 + S::ROW_OFFSET;
         let y_end = y1 + S::ROW_OFFSET;
 
-        self.set_column_address(bus, x_start, x_end).await?;
-        self.set_page_address(bus, y_start, y_end).await
+        self.set_column_address(bus, x_start, x_end).await.map_err(DisplayError::BusError)?;
+        self.set_page_address(bus, y_start, y_end).await.map_err(DisplayError::BusError)
     }
 
     async fn write_pixels(
         &mut self,
         bus: &mut B,
-        x0: u16,
-        y0: u16,
-        x1: u16,
-        y1: u16,
-        buffer: &[u8],
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
+        data: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
-        self.set_window(bus, x0, y0, x1, y1).await.map_err(DisplayError::BusError)?;
+        let x1 = x + w - 1;
+        let y1 = y + h - 1;
+        self.set_window(bus, x, y, x1, y1).await?;
 
         let metadata = Metadata {
-            width: x1 - x0 + 1,
-            height: y1 - y0 + 1,
+            x,
+            y,
+            w,
+            h,
         };
 
-        bus.write_pixels(&[WRITE_MEMORY_START], &[], buffer, metadata).await
+        bus.write_pixels(&[WRITE_MEMORY_START], data, metadata).await
     }
 
     async fn set_color_format(
@@ -89,9 +93,6 @@ where
         orientation: Orientation,
     ) -> Result<(), DisplayError<B::Error>> {
         let mut mode = self.address_mode;
-        
-        // Clean up ONLY orientation related bits, preserving others (like BGR, Flip, Latch Order)
-        mode.remove(AddressMode::MX | AddressMode::MY | AddressMode::MV);
 
         // Calculate new orientation bits
         let (mx, my, mv) = match orientation {

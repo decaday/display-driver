@@ -99,21 +99,21 @@ where
         y0: u16,
         x1: u16,
         y1: u16,
-    ) -> Result<(), B::Error> {
+    ) -> Result<(), DisplayError<B::Error>> {
         self.inner.set_window(bus, x0, y0, x1, y1).await
     }
 
     async fn write_pixels(
         &mut self,
         bus: &mut B,
-        x0: u16,
-        y0: u16,
-        x1: u16,
-        y1: u16,
-        buffer: &[u8],
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
+        data: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
         self.inner
-            .write_pixels(bus, x0, y0, x1, y1, buffer)
+            .write_pixels(bus, x, y, w, h, data)
             .await
     }
 

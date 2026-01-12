@@ -52,10 +52,14 @@ pub trait SimpleDisplayBus {
 
 /// Metadata about the pixel data transfer.
 pub struct Metadata {
+    /// Start X coordinate.
+    pub x: u16,
+    /// Start Y coordinate.
+    pub y: u16,
     /// Width of the area being written.
-    pub width: u16,
+    pub w: u16,
     /// Height of the area being written.
-    pub height: u16,
+    pub h: u16,
 }
 
 #[allow(async_fn_in_trait)]
@@ -73,7 +77,7 @@ pub trait DisplayBus {
     async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error>;
 
     /// Writes pixel data to the display.
-    async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
+    async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
 
     /// Reads data from the display (optional).
     async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
@@ -103,10 +107,9 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
         T::write_cmd_with_params(self, cmd, params).await
     }
 
-    async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], _metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+    async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], _metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
         self.write_cmds(cmd).await.map_err(DisplayError::BusError)?;
-        self.write_data(params).await.map_err(DisplayError::BusError)?;
-        self.write_data(buffer).await.map_err(DisplayError::BusError)
+        self.write_data(data).await.map_err(DisplayError::BusError)
     }
 
     async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
@@ -164,9 +167,9 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
         self.inner.write_cmd_with_params(&cmd, params).await
     }
 
-    async fn write_pixels(&mut self, cmd: &[u8], params: &[u8], buffer: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+    async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
         let cmd = self.to_cmd_and_addr(cmd, true);
-        self.inner.write_pixels(&cmd, params, buffer, metadata).await
+        self.inner.write_pixels(&cmd, data, metadata).await
     }
 
     async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
