@@ -1,6 +1,6 @@
 use display_driver::display_bus::{DisplayBus, Metadata};
 use display_driver::panel::{LCDReseter, Orientation, Panel, sequenced_init};
-use display_driver::{ColorFormat, DisplayError};
+use display_driver::{ColorFormat, DisplayError, SingleColor};
 use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
@@ -75,7 +75,7 @@ where
         y: u16,
         w: u16,
         h: u16,
-        color: &[u8],
+        color: SingleColor,
     ) -> Result<(), DisplayError<B::Error>> {
         self.set_window(bus, x, y, x + w - 1, y + h - 1).await?;
 

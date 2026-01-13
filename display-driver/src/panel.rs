@@ -1,7 +1,7 @@
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 
-use crate::{DisplayError, ColorFormat, DisplayBus};
+use crate::{ColorFormat, DisplayBus, DisplayError, SingleColor};
 
 /// Display orientation.
 pub enum Orientation {
@@ -61,11 +61,11 @@ pub trait Panel<B: DisplayBus> {
         y: u16,
         w: u16,
         h: u16,
-        color: &[u8],
+        color: SingleColor,
     ) -> Result<(), DisplayError<B::Error>>;
 
     /// Fills the entire screen with a solid color.
-    async fn fill_screen(&mut self, bus: &mut B, color: &[u8]) -> Result<(), DisplayError<B::Error>> {
+    async fn fill_screen(&mut self, bus: &mut B, color: SingleColor) -> Result<(), DisplayError<B::Error>> {
         let (w, h) = self.size();
         self.fill_solid(bus, 0, 0, w - 1, h - 1, color).await
     }

@@ -1,4 +1,4 @@
-use crate::DisplayError;
+use crate::{DisplayError, SingleColor};
 
 // /// Configuration for the display bus.
 // pub struct Config {
@@ -85,7 +85,7 @@ pub trait DisplayBus {
     /// This operation can often be hardware accelerated (e.g., 2D DMA with non-incrementing source).
     /// If using `SimpleDisplayBus`, note that the default implementation uses a 16-byte stack buffer.
     /// If larger batches are desired, consider wrapping with `BatchFillBus`.
-    async fn fill_solid(&mut self, cmd: &[u8], color: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
+    async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
 
     /// Reads data from the display (optional).
     async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
@@ -120,10 +120,10 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
         self.write_data(data).await.map_err(DisplayError::BusError)
     }
 
-    async fn fill_solid(&mut self, cmd: &[u8], color: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+    async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
         self.write_cmds(cmd).await.map_err(DisplayError::BusError)?;
 
-        let pixel_size = color.len();
+        let pixel_size = color.format.size_bytes() as usize;
         let total_pixels = metadata.w as usize * metadata.h as usize;
         let mut remaining_pixels = total_pixels;
 
@@ -133,9 +133,12 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
         // Calculate how many full pixels fit in the buffer
         let pixels_per_chunk = buffer.len() / pixel_size;
         
+        // Extract the raw bytes for the color based on its size
+        let color_bytes = &color.raw[..pixel_size];
+
         // Pre-fill the buffer with the color pattern
         for i in 0..pixels_per_chunk {
-            buffer[i * pixel_size..(i + 1) * pixel_size].copy_from_slice(color);
+            buffer[i * pixel_size..(i + 1) * pixel_size].copy_from_slice(color_bytes);
         }
 
         while remaining_pixels > 0 {
@@ -208,7 +211,7 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
         self.inner.write_pixels(&cmd, data, metadata).await
     }
 
-    async fn fill_solid(&mut self, cmd: &[u8], color: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+    async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
         let cmd = self.to_cmd_and_addr(cmd, true);
         self.inner.fill_solid(&cmd, color, metadata).await
     }
@@ -258,8 +261,8 @@ impl<B: DisplayBus, const N: usize> DisplayBus for BatchFillBus<B, N> {
         self.inner.write_pixels(cmd, data, metadata).await
     }
 
-    async fn fill_solid(&mut self, cmd: &[u8], color: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
-        let pixel_size = color.len();
+    async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+        let pixel_size = color.format.size_bytes() as usize;
         if pixel_size == 0 {
             return Ok(());
         }
@@ -272,8 +275,10 @@ impl<B: DisplayBus, const N: usize> DisplayBus for BatchFillBus<B, N> {
 
         // Prepare the fill buffer once.
         let mut buffer = [0u8; N];
+        let color_bytes = &color.raw[..pixel_size];
+        
         for i in 0..max_pixels_per_batch {
-            buffer[i * pixel_size..(i + 1) * pixel_size].copy_from_slice(color);
+            buffer[i * pixel_size..(i + 1) * pixel_size].copy_from_slice(color_bytes);
         }
 
         if self.strict_metadata {

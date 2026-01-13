@@ -2,45 +2,15 @@
 
 pub mod panel;
 pub mod display_bus;
+pub mod color;
 #[cfg(feature = "display-interface")]
 pub mod di;
 
 pub use display_bus::DisplayBus;
 pub use panel::Panel;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-/// Color format used by the display.
-pub enum ColorFormat {
-    /// 1-bit per pixel (Monochrome).
-    Binary,
-    /// 2-bit grayscale.
-    Gray2,
-    /// 4-bit grayscale.
-    Gray4,
-    /// 8-bit grayscale.
-    Gray8,
-    /// 16-bit RGB565.
-    RGB565,
-    /// 18-bit RGB666.
-    RGB666,
-    /// 24-bit RGB888.
-    RGB888,
-}
+pub use color::{ColorFormat, ColorType, SingleColor};
 
-impl ColorFormat {
-    /// Returns the number of bits per pixel for this format.
-    pub fn size_bits(self) -> u8 {
-        match self {
-            ColorFormat::Binary => 1,
-            ColorFormat::Gray2 => 2,
-            ColorFormat::Gray4 => 4,
-            ColorFormat::Gray8 => 8,
-            ColorFormat::RGB565 => 16,
-            ColorFormat::RGB666 => 18,
-            ColorFormat::RGB888 => 24,
-        }
-    }
-}
 
 #[derive(Debug)]
 /// Common errors that can occur during display operations.

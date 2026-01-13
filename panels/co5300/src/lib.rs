@@ -7,7 +7,7 @@ use display_driver::display_bus::{DisplayBus};
 use display_driver::panel::{
     address_window_param_u8, sequenced_init, InitStep, LCDResetOption, LCDReseter, Orientation, Panel,
 };
-use display_driver::{ColorFormat, DisplayError};
+use display_driver::{ColorFormat, DisplayError, SingleColor};
 
 // Use GenericMipidcs to handle standard DCS operations
 use mipidcs::{dcs_types::AddressMode, GenericMipidcs};
@@ -123,7 +123,7 @@ where
         y: u16,
         w: u16,
         h: u16,
-        color: &[u8],
+        color: SingleColor,
     ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
         self.inner
             .fill_solid(bus, x, y, w, h, color)
