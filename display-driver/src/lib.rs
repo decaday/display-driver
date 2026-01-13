@@ -1,12 +1,10 @@
 #![no_std]
 
 pub mod panel;
-pub mod display_bus;
+pub mod bus;
 pub mod color;
-#[cfg(feature = "display-interface")]
-pub mod di;
 
-pub use display_bus::DisplayBus;
+pub use bus::DisplayBus;
 pub use panel::Panel;
 
 pub use color::{ColorFormat, ColorType, SingleColor};

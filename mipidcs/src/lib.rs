@@ -5,8 +5,8 @@ pub mod dcs_types;
 pub mod display_bus;
 
 use core::marker::PhantomData;
-use display_driver::display_bus::{DisplayBus};
-use display_driver::panel::{InitStep, LCDResetOption, address_window_param_u8};
+use display_driver::bus::DisplayBus;
+use display_driver::panel::{initseq::InitStep, reset::LCDResetOption, address_window_param_u8};
 use embedded_hal::digital::OutputPin;
 
 use crate::consts::*;

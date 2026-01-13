@@ -1,7 +1,7 @@
 //! Implementation of `SimpleDisplayBus` for `display-interface` traits.
 
 use display_interface::{AsyncWriteOnlyDataCommand, DisplayError, DataFormat};
-use crate::display_bus::SimpleDisplayBus;
+use super::SimpleDisplayBus;
 
 impl<DI: AsyncWriteOnlyDataCommand> SimpleDisplayBus for DI {
     type Error = DisplayError;

@@ -3,10 +3,11 @@
 use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
-use display_driver::display_bus::{DisplayBus};
-use display_driver::panel::{
-    address_window_param_u8, sequenced_init, InitStep, LCDResetOption, LCDReseter, Orientation, Panel,
-};
+use display_driver::bus::DisplayBus;
+use display_driver::panel::{address_window_param_u8, Orientation, Panel};
+use display_driver::panel::reset::{LCDResetOption, LCDReseter};
+use display_driver::panel::initseq::{sequenced_init, InitStep};
+
 use display_driver::{ColorFormat, DisplayError, SingleColor};
 
 // Use GenericMipidcs to handle standard DCS operations
