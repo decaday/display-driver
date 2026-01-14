@@ -5,11 +5,10 @@ pub mod bus;
 pub mod color;
 pub mod area;
 
-pub use bus::DisplayBus;
 pub use panel::Panel;
-
 pub use color::{ColorFormat, ColorType, SingleColor};
 pub use crate::area::Area;
+pub use crate::bus::{BusAutoFill, FrameControl, Metadata, DisplayBus, SimpleDisplayBus};
 
 #[derive(Debug)]
 /// Common errors that can occur during display operations.
@@ -24,58 +23,58 @@ pub enum DisplayError<E> {
     InvalidArgs,
 }
 
-#[derive(Debug, Clone, Copy, Default)]
-pub struct FrameControl {
-    pub first: bool,
-    pub last: bool,
+pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {
+    pub bus: B,
+    pub panel: P,
 }
 
-impl FrameControl {
-    pub fn new_single() -> Self {
-        Self {
-            first: true,
-            last: true,
-        }
+impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
+    /// Init your bus and panel before create a DisplayDriver
+    pub fn new(bus: B, panel: P) -> Self {
+        Self { bus, panel }
     }
 
-    pub fn new_first() -> Self {
-        Self {
-            first: true,
-            last: false,
-        }
+    /// Writes pixels to the specified area.
+    /// 
+    /// # Arguments
+    /// * `bus` - The display bus interface.
+    /// * `buffer` - Pixel data.
+    pub async fn write_pixels(&mut self,
+        area: Area,
+        frame_control: FrameControl,
+        buffer: &[u8],
+    ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
+        self.panel.set_window(&mut self.bus, area.x, area.y, area.x + area.w - 1, area.y + area.h - 1).await?;
+        let cmd = &self.panel.cmd_write_pixels()[0..P::CMD_LEN];
+        let metadata = Metadata {area: Some(area), frame_control};
+        self.bus.write_pixels(cmd, buffer, metadata).await
     }
 
-    pub fn new_last() -> Self {
-        Self {
-            first: false,
-            last: true,
-        }
+    pub async fn write_frame(&mut self, 
+        buffer: &[u8],
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.panel.set_full_window(&mut self.bus).await?;
+        let (w, h) = self.panel.size();
+        self.write_pixels(Area::new_at_zero(w, h), FrameControl::new_single(), buffer).await
     }
 }
 
-// pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {
-//     pub bus: B,
-//     pub panel: P,
-// }
+impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
+    pub async fn fill_solid_via_bus(&mut self, 
+        area: Area,
+        frame_control: FrameControl,
+        color: SingleColor,
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.panel.set_window(&mut self.bus, area.x, area.y, area.x + area.w - 1, area.y + area.h - 1).await?;
+        let cmd = &self.panel.cmd_write_pixels()[0..P::CMD_LEN];
+        let metadata = Metadata {area: Some(area), frame_control};
+        self.bus.fill_solid(cmd, color, metadata).await
+    }
 
-// impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
-//     pub fn new(bus: B, panel: P) -> Self {
-//         Self { bus, panel }
-//     }
-
-//     pub async fn write_pixels(&mut self, 
-//         x0: u16,
-//         y0: u16,
-//         x1: u16,
-//         y1: u16,
-//         pixels: &[u8]
-//     ) -> Result<(), B::Error> {
-//         self.panel.write_pixels(&mut self.bus, x0, y0, x1, y1, pixels).await
-//     }
-
-//     pub async fn set_orientation(&mut self, 
-//         orientation: Orientation,
-//     ) -> Result<(), DisplayError<B::Error>> {
-//         self.panel.set_orientation(&mut self.bus, orientation).await
-//     }
-// }
+    /// Fills the entire screen with a solid color.
+    pub async fn fill_screen_via_bus(&mut self, color: SingleColor) -> Result<(), DisplayError<B::Error>> {
+        let (w, h) = self.panel.size();
+        
+        self.fill_solid_via_bus(Area::new_at_zero(w, h), FrameControl::new_single(), color).await
+    }
+}

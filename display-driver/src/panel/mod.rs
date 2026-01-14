@@ -1,11 +1,12 @@
 use embedded_hal_async::delay::DelayNs;
 
-use crate::{Area, ColorFormat, DisplayBus, DisplayError, FrameControl, SingleColor};
+use crate::{ColorFormat, DisplayBus, DisplayError, bus::BusRead};
 
 pub mod initseq;
 pub mod reset;
 
 /// Display orientation.
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Orientation {
     Deg0,
     Deg90,
@@ -16,13 +17,19 @@ pub enum Orientation {
 #[allow(async_fn_in_trait)]
 /// Trait for display panels.
 pub trait Panel<B: DisplayBus> {
-    /// Initializes the panel.
-    async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;
+    const CMD_LEN: usize;
 
     /// Returns the panel resolution (width, height).
     fn size(&self) -> (u16, u16);
 
     // fn offset(&self) -> (u16, u16);
+
+    /// Note: We can't use [u8; Self::CMD_LEN] in stable
+    /// use &cmd_write_pixels()[0..P::CMD_LEN] instead
+    fn cmd_write_pixels(&mut self) -> [u8; 4];
+
+    /// Initializes the panel.
+    async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;
 
     /// Sets the active window for pixel writing.
     async fn set_window(&mut self, 
@@ -39,44 +46,12 @@ pub trait Panel<B: DisplayBus> {
         self.set_window(bus, 0, 0, w - 1, h - 1).await
     }
 
-    /// Writes pixels to the specified area.
-    /// 
-    /// # Arguments
-    /// * `bus` - The display bus interface.
-    /// * `buffer` - Pixel data.
-    async fn write_pixels(&mut self, 
+    /// Check the panel ID (if supported).
+    async fn check_id(&mut self, 
         bus: &mut B,
-        area: Area,
-        frame_control: FrameControl,
-        buffer: &[u8],
-    ) -> Result<(), DisplayError<B::Error>>;
-
-    async fn write_frame(&mut self, 
-        bus: &mut B,
-        buffer: &[u8],
-    ) -> Result<(), DisplayError<B::Error>> {
-        let (w, h) = self.size();
-        self.write_pixels(bus, Area::new_at_zero(w, h), FrameControl::new_single(), buffer).await
-    }
-
-    async fn fill_solid(&mut self, 
-        bus: &mut B,
-        area: Area,
-        frame_control: FrameControl,
-        color: SingleColor,
-    ) -> Result<(), DisplayError<B::Error>>;
-
-    /// Fills the entire screen with a solid color.
-    async fn fill_screen(&mut self, bus: &mut B, color: SingleColor) -> Result<(), DisplayError<B::Error>> {
-        let (w, h) = self.size();
-        
-        self.fill_solid(bus, Area::new_at_zero(w, h), FrameControl::new_single(), color).await
-    }
-
-    /// Verifies the panel ID (if supported).
-    async fn verify_id(&mut self, 
-        bus: &mut B,
-    ) -> Result<bool, DisplayError<B::Error>> {
+    ) -> Result<bool, DisplayError<B::Error>> where 
+        B: BusRead
+    {
         let _ = bus;
         Err(DisplayError::Unsupported)
     }

@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 /// Color format used by the display.
 pub enum ColorFormat {
     /// 1-bit per pixel (Monochrome).
@@ -44,7 +44,7 @@ impl ColorFormat {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ColorType {
     Gray(u8),
     Rgb(u8, u8, u8),

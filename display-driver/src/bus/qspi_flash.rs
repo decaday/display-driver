@@ -1,4 +1,4 @@
-use super::{DisplayBus, Metadata, SingleColor, DisplayError};
+use super::{DisplayBus, Metadata, DisplayError};
 
 /// Adapter for QSPI buses that require command formatting for flash-like interfaces.
 pub struct QspiFlashBus<B: DisplayBus> {
@@ -49,16 +49,6 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
     async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
         let cmd = self.to_cmd_and_addr(cmd, true);
         self.inner.write_pixels(&cmd, data, metadata).await
-    }
-
-    async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
-        let cmd = self.to_cmd_and_addr(cmd, true);
-        self.inner.fill_solid(&cmd, color, metadata).await
-    }
-
-    async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
-        let cmd = self.to_cmd_and_addr(cmd, false);
-        self.inner.read_data(&cmd, params, buffer).await
     }
 
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {

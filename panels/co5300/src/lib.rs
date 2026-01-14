@@ -8,7 +8,7 @@ use display_driver::panel::{address_window_param_u8, Orientation, Panel};
 use display_driver::panel::reset::{LCDResetOption, LCDReseter};
 use display_driver::panel::initseq::{sequenced_init, InitStep};
 
-use display_driver::{Area, ColorFormat, DisplayError, FrameControl, SingleColor};
+use display_driver::{ColorFormat, DisplayError};
 
 // Use GenericMipidcs to handle standard DCS operations
 use mipidcs::{dcs_types::AddressMode, GenericMipidcs};
@@ -60,16 +60,16 @@ where
         // Configuration
         InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[0x00])),
         InitStep::CommandWithParams((SPI_MODE, &[0x80])),
-            InitStep::CommandWithParams((COLOR_MODE, &[0x55])), // Default to RGB565
-            InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
+        InitStep::CommandWithParams((COLOR_MODE, &[0x55])), // Default to RGB565
+        InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
         InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
         InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
-            InitStep::CommandWithParams((CASET, &address_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET))),
-            InitStep::CommandWithParams((RASET, &address_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET))),
+        InitStep::CommandWithParams((CASET, &address_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET))),
+        InitStep::CommandWithParams((RASET, &address_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET))),
         // Power On
-            InitStep::SingleCommand(SLEEP_OUT),
+        InitStep::SingleCommand(SLEEP_OUT),
         InitStep::DelayMs(120),
-            InitStep::SingleCommand(DISPLAY_ON),
+        InitStep::SingleCommand(DISPLAY_ON),
         InitStep::DelayMs(70),
     ];
 }
@@ -104,27 +104,10 @@ where
         self.inner.set_window(bus, x0, y0, x1, y1).await
     }
 
-    async fn write_pixels(
-        &mut self,
-        bus: &mut B,
-        area: Area,
-        frame_control: FrameControl,
-        data: &[u8],
-    ) -> Result<(), DisplayError<B::Error>> {
-        self.inner
-            .write_pixels(bus, area, frame_control, data)
-            .await
-    }
-    
-    async fn fill_solid(&mut self, 
-        bus: &mut B,
-        area: Area,
-        frame_control: FrameControl,
-        color: SingleColor,
-    ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
-        self.inner
-            .fill_solid(bus, area, frame_control, color)
-            .await
+    const CMD_LEN: usize = 1;
+
+    fn cmd_write_pixels(&mut self) -> [u8; 4] {
+        [consts::WRITE_RAM, 0, 0, 0]
     }
 
     async fn set_color_format(
