@@ -3,12 +3,13 @@
 pub mod panel;
 pub mod bus;
 pub mod color;
+pub mod area;
 
 pub use bus::DisplayBus;
 pub use panel::Panel;
 
 pub use color::{ColorFormat, ColorType, SingleColor};
-
+pub use crate::area::Area;
 
 #[derive(Debug)]
 /// Common errors that can occur during display operations.
@@ -21,6 +22,35 @@ pub enum DisplayError<E> {
     OutOfRange,
     /// 
     InvalidArgs,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct FrameControl {
+    pub first: bool,
+    pub last: bool,
+}
+
+impl FrameControl {
+    pub fn new_single() -> Self {
+        Self {
+            first: true,
+            last: true,
+        }
+    }
+
+    pub fn new_first() -> Self {
+        Self {
+            first: true,
+            last: false,
+        }
+    }
+
+    pub fn new_last() -> Self {
+        Self {
+            first: false,
+            last: true,
+        }
+    }
 }
 
 // pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {

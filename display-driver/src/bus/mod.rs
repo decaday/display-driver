@@ -4,10 +4,10 @@ mod display_interface_impl;
 pub mod qspi_flash;
 pub use qspi_flash::QspiFlashBus;
 
-pub mod batch_fill;
-pub use batch_fill::BatchFillBus;
+// pub mod batch_fill;
+// pub use batch_fill::BatchFillBus;
 
-use crate::{DisplayError, SingleColor};
+use crate::{Area, DisplayError, FrameControl, SingleColor};
 
 // /// Configuration for the display bus.
 // pub struct Config {
@@ -62,14 +62,24 @@ pub trait SimpleDisplayBus {
 /// Metadata about the pixel data transfer.
 #[derive(Clone, Copy, Debug)]
 pub struct Metadata {
-    /// Start X coordinate.
-    pub x: u16,
-    /// Start Y coordinate.
-    pub y: u16,
-    /// Width of the area being written.
-    pub w: u16,
-    /// Height of the area being written.
-    pub h: u16,
+    pub area: Option<Area>,
+    pub frame_control: FrameControl,
+}
+
+impl Metadata {
+    pub fn full_screen(w: u16, h: u16) -> Self {
+        Self {
+            area: Some(Area::new_at_zero(w, h)),
+            frame_control: FrameControl { first: true, last: true }
+        }
+    }
+
+    pub fn stream_continue() -> Self {
+        Self {
+            area: None,
+            frame_control: FrameControl { first: false, last: false },
+        }
+    }
 }
 
 #[allow(async_fn_in_trait)]
@@ -133,7 +143,7 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
         self.write_cmds(cmd).await.map_err(DisplayError::BusError)?;
 
         let pixel_size = color.format.size_bytes() as usize;
-        let total_pixels = metadata.w as usize * metadata.h as usize;
+        let total_pixels = metadata.area.unwrap().size();
         let mut remaining_pixels = total_pixels;
 
         // Use a small fixed-size buffer on the stack to minimize overhead

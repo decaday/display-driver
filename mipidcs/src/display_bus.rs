@@ -1,7 +1,7 @@
 use display_driver::bus::{DisplayBus, Metadata};
 use display_driver::panel::{reset::LCDReseter, Orientation, Panel, initseq::sequenced_init};
 
-use display_driver::{ColorFormat, DisplayError, SingleColor};
+use display_driver::{Area, ColorFormat, DisplayError, FrameControl, SingleColor};
 use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
@@ -49,42 +49,44 @@ where
     async fn write_pixels(
         &mut self,
         bus: &mut B,
-        x: u16,
-        y: u16,
-        w: u16,
-        h: u16,
+        area: Area,
+        frame_control: FrameControl,
         data: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
+        let x = area.x;
+        let y = area.y;
+        let w = area.w;
+        let h = area.h;
+
         let x1 = x + w - 1;
         let y1 = y + h - 1;
         self.set_window(bus, x, y, x1, y1).await?;
 
         let metadata = Metadata {
-            x,
-            y,
-            w,
-            h,
+            area: Some(area),
+            frame_control,
         };
 
         bus.write_pixels(&[WRITE_MEMORY_START], data, metadata).await
     }
 
-        async fn fill_solid(
+    async fn fill_solid(
         &mut self,
         bus: &mut B,
-        x: u16,
-        y: u16,
-        w: u16,
-        h: u16,
+        area: Area,
+        frame_control: FrameControl,
         color: SingleColor,
     ) -> Result<(), DisplayError<B::Error>> {
+        let x = area.x;
+        let y = area.y;
+        let w = area.w;
+        let h = area.h;
+
         self.set_window(bus, x, y, x + w - 1, y + h - 1).await?;
 
         let metadata = Metadata {
-            x,
-            y,
-            w,
-            h,
+            area: Some(area),
+            frame_control,
         };
 
         bus.fill_solid(&[WRITE_MEMORY_START], color, metadata).await

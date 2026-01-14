@@ -8,7 +8,7 @@ use display_driver::panel::{address_window_param_u8, Orientation, Panel};
 use display_driver::panel::reset::{LCDResetOption, LCDReseter};
 use display_driver::panel::initseq::{sequenced_init, InitStep};
 
-use display_driver::{ColorFormat, DisplayError, SingleColor};
+use display_driver::{Area, ColorFormat, DisplayError, FrameControl, SingleColor};
 
 // Use GenericMipidcs to handle standard DCS operations
 use mipidcs::{dcs_types::AddressMode, GenericMipidcs};
@@ -107,27 +107,23 @@ where
     async fn write_pixels(
         &mut self,
         bus: &mut B,
-        x: u16,
-        y: u16,
-        w: u16,
-        h: u16,
+        area: Area,
+        frame_control: FrameControl,
         data: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
         self.inner
-            .write_pixels(bus, x, y, w, h, data)
+            .write_pixels(bus, area, frame_control, data)
             .await
     }
     
     async fn fill_solid(&mut self, 
         bus: &mut B,
-        x: u16,
-        y: u16,
-        w: u16,
-        h: u16,
+        area: Area,
+        frame_control: FrameControl,
         color: SingleColor,
     ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
         self.inner
-            .fill_solid(bus, x, y, w, h, color)
+            .fill_solid(bus, area, frame_control, color)
             .await
     }
 
