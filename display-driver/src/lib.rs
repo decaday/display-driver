@@ -44,7 +44,8 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
         frame_control: FrameControl,
         buffer: &[u8],
     ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
-        self.panel.set_window(&mut self.bus, area.x, area.y, area.x + area.w - 1, area.y + area.h - 1).await?;
+        let (x1, y1) = area.bottom_right();
+        self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
         let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
         let metadata = Metadata {area: Some(area), frame_control};
         self.bus.write_pixels(cmd, buffer, metadata).await
@@ -65,7 +66,8 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
         frame_control: FrameControl,
         color: SingleColor,
     ) -> Result<(), DisplayError<B::Error>> {
-        self.panel.set_window(&mut self.bus, area.x, area.y, area.x + area.w - 1, area.y + area.h - 1).await?;
+        let (x1, y1) = area.bottom_right();
+        self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
         let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
         let metadata = Metadata {area: Some(area), frame_control};
         self.bus.fill_solid(cmd, color, metadata).await
@@ -87,7 +89,8 @@ impl<B, P> DisplayDriver<B, P> where
         area: Area,
         color: SingleColor,
     ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
-        self.panel.set_window(&mut self.bus, area.x, area.y, area.x + area.w - 1, area.y + area.h - 1).await?;
+        let (x1, y1) = area.bottom_right();
+        self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
         let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
 
         <B as SimpleDisplayBus>::write_cmds(&mut self.bus, cmd).await.map_err(DisplayError::BusError)?;

@@ -24,6 +24,10 @@ impl Area {
     pub fn size(&self) -> usize {
         self.w as usize * self.h as usize
     }
+
+    pub fn bottom_right(&self) -> (u16, u16) {
+        (self.x + self.w - 1, self.y + self.h - 1)
+    }
 }
 
 // #[derive(Clone, Copy, Debug)]
