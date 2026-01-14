@@ -71,7 +71,7 @@ pub struct Metadata {
 impl Metadata {
     pub fn new_full_screen(w: u16, h: u16) -> Self {
         Self {
-            area: Some(Area::new_at_zero(w, h)),
+            area: Some(Area::from_origin(w, h)),
             frame_control: FrameControl { first: true, last: true }
         }
     }
@@ -152,6 +152,3 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
         T::set_reset(self, reset)
     }
 }
-
-
-

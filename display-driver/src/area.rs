@@ -12,12 +12,12 @@ pub struct Area {
 }
 
 impl Area {
-    pub fn new_at_zero(w: u16, h: u16) -> Self {
+    pub fn from_origin(w: u16, h: u16) -> Self {
         Self { x: 0, y: 0, w, h }
     }
 
 
-    pub fn positon(&self) -> (u16, u16) {
+    pub fn position(&self) -> (u16, u16) {
         (self.x, self.y)
     }
 
@@ -26,22 +26,22 @@ impl Area {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
-pub enum AreaOrSize {
-    Area(Area),
-    // WidthAndHeight(u16, u16),
-    Size(usize)
-}
+// #[derive(Clone, Copy, Debug)]
+// pub enum AreaOrSize {
+//     Area(Area),
+//     // WidthAndHeight(u16, u16),
+//     Size(usize)
+// }
 
-impl AreaOrSize {
-    pub fn size(&self) -> usize {
-        match *self {
-            AreaOrSize::Area(area) => area.size(),
-            // AreaOrSize::WidthAndHeight(w, h) => w as usize * h as usize,
-            AreaOrSize::Size(size) => size,
-        }
-    }
-}
+// impl AreaOrSize {
+//     pub fn size(&self) -> usize {
+//         match *self {
+//             AreaOrSize::Area(area) => area.size(),
+//             // AreaOrSize::WidthAndHeight(w, h) => w as usize * h as usize,
+//             AreaOrSize::Size(size) => size,
+//         }
+//     }
+// }
 
 
 #[cfg(feature = "embedded-graphics")]

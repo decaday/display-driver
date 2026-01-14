@@ -3,7 +3,6 @@ use embedded_hal_async::delay::DelayNs;
 
 use crate::{DisplayBus, DisplayError};
 
-#[derive(PartialEq, Eq)]
 /// Option for LCD reset control.
 pub enum LCDResetOption<P: OutputPin> {
     /// Reset via a GPIO pin (active high).
@@ -39,6 +38,10 @@ impl<P: OutputPin> LCDResetOption<P> {
             Self::Bus => None,
             Self::None => None,
         }
+    }
+
+    pub fn is_none(&self) -> bool {
+        matches!(self, Self::None)
     }
 }
 
@@ -98,19 +101,20 @@ impl<'a, P: OutputPin, B: DisplayBus, D: DelayNs> LCDReseter<'a, P, B, D> {
                     _ => unreachable!(),
                 }) 
             },
-            LCDResetOption::None => Ok(()),
+            LCDResetOption::None => unreachable!(),
         }
     }
 
     /// Performs the reset sequence: assert -> wait -> release -> wait.
     pub async fn reset(&mut self) -> Result<(), B::Error> {
-        self.set_reset(false)?;
-        self.delay.delay_ms(self.gap_ms as u32).await;
-        self.set_reset(true)?;
-        self.delay.delay_ms(self.gap_ms as u32).await;
-        self.set_reset(false)?;
-        self.delay.delay_ms(self.gap_ms as u32).await;
-
+        if !self.option.is_none() {
+            self.set_reset(false)?;
+            self.delay.delay_ms(self.gap_ms as u32).await;
+            self.set_reset(true)?;
+            self.delay.delay_ms(self.gap_ms as u32).await;
+            self.set_reset(false)?;
+            self.delay.delay_ms(self.gap_ms as u32).await;
+        }
         Ok(())
     }
 }

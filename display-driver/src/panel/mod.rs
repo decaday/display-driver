@@ -25,8 +25,8 @@ pub trait Panel<B: DisplayBus> {
     // fn offset(&self) -> (u16, u16);
 
     /// Note: We can't use [u8; Self::CMD_LEN] in stable
-    /// use &cmd_write_pixels()[0..P::CMD_LEN] instead
-    fn cmd_write_pixels(&mut self) -> [u8; 4];
+    /// use &pixel_write_command()[0..P::CMD_LEN] instead
+    fn pixel_write_command(&mut self) -> [u8; 4];
 
     /// Initializes the panel.
     async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;

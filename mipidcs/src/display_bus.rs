@@ -48,7 +48,7 @@ where
 
     const CMD_LEN: usize = 1;
 
-    fn cmd_write_pixels(&mut self) -> [u8; 4] {
+    fn pixel_write_command(&mut self) -> [u8; 4] {
         [WRITE_MEMORY_START, 0, 0, 0]
     }
 
