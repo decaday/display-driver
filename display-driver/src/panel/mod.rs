@@ -18,6 +18,8 @@ pub enum Orientation {
 /// Trait for display panels.
 pub trait Panel<B: DisplayBus> {
     const CMD_LEN: usize;
+    const X_ALIGNMENT: u16;
+    const Y_ALIGNMENT: u16;
 
     /// Returns the panel resolution (width, height).
     fn size(&self) -> (u16, u16);

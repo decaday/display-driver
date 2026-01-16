@@ -54,7 +54,6 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
     pub async fn write_frame(&mut self, 
         buffer: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
-        self.panel.set_full_window(&mut self.bus).await?;
         let (w, h) = self.panel.size();
         self.write_pixels(Area::from_origin(w, h), FrameControl::new_single(), buffer).await
     }

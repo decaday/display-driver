@@ -80,6 +80,10 @@ where
     RST: OutputPin,
     B: DisplayBus,
 {
+    const CMD_LEN: usize = 1;
+    const X_ALIGNMENT: u16 = 1;
+    const Y_ALIGNMENT: u16 = 1;
+
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
         let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
@@ -103,8 +107,6 @@ where
     ) -> Result<(), DisplayError<B::Error>> {
         self.inner.set_window(bus, x0, y0, x1, y1).await
     }
-
-    const CMD_LEN: usize = 1;
 
     fn pixel_write_command(&mut self) -> [u8; 4] {
         [consts::WRITE_RAM, 0, 0, 0]

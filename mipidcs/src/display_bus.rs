@@ -16,6 +16,10 @@ where
     S: DisplaySize,
     RST: OutputPin,
 {
+    const CMD_LEN: usize = 1;
+    const X_ALIGNMENT: u16 = 1;
+    const Y_ALIGNMENT: u16 = 1;
+
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
         let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
@@ -45,8 +49,6 @@ where
         self.set_column_address(bus, x_start, x_end).await.map_err(DisplayError::BusError)?;
         self.set_page_address(bus, y_start, y_end).await.map_err(DisplayError::BusError)
     }
-
-    const CMD_LEN: usize = 1;
 
     fn pixel_write_command(&mut self) -> [u8; 4] {
         [WRITE_MEMORY_START, 0, 0, 0]
