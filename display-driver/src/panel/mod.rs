@@ -72,16 +72,7 @@ pub trait Panel<B: DisplayBus> {
         bus: &mut B,
         color_format: ColorFormat,
     ) -> Result<(), DisplayError<B::Error>>;
-
-    /// Sets the brightness (0-255).
-    async fn set_brightness(&mut self, 
-        bus: &mut B,
-        brightness: u8,
-    ) -> Result<(), DisplayError<B::Error>> {
-        let _ = (bus, brightness);
-        Err(DisplayError::Unsupported)
-    }
-
+    
     // async fn set_rgb_order(&mut self, 
     //     bus: &mut B,
     //     rgb_order: bool,

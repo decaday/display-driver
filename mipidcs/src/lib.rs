@@ -21,7 +21,7 @@ where
     S: DisplaySize,
     RST: OutputPin,
 {
-    reset_pin: LCDResetOption<RST>,
+    pub reset_pin: LCDResetOption<RST>,
     /// The current Address Mode (MADCTL) setting.
     pub address_mode: AddressMode,
     _phantom: PhantomData<(B, S)>,

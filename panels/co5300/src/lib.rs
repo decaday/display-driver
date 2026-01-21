@@ -26,9 +26,6 @@ where
     RST: OutputPin,
     B: DisplayBus,
 {
-    /// Hardware reset pin control.
-    /// We keep this here to perform the specific reset timing in `init`.
-    reset_pin: LCDResetOption<RST>,
     /// Inner generic driver for standard functionality.
     inner: GenericMipidcs<B, Spec, RST>,
 }
@@ -42,9 +39,19 @@ where
     /// Creates a new driver instance.
     pub fn new(reset_pin: LCDResetOption<RST>) -> Self {
         Self {
-            reset_pin,
-            inner: GenericMipidcs::new(LCDResetOption::None, AddressMode::empty()),
+            inner: GenericMipidcs::new(reset_pin, AddressMode::empty()),
         }
+    }
+
+    /// Sets the display brightness (0-255).
+    pub async fn set_brightness(
+        &mut self,
+        bus: &mut B,
+        value: u8,
+    ) -> Result<(), DisplayError<B::Error>> {
+        bus.write_cmd_with_params(&[WBRIGHT], &[value])
+            .await
+            .map_err(DisplayError::BusError)
     }
 
     /// Initialization sequence for CO5300.
@@ -86,7 +93,7 @@ where
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
-        let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
+        let mut reseter = LCDReseter::new(&mut self.inner.reset_pin, bus, &mut delay, 10);
         reseter.reset().await?;
 
         // Execute Initialization Sequence
@@ -118,17 +125,6 @@ where
         color_format: ColorFormat,
     ) -> Result<(), DisplayError<B::Error>> {
         self.inner.set_color_format(bus, color_format).await
-    }
-
-    /// Sets the display brightness (0-255).
-    async fn set_brightness(
-        &mut self,
-        bus: &mut B,
-        value: u8,
-    ) -> Result<(), DisplayError<B::Error>> {
-        bus.write_cmd_with_params(&[WBRIGHT], &[value])
-            .await
-            .map_err(DisplayError::BusError)
     }
 
     async fn set_orientation(
