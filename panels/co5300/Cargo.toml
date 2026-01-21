@@ -10,3 +10,4 @@ display-driver = { path = "../../display-driver" }
 mipidcs = { path = "../../mipidcs" }
 embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
+delegate = "0.13.5"

@@ -54,6 +54,25 @@ where
             .map_err(DisplayError::BusError)
     }
 
+
+    delegate::delegate! {
+        to self.inner {
+            pub async fn set_invert_mode(
+                &mut self,
+                bus: &mut B,
+                invert: bool,
+            ) -> Result<(), B::Error>;
+
+            pub async fn set_address_mode(
+                &mut self,
+                bus: &mut B,
+                address_mode: AddressMode,
+            ) -> Result<(), B::Error>;
+
+            pub async fn set_bgr_order(&mut self, bus: &mut B, bgr: bool) -> Result<(), B::Error>;
+        }
+    }
+
     /// Initialization sequence for CO5300.
     const INIT_STEPS: [InitStep<'static>; 18] = [
         // Unlock Sequence
@@ -88,8 +107,13 @@ where
     B: DisplayBus,
 {
     const CMD_LEN: usize = 1;
-    const X_ALIGNMENT: u16 = 1;
-    const Y_ALIGNMENT: u16 = 1;
+    const PIXEL_WRITE_CMD: [u8; 4] = [WRITE_RAM, 0, 0, 0];
+
+    const HEIGHT: u16 = Spec::HEIGHT;
+    const WIDTH: u16 = Spec::WIDTH;
+
+    const X_ALIGNMENT: u16 = 2;
+    const Y_ALIGNMENT: u16 = 2;
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
@@ -100,38 +124,28 @@ where
         sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
     }
 
-    fn size(&self) -> (u16, u16) {
-        (Spec::WIDTH, Spec::HEIGHT)
-    }
+    delegate::delegate! {
+        to self.inner {
+            async fn set_window(
+                &mut self,
+                bus: &mut B,
+                x0: u16,
+                y0: u16,
+                x1: u16,
+                y1: u16,
+            ) -> Result<(), DisplayError<B::Error>>;
 
-    async fn set_window(
-        &mut self,
-        bus: &mut B,
-        x0: u16,
-        y0: u16,
-        x1: u16,
-        y1: u16,
-    ) -> Result<(), DisplayError<B::Error>> {
-        self.inner.set_window(bus, x0, y0, x1, y1).await
-    }
+            async fn set_color_format(
+                &mut self,
+                bus: &mut B,
+                color_format: ColorFormat,
+            ) -> Result<(), DisplayError<B::Error>>;
 
-    fn pixel_write_command(&mut self) -> [u8; 4] {
-        [consts::WRITE_RAM, 0, 0, 0]
-    }
-
-    async fn set_color_format(
-        &mut self,
-        bus: &mut B,
-        color_format: ColorFormat,
-    ) -> Result<(), DisplayError<B::Error>> {
-        self.inner.set_color_format(bus, color_format).await
-    }
-
-    async fn set_orientation(
-        &mut self,
-        bus: &mut B,
-        orientation: Orientation,
-    ) -> Result<(), DisplayError<B::Error>> {
-        self.inner.set_orientation(bus, orientation).await
+            async fn set_orientation(
+                &mut self,
+                bus: &mut B,
+                orientation: Orientation,
+            ) -> Result<(), DisplayError<B::Error>>;
+        }
     }
 }

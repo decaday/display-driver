@@ -91,9 +91,43 @@ where
             .await
     }
 
+    pub async fn set_address_window(
+        &self,
+        bus: &mut B,
+        x0: u16,
+        y0: u16,
+        x1: u16,
+        y1: u16,
+    ) -> Result<(), B::Error> {
+        let x_start = x0 + S::COL_OFFSET;
+        let x_end = x1 + S::COL_OFFSET;
+        let y_start = y0 + S::ROW_OFFSET;
+        let y_end = y1 + S::ROW_OFFSET;
+
+        bus.write_cmd_with_params(
+            &[SET_COLUMN_ADDRESS],
+            &AddressRange::new(x_start, x_end).0,
+        )
+        .await?;
+
+        bus.write_cmd_with_params(
+            &[SET_PAGE_ADDRESS],
+            &AddressRange::new(y_start, y_end).0,
+        )
+        .await
+    }
+
     /// Set the Address Mode (Memory Data Access Control, aka. MADCTL - Command 0x36).
-    pub async fn set_address_mode(&self, bus: &mut B, mode: AddressMode) -> Result<(), B::Error> {
+    pub async fn set_address_mode(&mut self, bus: &mut B, mode: AddressMode) -> Result<(), B::Error> {
+        self.address_mode = mode;
         bus.write_cmd_with_params(&[SET_ADDRESS_MODE], &[mode.bits()])
+            .await
+    }
+
+    /// Set the BGR/RGB order in Address Mode (MADCTL).
+    pub async fn set_bgr_order(&mut self, bus: &mut B, bgr: bool) -> Result<(), B::Error> {
+        self.address_mode.set(AddressMode::BGR, bgr);
+        bus.write_cmd_with_params(&[SET_ADDRESS_MODE], &[self.address_mode.bits()])
             .await
     }
 

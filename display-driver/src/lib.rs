@@ -46,7 +46,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
     ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
-        let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
+        let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
         let metadata = Metadata {area: Some(area), frame_control};
         self.bus.write_pixels(cmd, buffer, metadata).await
     }
@@ -54,8 +54,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
     pub async fn write_frame(&mut self, 
         buffer: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
-        let (w, h) = self.panel.size();
-        self.write_pixels(Area::from_origin(w, h), FrameControl::new_single(), buffer).await
+        self.write_pixels(Area::from_origin(P::WIDTH, P::HEIGHT), FrameControl::new_single(), buffer).await
     }
 }
 
@@ -67,16 +66,14 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
     ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
-        let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
+        let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
         let metadata = Metadata {area: Some(area), frame_control};
         self.bus.fill_solid(cmd, color, metadata).await
     }
 
     /// Fills the entire screen with a solid color.
     pub async fn fill_screen_via_bus(&mut self, color: SingleColor) -> Result<(), DisplayError<B::Error>> {
-        let (w, h) = self.panel.size();
-        
-        self.fill_solid_via_bus(Area::from_origin(w, h), FrameControl::new_single(), color).await
+        self.fill_solid_via_bus(Area::from_origin(P::WIDTH, P::HEIGHT), FrameControl::new_single(), color).await
     }
 }
 
@@ -90,7 +87,7 @@ impl<B, P> DisplayDriver<B, P> where
     ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
-        let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
+        let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
 
         <B as SimpleDisplayBus>::write_cmds(&mut self.bus, cmd).await.map_err(DisplayError::BusError)?;
 
@@ -123,8 +120,6 @@ impl<B, P> DisplayDriver<B, P> where
 
     /// Fills the entire screen with a solid color.
     pub async fn fill_screen_batch<const N: usize>(&mut self, color: SingleColor) -> Result<(), DisplayError<B::Error>> {
-        let (w, h) = self.panel.size();
-        
-        self.fill_solid_batch::<N>(Area::from_origin(w, h), color).await
+        self.fill_solid_batch::<N>(Area::from_origin(P::WIDTH, P::HEIGHT), color).await
     }
 }

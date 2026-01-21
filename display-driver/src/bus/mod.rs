@@ -120,9 +120,8 @@ pub trait DisplayBus: ErrorType {
 pub trait BusAutoFill: DisplayBus {
     /// Fills a region with a solid color.
     ///
-    /// This operation can often be hardware accelerated (e.g., Graphics Hardware or DMA with non-incrementing source).
-    /// If using `SimpleDisplayBus`, note that the default implementation uses a 16-byte stack buffer.
-    /// If larger batches are desired, consider wrapping with `BatchFillBus`.
+    /// This operation can often be hardware accelerated.
+    /// (e.g., Graphics Hardware or DMA with non-incrementing source).
     async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
 }
 

@@ -17,6 +17,11 @@ where
     RST: OutputPin,
 {
     const CMD_LEN: usize = 1;
+    const PIXEL_WRITE_CMD: [u8; 4] = [WRITE_MEMORY_START, 0, 0, 0];
+
+    const HEIGHT: u16 = S::HEIGHT;
+    const WIDTH: u16 = S::WIDTH;
+
     const X_ALIGNMENT: u16 = 1;
     const Y_ALIGNMENT: u16 = 1;
 
@@ -29,10 +34,6 @@ where
         self.set_address_mode(bus, self.address_mode).await
     }
 
-    fn size(&self) -> (u16, u16) {
-        (S::WIDTH, S::HEIGHT)
-    }
-
     async fn set_window(
         &mut self,
         bus: &mut B,
@@ -41,17 +42,7 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), DisplayError<B::Error>> {
-        let x_start = x0 + S::COL_OFFSET;
-        let x_end = x1 + S::COL_OFFSET;
-        let y_start = y0 + S::ROW_OFFSET;
-        let y_end = y1 + S::ROW_OFFSET;
-
-        self.set_column_address(bus, x_start, x_end).await.map_err(DisplayError::BusError)?;
-        self.set_page_address(bus, y_start, y_end).await.map_err(DisplayError::BusError)
-    }
-
-    fn pixel_write_command(&mut self) -> [u8; 4] {
-        [WRITE_MEMORY_START, 0, 0, 0]
+        self.set_address_window(bus, x0, y0, x1, y1).await.map_err(DisplayError::BusError)
     }
 
     async fn set_color_format(
@@ -92,7 +83,6 @@ where
         mode.set(AddressMode::MY, my);
         mode.set(AddressMode::MV, mv);
 
-        self.address_mode = mode;
         self.set_address_mode(bus, mode)
             .await
             .map_err(DisplayError::BusError)

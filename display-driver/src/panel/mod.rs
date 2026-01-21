@@ -18,17 +18,17 @@ pub enum Orientation {
 /// Trait for display panels.
 pub trait Panel<B: DisplayBus> {
     const CMD_LEN: usize;
+    
+    /// Note: We can't use [u8; Self::CMD_LEN] in stable
+    /// use &PIXEL_WRITE_CMD[0..P::CMD_LEN] instead
+    const PIXEL_WRITE_CMD: [u8; 4];
+    
+    const WIDTH: u16;
+    const HEIGHT: u16;
+
+    /// Alignment requirements for X and Y coordinates.
     const X_ALIGNMENT: u16;
     const Y_ALIGNMENT: u16;
-
-    /// Returns the panel resolution (width, height).
-    fn size(&self) -> (u16, u16);
-
-    // fn offset(&self) -> (u16, u16);
-
-    /// Note: We can't use [u8; Self::CMD_LEN] in stable
-    /// use &pixel_write_command()[0..P::CMD_LEN] instead
-    fn pixel_write_command(&mut self) -> [u8; 4];
 
     /// Initializes the panel.
     async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;
@@ -44,8 +44,7 @@ pub trait Panel<B: DisplayBus> {
 
     /// Sets the window to the full screen size.
     async fn set_full_window(&mut self, bus: &mut B) -> Result<(), DisplayError<B::Error>> {
-        let (w, h) = self.size();
-        self.set_window(bus, 0, 0, w - 1, h - 1).await
+        self.set_window(bus, 0, 0, Self::WIDTH - 1, Self::HEIGHT - 1).await
     }
 
     /// Check the panel ID (if supported).
@@ -72,12 +71,4 @@ pub trait Panel<B: DisplayBus> {
         bus: &mut B,
         color_format: ColorFormat,
     ) -> Result<(), DisplayError<B::Error>>;
-    
-    // async fn set_rgb_order(&mut self, 
-    //     bus: &mut B,
-    //     rgb_order: bool,
-    // ) -> Result<(), DisplayError<B::Error>> {
-    //     let _ = (bus, rgb_order);
-    //     Err(DisplayError::Unsupported)
-    // }
 }
