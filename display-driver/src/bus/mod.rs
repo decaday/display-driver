@@ -6,11 +6,17 @@ pub use qspi_flash::QspiFlashBus;
 
 use crate::{Area, DisplayError, SingleColor};
 
+/// Error type trait.
+///
+/// This just defines the error type, to be used by the other traits.
+pub trait ErrorType {
+    /// Error type
+    type Error: core::fmt::Debug;
+}
+
 #[allow(async_fn_in_trait)]
 /// A simplified interface for display buses (e.g., SPI, I2C).
-pub trait SimpleDisplayBus {
-    /// Error type for bus operations.
-    type Error;
+pub trait SimpleDisplayBus: ErrorType {
 
     /// Writes a sequence of commands.
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
@@ -93,10 +99,7 @@ impl Metadata {
 
 #[allow(async_fn_in_trait)]
 /// Core trait for display bus implementations.
-pub trait DisplayBus {
-    /// Error type for bus operations.
-    type Error;
-
+pub trait DisplayBus: ErrorType {
     /// Writes a sequence of commands.
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 
@@ -133,8 +136,6 @@ pub trait BusRead: DisplayBus {
 }
 
 impl<T: SimpleDisplayBus> DisplayBus for T {
-    type Error = T::Error;
-
     async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
         T::write_cmds(self, cmd).await
     }

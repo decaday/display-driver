@@ -43,7 +43,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
         area: Area,
         frame_control: FrameControl,
         buffer: &[u8],
-    ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
+    ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
         let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
@@ -81,13 +81,13 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
 }
 
 impl<B, P> DisplayDriver<B, P> where 
-    B: DisplayBus + SimpleDisplayBus<Error = <B as DisplayBus>::Error>,
+    B: DisplayBus + SimpleDisplayBus,
     P: Panel<B>
 {
     pub async fn fill_solid_batch<const N: usize>(&mut self, 
         area: Area,
         color: SingleColor,
-    ) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
+    ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel.set_window(&mut self.bus, area.x, area.y, x1, y1).await?;
         let cmd = &self.panel.pixel_write_command()[0..P::CMD_LEN];
@@ -122,7 +122,7 @@ impl<B, P> DisplayDriver<B, P> where
     }
 
     /// Fills the entire screen with a solid color.
-    pub async fn fill_screen_batch<const N: usize>(&mut self, color: SingleColor) -> Result<(), DisplayError<<B as DisplayBus>::Error>> {
+    pub async fn fill_screen_batch<const N: usize>(&mut self, color: SingleColor) -> Result<(), DisplayError<B::Error>> {
         let (w, h) = self.panel.size();
         
         self.fill_solid_batch::<N>(Area::from_origin(w, h), color).await

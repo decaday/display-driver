@@ -1,4 +1,4 @@
-use super::{DisplayBus, Metadata, DisplayError};
+use super::{DisplayBus, Metadata, DisplayError, ErrorType};
 
 /// Adapter for QSPI buses that require command formatting for flash-like interfaces.
 pub struct QspiFlashBus<B: DisplayBus> {
@@ -27,8 +27,11 @@ impl<B: DisplayBus> QspiFlashBus<B> {
     }
 }
 
-impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
+impl<B: DisplayBus> ErrorType for QspiFlashBus<B> {
     type Error = B::Error;
+}
+
+impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
 
     // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
     //     let mut config = config;
