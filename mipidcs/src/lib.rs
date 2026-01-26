@@ -12,9 +12,11 @@ use embedded_hal::digital::OutputPin;
 use crate::consts::*;
 pub use crate::dcs_types::*;
 
-/// Generic MIPI DCS display driver.
+/// A generic driver for MIPI DCS compliant displays.
 ///
-/// This driver uses standard MIPI DCS commands to control the display.
+/// This struct implements standard MIPI Display Command Set (MIPI DCS) operations such as setting address windows, 
+/// controlling sleep modes, and handling pixel formats.
+/// It is designed to be embedded within specific panel drivers to handle the common DCS functionality.
 pub struct GenericMipidcs<B, S, RST>
 where
     B: DisplayBus,

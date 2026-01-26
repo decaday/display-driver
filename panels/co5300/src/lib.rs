@@ -19,7 +19,7 @@ pub mod spec;
 use consts::*;
 use spec::DisplaySpec;
 
-/// CO5300 LCD Driver.
+/// Driver for the CO5300 AMOLED display controller.
 pub struct Co5300<Spec, RST, B>
 where
     Spec: DisplaySpec,

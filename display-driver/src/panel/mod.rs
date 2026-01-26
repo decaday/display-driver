@@ -15,12 +15,20 @@ pub enum Orientation {
 }
 
 #[allow(async_fn_in_trait)]
-/// Trait for display panels.
+/// A trait representing a specific display panel model (e.g., ST7789, ILI9341).
+///
+/// While [`DisplayBus`] handles *how* data is sent to the screen, this `Panel` trait handles *what* is sent.
+/// It encapsulates the specific command set and initialization sequence required by the display controller IC.
 pub trait Panel<B: DisplayBus> {
     const CMD_LEN: usize;
     
-    /// Note: We can't use [u8; Self::CMD_LEN] in stable
-    /// use &PIXEL_WRITE_CMD[0..P::CMD_LEN] instead
+    /// The specific command byte(s) used to initiate a pixel write operation to the display's RAM.
+    ///
+    /// For many MIPI DCS compliant displays, this is `0x2C` (RAMWR). Defining it as a constant allow
+    /// the driver to start a pixel transfer efficiently without constructing the command at runtime.
+    ///
+    /// Note: We can't use `[u8; Self::CMD_LEN]` in stable Rust constants yet, so we use a reference slice
+    /// `&PIXEL_WRITE_CMD[0..P::CMD_LEN]` when using this.
     const PIXEL_WRITE_CMD: [u8; 4];
     
     const WIDTH: u16;
@@ -33,7 +41,13 @@ pub trait Panel<B: DisplayBus> {
     /// Initializes the panel.
     async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;
 
-    /// Sets the active window for pixel writing.
+    /// Sets the active drawing window on the display.
+    ///
+    /// This method translates the abstract coordinates (x0, y0, x1, y1) into the specific "Column Address Set"
+    /// and "Page Address Set" commands understood by the display controller.
+    /// 
+    /// Note: For some monochrome displays or AMOLED panels, coordinates must be aligned to `Self::X_ALIGNMENT` 
+    /// and `Self::Y_ALIGNMENT`.
     async fn set_window(&mut self, 
         bus: &mut B,
         x0: u16,
@@ -66,7 +80,9 @@ pub trait Panel<B: DisplayBus> {
         Err(DisplayError::Unsupported)
     }
 
-    /// Sets the color format.
+    /// Configures the pixel color format (e.g., RGB565, RGB888).
+    ///
+    /// This updates the display controller's interface pixel format setting to match the data being sent.
     async fn set_color_format(&mut self, 
         bus: &mut B,
         color_format: ColorFormat,

@@ -11,7 +11,7 @@ pub use crate::area::Area;
 pub use crate::bus::{BusAutoFill, FrameControl, Metadata, DisplayBus, SimpleDisplayBus};
 
 #[derive(Debug)]
-/// Common errors that can occur during display operations.
+/// A unified error type identifying what went wrong during a display operation.
 pub enum DisplayError<E> {
     /// Error propagated from the underlying bus.
     BusError(E),
@@ -23,8 +23,15 @@ pub enum DisplayError<E> {
     InvalidArgs,
 }
 
+/// The high-level driver that orchestrates drawing operations.
+///
+/// This struct acts as the "glue" between the logical [`Panel`] implementation (which knows the command set)
+/// and the [`DisplayBus`] (which handles the physical transport). It exposes user-friendly methods
+/// for drawing pixels, filling rectangles, and managing the display state.
 pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {
+    /// The underlying bus interface used for communication.
     pub bus: B,
+    /// The panel.
     pub panel: P,
 }
 

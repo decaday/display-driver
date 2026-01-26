@@ -1,6 +1,10 @@
 use super::{DisplayBus, Metadata, DisplayError, ErrorType};
 
-/// Adapter for QSPI buses that require command formatting for flash-like interfaces.
+/// An adapter that bridges a standard [`DisplayBus`] to a QSPI-connected display.
+///
+/// Some displays attached via QSPI don't use standard display commands directly but instead emulate
+/// a SPI Flash memory interface. This adapter wraps an inner bus and automatically transforms
+/// standard display commands into the appropriate QSPI Flash opcodes.
 pub struct QspiFlashBus<B: DisplayBus> {
     inner: B,
 }
