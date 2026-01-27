@@ -23,7 +23,6 @@ pub trait ErrorType {
 ///
 /// Implementors only need to define how to send raw command bytes and raw data bytes.
 pub trait SimpleDisplayBus: ErrorType {
-
     /// Writes a sequence of commands to the bus.
     ///
     /// This is typically used for sending register addresses or command opcodes.
@@ -35,7 +34,11 @@ pub trait SimpleDisplayBus: ErrorType {
     async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 
     /// Writes a command followed immediately by its parameters.
-    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
+    async fn write_cmd_with_params(
+        &mut self,
+        cmd: &[u8],
+        params: &[u8],
+    ) -> Result<(), Self::Error> {
         self.write_cmds(cmd).await?;
         self.write_data(params).await
     }
@@ -46,7 +49,6 @@ pub trait SimpleDisplayBus: ErrorType {
         Err(DisplayError::Unsupported)
     }
 }
-
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct FrameControl {
@@ -81,7 +83,7 @@ impl FrameControl {
 ///
 /// Advanced display buses (like MIPI DSI or QSPI with DMA) often require more context than just the raw pixel bytes.
 /// This struct carries that side-band information, allowing the bus implementation to orchestrate the transfer correctly.
-[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Metadata {
     /// The rectangular area on the display this data corresponds to.
     ///
@@ -100,7 +102,10 @@ impl Metadata {
     pub fn new_full_screen(w: u16, h: u16) -> Self {
         Self {
             area: Some(Area::from_origin(w, h)),
-            frame_control: FrameControl { first: true, last: true }
+            frame_control: FrameControl {
+                first: true,
+                last: true,
+            },
         }
     }
 
@@ -110,14 +115,17 @@ impl Metadata {
     pub fn new_stream_continue() -> Self {
         Self {
             area: None,
-            frame_control: FrameControl { first: false, last: false },
+            frame_control: FrameControl {
+                first: false,
+                last: false,
+            },
         }
     }
 
     /// Creates metadata with specific area and frame control settings.
     ///
     /// Use this for partial updates or specialized transfer patterns.
-    pub fn new_from_parts(area: Option<Area>, frame_control: FrameControl)-> Self {
+    pub fn new_from_parts(area: Option<Area>, frame_control: FrameControl) -> Self {
         Self {
             area,
             frame_control,
@@ -148,7 +156,8 @@ pub trait DisplayBus: ErrorType {
     /// This guarantees an atomic transaction where the command and parameters are sent without interruption.
     /// This is critical for many display controllers that expect the parameter bytes to immediately follow the command byte
     /// while the Chip Select (CS) line remains active.
-    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error>;
+    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8])
+        -> Result<(), Self::Error>;
 
     /// Writes a stream of pixel data to the display.
     ///
@@ -160,7 +169,12 @@ pub trait DisplayBus: ErrorType {
     /// # Implementation Note
     /// Implementations should use the `metadata` to handle frame synchronization (VSYNC/TE) before sending the pixel data.
     /// This method is often the primary candidate for DMA or hardware acceleration.
-    async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
+    async fn write_pixels(
+        &mut self,
+        cmd: &[u8],
+        data: &[u8],
+        metadata: Metadata,
+    ) -> Result<(), DisplayError<Self::Error>>;
 
     /// Reset the screen via the bus (optional).
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
@@ -179,7 +193,12 @@ pub trait BusAutoFill: DisplayBus {
     /// Fills a specific region of the display with a solid color.
     ///
     /// The implementation should leverage available hardware acceleration to perform this operation efficiently.
-    async fn fill_solid(&mut self, cmd: &[u8], color: SingleColor, metadata: Metadata) -> Result<(), DisplayError<Self::Error>>;
+    async fn fill_solid(
+        &mut self,
+        cmd: &[u8],
+        color: SingleColor,
+        metadata: Metadata,
+    ) -> Result<(), DisplayError<Self::Error>>;
 }
 
 #[allow(async_fn_in_trait)]
@@ -198,7 +217,12 @@ pub trait BusRead: DisplayBus {
     /// * `cmd` - The command to initiate the read operation.
     /// * `params` - Optional parameters required before the read transaction begins.
     /// * `buffer` - The destination buffer where the read data will be stored.
-    async fn read_data(&mut self, cmd: &[u8], params: &[u8], buffer: &mut [u8]) -> Result<(), DisplayError<Self::Error>> {
+    async fn read_data(
+        &mut self,
+        cmd: &[u8],
+        params: &[u8],
+        buffer: &mut [u8],
+    ) -> Result<(), DisplayError<Self::Error>> {
         let (_, _, _) = (cmd, params, buffer);
         Err(DisplayError::Unsupported)
     }
@@ -209,11 +233,20 @@ impl<T: SimpleDisplayBus> DisplayBus for T {
         T::write_cmds(self, cmd).await
     }
 
-    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
+    async fn write_cmd_with_params(
+        &mut self,
+        cmd: &[u8],
+        params: &[u8],
+    ) -> Result<(), Self::Error> {
         T::write_cmd_with_params(self, cmd, params).await
     }
 
-    async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], _metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+    async fn write_pixels(
+        &mut self,
+        cmd: &[u8],
+        data: &[u8],
+        _metadata: Metadata,
+    ) -> Result<(), DisplayError<Self::Error>> {
         self.write_cmds(cmd).await.map_err(DisplayError::BusError)?;
         self.write_data(data).await.map_err(DisplayError::BusError)
     }

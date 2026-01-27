@@ -4,14 +4,18 @@ use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
 use display_driver::bus::DisplayBus;
-use display_driver::panel::{Orientation, Panel};
-use display_driver::panel::reset::{LCDResetOption, LCDReseter};
 use display_driver::panel::initseq::{sequenced_init, InitStep};
+use display_driver::panel::reset::{LCDResetOption, LCDReseter};
+use display_driver::panel::{Orientation, Panel};
 
 use display_driver::{ColorFormat, DisplayError};
 
 // Use GenericMipidcs to handle standard DCS operations
-use mipidcs::{dcs_types::{AddressMode, address_window_param_u8}, GenericMipidcs};
+use mipidcs::{
+    consts::*,
+    dcs_types::{address_window_param_u8, AddressMode},
+    GenericMipidcs,
+};
 
 pub mod consts;
 pub mod spec;
@@ -54,7 +58,6 @@ where
             .map_err(DisplayError::BusError)
     }
 
-
     delegate::delegate! {
         to self.inner {
             pub async fn set_invert_mode(
@@ -90,8 +93,14 @@ where
         InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
         InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
         InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
-        InitStep::CommandWithParams((CASET, &address_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET))),
-        InitStep::CommandWithParams((RASET, &address_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET))),
+        InitStep::CommandWithParams((
+            CASET,
+            &address_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET),
+        )),
+        InitStep::CommandWithParams((
+            RASET,
+            &address_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET),
+        )),
         // Power On
         InitStep::SingleCommand(SLEEP_OUT),
         InitStep::DelayMs(120),
@@ -117,7 +126,14 @@ where
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
-        let mut reseter = LCDReseter::new(&mut self.inner.reset_pin, bus, &mut delay, 10);
+        let mut reseter = LCDReseter::new(
+            &mut self.inner.reset_pin,
+            bus,
+            &mut delay,
+            10,
+            120,
+            Some(&[SOFT_RESET]),
+        );
         reseter.reset().await?;
 
         // Execute Initialization Sequence

@@ -1,14 +1,13 @@
 use display_driver::bus::DisplayBus;
-use display_driver::panel::{reset::LCDReseter, Orientation, Panel, initseq::sequenced_init};
+use display_driver::panel::{initseq::sequenced_init, reset::LCDReseter, Orientation, Panel};
 
 use display_driver::{ColorFormat, DisplayError};
 use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
-use crate::{DisplaySize, GenericMipidcs};
 use crate::consts::*;
 use crate::dcs_types::*;
-
+use crate::{DisplaySize, GenericMipidcs};
 
 impl<B, S, RST> Panel<B> for GenericMipidcs<B, S, RST>
 where
@@ -27,7 +26,14 @@ where
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
-        let mut reseter = LCDReseter::new(&mut self.reset_pin, bus, &mut delay, 10);
+        let mut reseter = LCDReseter::new(
+            &mut self.reset_pin,
+            bus,
+            &mut delay,
+            10,
+            120,
+            Some(&[SOFT_RESET]),
+        );
         reseter.reset().await?;
 
         sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await?;
@@ -42,7 +48,9 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), DisplayError<B::Error>> {
-        self.set_address_window(bus, x0, y0, x1, y1).await.map_err(DisplayError::BusError)
+        self.set_address_window(bus, x0, y0, x1, y1)
+            .await
+            .map_err(DisplayError::BusError)
     }
 
     async fn set_color_format(
@@ -51,11 +59,10 @@ where
         color_format: ColorFormat,
     ) -> Result<(), DisplayError<B::Error>> {
         let bits = color_format.size_bits();
-        
+
         // Use from_bit_count as requested
-        let pf_type = PixelFormatType::from_bit_count(bits)
-            .ok_or(DisplayError::Unsupported)?;
-            
+        let pf_type = PixelFormatType::from_bit_count(bits).ok_or(DisplayError::Unsupported)?;
+
         // Use dbi_and_dpi for better compatibility
         let pf = PixelFormat::dbi_and_dpi(pf_type);
 

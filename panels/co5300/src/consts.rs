@@ -36,14 +36,3 @@ pub const CMD_PAGE_SWITCH: u8 = 0xFE;
 // Chip IDs
 pub const CHIP_ID_VAL: u32 = 0x530001;
 pub const CHIP_ID_ALT: u32 = 0x331100;
-
-// Orientation
-pub const REG_ORIENTATION_PORTRAIT: u8 = 0x00; /* Portrait orientation choice of LCD screen  */
-pub const REG_ORIENTATION_LANDSCAPE: u8 = 0x01; /* Landscape orientation choice of LCD screen */
-pub const REG_ORIENTATION_LANDSCAPE_ROT180: u8 = 0x02; /* Landscape rotated 180 orientation choice of LCD screen */
-
-/// Color modes
-pub enum ColorMode {
-    RGB565 = 0xD5,
-    RGB666 = 0xF7,
-}
