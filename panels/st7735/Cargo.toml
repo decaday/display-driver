@@ -1,0 +1,11 @@
+[package]
+name = "dd-st7735"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+display-driver = { path = "../../display-driver" }
+mipidcs = { path = "../../mipidcs" }
+embedded-hal = "1.0"
+embedded-hal-async = "1.0"
+delegate = "0.13"
