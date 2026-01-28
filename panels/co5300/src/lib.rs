@@ -13,7 +13,7 @@ use display_driver::{ColorFormat, DisplayError};
 // Use GenericMipidcs to handle standard DCS operations
 use mipidcs::{
     consts::*,
-    dcs_types::{address_window_param_u8, AddressMode},
+    dcs_types::AddressMode,
     GenericMipidcs,
 };
 
@@ -77,7 +77,7 @@ where
     }
 
     /// Initialization sequence for CO5300.
-    const INIT_STEPS: [InitStep<'static>; 18] = [
+    const INIT_STEPS: [InitStep<'static>; 16] = [
         // Unlock Sequence
         InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[Spec::INIT_PAGE_PARAM])),
         InitStep::CommandWithParams((PASSWD1, &[0x5A])),
@@ -93,14 +93,6 @@ where
         InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
         InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
         InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
-        InitStep::CommandWithParams((
-            CASET,
-            &address_window_param_u8(0, Spec::WIDTH, Spec::COL_OFFSET),
-        )),
-        InitStep::CommandWithParams((
-            RASET,
-            &address_window_param_u8(0, Spec::HEIGHT, Spec::ROW_OFFSET),
-        )),
         // Power On
         InitStep::SingleCommand(SLEEP_OUT),
         InitStep::DelayMs(120),
@@ -125,7 +117,6 @@ where
     const Y_ALIGNMENT: u16 = 2;
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
-        // Hardware Reset
         let mut reseter = LCDReseter::new(
             &mut self.inner.reset_pin,
             bus,

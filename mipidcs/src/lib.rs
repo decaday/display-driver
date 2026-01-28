@@ -76,8 +76,8 @@ where
         start: u16,
         end: u16,
     ) -> Result<(), B::Error> {
-        let params = AddressRange::new(start + S::COL_OFFSET, end + S::COL_OFFSET);
-        bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], &params.0)
+        let params = AddressRange::new_with_offset(start, end, S::COL_OFFSET);
+        bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], params.as_bytes())
             .await
     }
 
@@ -88,8 +88,8 @@ where
         start: u16,
         end: u16,
     ) -> Result<(), B::Error> {
-        let params = AddressRange::new(start + S::ROW_OFFSET, end + S::ROW_OFFSET);
-        bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], &params.0)
+        let params = AddressRange::new_with_offset(start, end, S::ROW_OFFSET);
+        bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], params.as_bytes())
             .await
     }
 
@@ -101,15 +101,10 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), B::Error> {
-        let x_start = x0 + S::COL_OFFSET;
-        let x_end = x1 + S::COL_OFFSET;
-        let y_start = y0 + S::ROW_OFFSET;
-        let y_end = y1 + S::ROW_OFFSET;
-
-        bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], &AddressRange::new(x_start, x_end).0)
+        bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], AddressRange::new_with_offset(x0, x1, S::COL_OFFSET).as_bytes())
             .await?;
 
-        bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], &AddressRange::new(y_start, y_end).0)
+        bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], AddressRange::new_with_offset(y0, y1, S::ROW_OFFSET).as_bytes())
             .await
     }
 
@@ -147,17 +142,9 @@ where
         }
     }
 
-    const INIT_STEPS: [InitStep<'_>; 6] = [
+    const INIT_STEPS: [InitStep<'_>; 4] = [
         InitStep::SingleCommand(EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
-        InitStep::CommandWithParams((
-            SET_COLUMN_ADDRESS,
-            &address_window_param_u8(0, S::WIDTH, S::COL_OFFSET),
-        )),
-        InitStep::CommandWithParams((
-            SET_PAGE_ADDRESS,
-            &address_window_param_u8(0, S::HEIGHT, S::ROW_OFFSET),
-        )),
         // Power On
         InitStep::SingleCommand(SET_DISPLAY_ON),
         InitStep::DelayMs(20),

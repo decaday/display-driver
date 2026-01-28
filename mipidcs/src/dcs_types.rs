@@ -160,17 +160,24 @@ impl AddressMode {
 pub struct AddressRange(pub [u8; 4]);
 
 impl AddressRange {
-    pub fn new(start: u16, end: u16) -> Self {
+    pub const fn new(start: u16, end: u16) -> Self {
         let s = start.to_be_bytes();
         let e = end.to_be_bytes();
         Self {
             0: [s[0], s[1], e[0], e[1]],
         }
     }
+
+    pub const fn new_with_offset(start: u16, end: u16, offset: u16) -> Self {
+        let s = (start + offset).to_be_bytes();
+        let e = (end + offset - 1).to_be_bytes();
+        Self {
+            0: [s[0], s[1], e[0], e[1]],
+        }
+    }
+
+    pub const fn as_bytes(&self) -> &[u8; 4] {
+        &self.0
+    }
 }
 
-pub const fn address_window_param_u8(start: u16, end: u16, offset: u16) -> [u8; 4] {
-    let s = (start + offset).to_be_bytes();
-    let e = (end + offset - 1).to_be_bytes();
-    [s[0], s[1], e[0], e[1]]
-}
