@@ -1,4 +1,4 @@
-use super::{DisplayBus, Metadata, DisplayError, ErrorType};
+use super::{DisplayBus, DisplayError, ErrorType, Metadata};
 
 /// An adapter that bridges a standard [`DisplayBus`] to a QSPI-connected display.
 ///
@@ -21,11 +21,7 @@ impl<B: DisplayBus> QspiFlashBus<B> {
             panic!("QSPI command must be 1 byte")
         }
 
-        let flash_command: u8 = if pixel_data {
-            0x32
-        } else {
-            0x02
-        };
+        let flash_command: u8 = if pixel_data { 0x32 } else { 0x02 };
 
         [flash_command, 0x00, cmd[0], 0x00]
     }
@@ -36,7 +32,6 @@ impl<B: DisplayBus> ErrorType for QspiFlashBus<B> {
 }
 
 impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
-
     // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
     //     let mut config = config;
     //     config.cmd_size_bytes = 4;
@@ -48,12 +43,21 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
         self.inner.write_cmds(&cmd).await
     }
 
-    async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8]) -> Result<(), Self::Error> {
+    async fn write_cmd_with_params(
+        &mut self,
+        cmd: &[u8],
+        params: &[u8],
+    ) -> Result<(), Self::Error> {
         let cmd = self.to_cmd_and_addr(cmd, false);
         self.inner.write_cmd_with_params(&cmd, params).await
     }
 
-    async fn write_pixels(&mut self, cmd: &[u8], data: &[u8], metadata: Metadata) -> Result<(), DisplayError<Self::Error>> {
+    async fn write_pixels(
+        &mut self,
+        cmd: &[u8],
+        data: &[u8],
+        metadata: Metadata,
+    ) -> Result<(), DisplayError<Self::Error>> {
         let cmd = self.to_cmd_and_addr(cmd, true);
         self.inner.write_pixels(&cmd, data, metadata).await
     }

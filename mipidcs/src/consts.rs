@@ -222,4 +222,3 @@ pub const READ_DDB_START: u8 = 0xa1;
 ///
 /// Parameters: variable
 pub const READ_DDB_CONTINUE: u8 = 0xa8;
-

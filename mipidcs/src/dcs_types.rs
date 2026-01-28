@@ -164,7 +164,7 @@ impl AddressRange {
         let s = start.to_be_bytes();
         let e = end.to_be_bytes();
         Self {
-            0: [s[0], s[1], e[0], e[1]]
+            0: [s[0], s[1], e[0], e[1]],
         }
     }
 }

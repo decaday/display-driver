@@ -60,15 +60,18 @@ pub struct SingleColor {
 #[cfg(feature = "embedded-graphics")]
 mod eg_impls {
     use super::*;
-    use embedded_graphics_core::pixelcolor::{Rgb666, Rgb888, Rgb565, RgbColor, PixelColor, raw::ToBytes};
-    
+    use embedded_graphics_core::pixelcolor::{
+        raw::ToBytes, PixelColor, Rgb565, Rgb666, Rgb888, RgbColor,
+    };
+
     impl<'a> From<Rgb565> for SingleColor {
         fn from(value: Rgb565) -> Self {
             let mut raw = [0u8; 3];
             raw[0..2].copy_from_slice(&<Rgb565 as PixelColor>::Raw::from(value).to_be_bytes());
-            SingleColor { raw,
-            format: ColorFormat::RGB565,
-            color: ColorType::Rgb(value.r(), value.g(), value.b())
+            SingleColor {
+                raw,
+                format: ColorFormat::RGB565,
+                color: ColorType::Rgb(value.r(), value.g(), value.b()),
             }
         }
     }
@@ -78,22 +81,23 @@ mod eg_impls {
         fn from(value: Rgb666) -> Self {
             let mut raw = [0u8; 3];
             raw.copy_from_slice(&<Rgb666 as PixelColor>::Raw::from(value).to_be_bytes());
-            SingleColor { raw,
-            format: ColorFormat::RGB666,
-            color: ColorType::Rgb(value.r(), value.g(), value.b())
+            SingleColor {
+                raw,
+                format: ColorFormat::RGB666,
+                color: ColorType::Rgb(value.r(), value.g(), value.b()),
             }
         }
     }
-
 
     #[cfg(feature = "embedded-graphics")]
     impl<'a> From<Rgb888> for SingleColor {
         fn from(value: Rgb888) -> Self {
             let mut raw = [0u8; 3];
             raw.copy_from_slice(&<Rgb888 as PixelColor>::Raw::from(value).to_be_bytes());
-            SingleColor { raw,
-            format: ColorFormat::RGB888,
-            color: ColorType::Rgb(value.r(), value.g(), value.b())
+            SingleColor {
+                raw,
+                format: ColorFormat::RGB888,
+                color: ColorType::Rgb(value.r(), value.g(), value.b()),
             }
         }
     }

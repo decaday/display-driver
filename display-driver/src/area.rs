@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone, Copy)]
 pub struct Area {
     /// Start X coordinate.
@@ -15,7 +14,6 @@ impl Area {
     pub fn from_origin(w: u16, h: u16) -> Self {
         Self { x: 0, y: 0, w, h }
     }
-
 
     pub fn position(&self) -> (u16, u16) {
         (self.x, self.y)
@@ -46,7 +44,6 @@ impl Area {
 //         }
 //     }
 // }
-
 
 #[cfg(feature = "embedded-graphics")]
 mod eg_impls {

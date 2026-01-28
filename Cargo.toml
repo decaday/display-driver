@@ -4,4 +4,5 @@ members = [
     "display-driver",
     "mipidcs",
     "panels/co5300",
+    "panels/st7735",
 ]

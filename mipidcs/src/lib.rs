@@ -9,12 +9,12 @@ use display_driver::bus::DisplayBus;
 use display_driver::panel::{initseq::InitStep, reset::LCDResetOption};
 use embedded_hal::digital::OutputPin;
 
-use crate::consts::*;
+pub use crate::consts::*;
 pub use crate::dcs_types::*;
 
 /// A generic driver for MIPI DCS compliant displays.
 ///
-/// This struct implements standard MIPI Display Command Set (MIPI DCS) operations such as setting address windows, 
+/// This struct implements standard MIPI Display Command Set (MIPI DCS) operations such as setting address windows,
 /// controlling sleep modes, and handling pixel formats.
 /// It is designed to be embedded within specific panel drivers to handle the common DCS functionality.
 pub struct GenericMipidcs<B, S, RST>
@@ -106,21 +106,19 @@ where
         let y_start = y0 + S::ROW_OFFSET;
         let y_end = y1 + S::ROW_OFFSET;
 
-        bus.write_cmd_with_params(
-            &[SET_COLUMN_ADDRESS],
-            &AddressRange::new(x_start, x_end).0,
-        )
-        .await?;
+        bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], &AddressRange::new(x_start, x_end).0)
+            .await?;
 
-        bus.write_cmd_with_params(
-            &[SET_PAGE_ADDRESS],
-            &AddressRange::new(y_start, y_end).0,
-        )
-        .await
+        bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], &AddressRange::new(y_start, y_end).0)
+            .await
     }
 
     /// Set the Address Mode (Memory Data Access Control, aka. MADCTL - Command 0x36).
-    pub async fn set_address_mode(&mut self, bus: &mut B, mode: AddressMode) -> Result<(), B::Error> {
+    pub async fn set_address_mode(
+        &mut self,
+        bus: &mut B,
+        mode: AddressMode,
+    ) -> Result<(), B::Error> {
         self.address_mode = mode;
         bus.write_cmd_with_params(&[SET_ADDRESS_MODE], &[mode.bits()])
             .await
@@ -149,13 +147,17 @@ where
         }
     }
 
-    const INIT_STEPS: [InitStep<'_>; 8] = [
-        InitStep::SingleCommand(SOFT_RESET),
-        InitStep::DelayMs(120),
+    const INIT_STEPS: [InitStep<'_>; 6] = [
         InitStep::SingleCommand(EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
-        InitStep::CommandWithParams((SET_COLUMN_ADDRESS, &address_window_param_u8(0, S::WIDTH, S::COL_OFFSET))),
-        InitStep::CommandWithParams((SET_PAGE_ADDRESS, &address_window_param_u8(0, S::HEIGHT, S::ROW_OFFSET))),
+        InitStep::CommandWithParams((
+            SET_COLUMN_ADDRESS,
+            &address_window_param_u8(0, S::WIDTH, S::COL_OFFSET),
+        )),
+        InitStep::CommandWithParams((
+            SET_PAGE_ADDRESS,
+            &address_window_param_u8(0, S::HEIGHT, S::ROW_OFFSET),
+        )),
         // Power On
         InitStep::SingleCommand(SET_DISPLAY_ON),
         InitStep::DelayMs(20),
