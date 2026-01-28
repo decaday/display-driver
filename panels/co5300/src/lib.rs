@@ -39,7 +39,7 @@ where
     /// Creates a new driver instance.
     pub fn new(reset_pin: LCDResetOption<RST>) -> Self {
         Self {
-            inner: GenericMipidcs::new(reset_pin, AddressMode::empty()),
+            inner: GenericMipidcs::new(reset_pin),
         }
     }
 
@@ -66,6 +66,7 @@ where
                 &mut self,
                 bus: &mut B,
                 address_mode: AddressMode,
+                orientation_if_changed: Option<Orientation>,
             ) -> Result<(), B::Error>;
 
             pub async fn set_bgr_order(&mut self, bus: &mut B, bgr: bool) -> Result<(), B::Error>;

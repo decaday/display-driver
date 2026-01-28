@@ -94,21 +94,20 @@ impl MipidcsSpec for InitR_BlackTab {
     const PHYSICAL_Y_OFFSET: u16 = 0;
 
     const INVERTED: bool = false;
-    const BGR: bool = false; // Adafruit sets MADCTL 0xC0 (RGB) for BlackTab
+    const BGR: bool = false;
 }
 
 impl_st7735_initr!(InitR_BlackTab);
 
 /// INITR_144GREENTAB
 /// 1.44" display, 128x128, Offset 2, 3 (for Rotation 0) or 2, 1? TODO
-/// Adafruit: colstart=2, rowstart=3.
 pub struct InitR_144GreenTab;
 
 impl MipidcsSpec for InitR_144GreenTab {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 128;
     const PHYSICAL_X_OFFSET: u16 = 2;
-    const PHYSICAL_Y_OFFSET: u16 = 3; // Adafruit says 3 for rotation 0
+    const PHYSICAL_Y_OFFSET: u16 = 3;
 
     const INVERTED: bool = false;
     const BGR: bool = true;
@@ -118,7 +117,6 @@ impl_st7735_initr!(InitR_144GreenTab);
 
 /// INITR_MINI160x80
 /// 0.96" display, 80x160, Offset 24, 0.
-/// Adafruit treats as "BlackTab" for MADCTL (RGB).
 pub struct InitR_Mini160x80;
 
 impl MipidcsSpec for InitR_Mini160x80 {
@@ -128,7 +126,7 @@ impl MipidcsSpec for InitR_Mini160x80 {
     const PHYSICAL_Y_OFFSET: u16 = 0;
 
     const INVERTED: bool = false;
-    const BGR: bool = false; // Treat as BlackTab (RGB)
+    const BGR: bool = false;
 }
 
 impl_st7735_initr!(InitR_Mini160x80);

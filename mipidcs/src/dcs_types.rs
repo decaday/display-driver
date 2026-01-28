@@ -1,6 +1,7 @@
 use core::mem;
 
 use bitflags::bitflags;
+use display_driver::panel::Orientation;
 
 /// Gamma Curve selection (Command 0x26).
 #[repr(u8)]
@@ -160,7 +161,31 @@ impl AddressMode {
     }
 
     pub const fn is_xy_swapped(&self) -> bool {
-        self.contains(AddressMode::ROW_COLUMN_SWAP)
+        self.contains(AddressMode::MV)
+    }
+
+    pub const fn from_orientation(orientation: Orientation) -> Self {
+        let bits = match orientation {
+            Orientation::Deg0 => Self::empty().bits(),
+            Orientation::Deg90 => Self::MV.bits() | Self::MX.bits(),
+            Orientation::Deg180 => Self::MX.bits() | Self::MY.bits(),
+            Orientation::Deg270 => Self::MV.bits() | Self::MY.bits(),
+        };
+        Self::from_bits_truncate(bits)
+    }
+
+    pub const fn orientation(&self) -> Option<Orientation> {
+        let bits = self.bits();
+        match bits {
+            0 => Some(Orientation::Deg0),
+            _ => None,
+        }
+    }
+
+    pub fn set_orientation(&mut self, orientation: Orientation) {
+        let bits = Self::from_orientation(orientation).bits();
+        let mask_bits = Self::MV.bits() | Self::MX.bits() | Self::MY.bits();
+        *self = Self::from_bits_retain((self.bits() & !mask_bits) | (bits & mask_bits));
     }
 }
 

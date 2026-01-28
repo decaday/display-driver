@@ -54,8 +54,7 @@ where
         );
         reseter.reset().await?;
 
-        sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await?;
-        self.set_address_mode(bus, self.address_mode).await
+        sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
     }
 
     async fn set_window(
@@ -96,19 +95,9 @@ where
     ) -> Result<(), DisplayError<B::Error>> {
         let mut mode = self.address_mode;
 
-        // Calculate new orientation bits
-        let (mx, my, mv) = match orientation {
-            Orientation::Deg0 => (false, false, false),
-            Orientation::Deg90 => (true, false, true),
-            Orientation::Deg180 => (true, true, false),
-            Orientation::Deg270 => (false, true, true),
-        };
+        mode.set_orientation(orientation);
 
-        mode.set(AddressMode::MX, mx);
-        mode.set(AddressMode::MY, my);
-        mode.set(AddressMode::MV, mv);
-
-        self.set_address_mode(bus, mode)
+        self.set_address_mode(bus, mode, Some(orientation))
             .await
             .map_err(DisplayError::BusError)
     }

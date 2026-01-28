@@ -6,7 +6,7 @@ pub mod display_bus;
 
 use core::marker::PhantomData;
 use display_driver::bus::DisplayBus;
-use display_driver::panel::{initseq::InitStep, reset::LCDResetOption};
+use display_driver::panel::{initseq::InitStep, reset::LCDResetOption, Orientation};
 use embedded_hal::digital::OutputPin;
 
 pub use crate::consts::*;
@@ -26,6 +26,7 @@ where
     pub reset_pin: LCDResetOption<RST>,
     /// The current Address Mode (MADCTL) setting.
     pub address_mode: AddressMode,
+    pub orientation: Orientation,
     _phantom: PhantomData<(B, S)>,
 }
 
@@ -36,10 +37,11 @@ where
     RST: OutputPin,
 {
     /// Creates a new generic MIPI DCS driver.
-    pub fn new(reset_pin: LCDResetOption<RST>, address_mode: AddressMode) -> Self {
+    pub fn new(reset_pin: LCDResetOption<RST>) -> Self {
         Self {
             reset_pin,
-            address_mode,
+            address_mode: AddressMode::empty(),
+            orientation: Orientation::Deg0,
             _phantom: PhantomData,
         }
     }
@@ -101,10 +103,11 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), B::Error> {
-        let (x_offset, y_offset) = if !self.address_mode.is_xy_swapped() {
-            (S::PHYSICAL_X_OFFSET, S::PHYSICAL_Y_OFFSET)
-        } else {
-            (S::PHYSICAL_Y_OFFSET, S::PHYSICAL_X_OFFSET)
+        let (x_offset, y_offset) = match self.orientation {
+            Orientation::Deg0 => (S::PHYSICAL_X_OFFSET, S::PHYSICAL_Y_OFFSET),
+            Orientation::Deg90 => (S::PHYSICAL_Y_OFFSET, S::PHYSICAL_X_OFFSET),
+            Orientation::Deg180 => (S::PHYSICAL_X_OFFSET_ROTATED, S::PHYSICAL_Y_OFFSET_ROTATED),
+            Orientation::Deg270 => (S::PHYSICAL_Y_OFFSET_ROTATED, S::PHYSICAL_X_OFFSET_ROTATED),
         };
 
         bus.write_cmd_with_params(
@@ -121,12 +124,27 @@ where
     }
 
     /// Set the Address Mode (Memory Data Access Control, aka. MADCTL - Command 0x36).
+    ///
+    /// # Arguments
+    ///
+    /// * `bus` - The display bus to write to.
+    /// * `mode` - The new address mode to set.
+    /// * `orientation_if_changed` - Set the orientation in state machine if it has changed
+    /// by your self for correct offset handling.
+    ///
+    /// # Note
+    ///
+    /// This function will not change `mode` and send it.
     pub async fn set_address_mode(
         &mut self,
         bus: &mut B,
         mode: AddressMode,
+        orientation_if_changed: Option<Orientation>,
     ) -> Result<(), B::Error> {
         self.address_mode = mode;
+        if let Some(orientation) = orientation_if_changed {
+            self.orientation = orientation;
+        }
         bus.write_cmd_with_params(&[SET_ADDRESS_MODE], &[mode.bits()])
             .await
     }
@@ -178,6 +196,14 @@ pub trait MipidcsSpec {
     const PHYSICAL_X_OFFSET: u16 = 0;
     /// Row(Y) offset in pixels (default 0).
     const PHYSICAL_Y_OFFSET: u16 = 0;
+
+    /// Column(X) offset in pixels when the screen is rotated 180° or 270° (default 0).
+    /// Used for panels that are not physically centered within the frame.
+    const PHYSICAL_X_OFFSET_ROTATED: u16 = Self::PHYSICAL_X_OFFSET;
+
+    /// Row(Y) offset in pixels when the screen is rotated 180° or 270° (default 0).
+    /// Used for panels that are not physically centered within the frame.
+    const PHYSICAL_Y_OFFSET_ROTATED: u16 = Self::PHYSICAL_Y_OFFSET;
 
     /// Whether the display is inverted (default false).
     const INVERTED: bool = false;
