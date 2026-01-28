@@ -10,7 +10,7 @@ impl MipidcsSpec for XX096T_IF09 {
     const PHYSICAL_X_OFFSET: u16 = 26;
     const PHYSICAL_Y_OFFSET: u16 = 1;
     const INVERTED: bool = true;
-    const BGR: bool = false;
+    const BGR: bool = true;
 }
 
 impl St7735Spec for XX096T_IF09 {
@@ -47,14 +47,14 @@ impl St7735Spec for XX096T_IF09 {
     ]);
 }
 
-/// 1.77 inch TFT 128x128 from polcd
+/// 1.77 inch TFT 128x128 from polcd (1.77 inch in datasheet)
 pub struct P144H008_V2;
 
 impl MipidcsSpec for P144H008_V2 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 128;
-    const PHYSICAL_X_OFFSET: u16 = 0;
-    const PHYSICAL_Y_OFFSET: u16 = 0;
+    const PHYSICAL_X_OFFSET: u16 = 0; // TODO
+    const PHYSICAL_Y_OFFSET: u16 = 0; // TODO
 
     const INVERTED: bool = false;
     const BGR: bool = true;
@@ -96,7 +96,7 @@ impl MipidcsSpec for CL177SPI {
     const PHYSICAL_X_OFFSET: u16 = 2;
     const PHYSICAL_Y_OFFSET: u16 = 1;
 
-    const INVERTED: bool = true;
+    const INVERTED: bool = false;
     const BGR: bool = true;
 }
 
