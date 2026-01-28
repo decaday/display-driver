@@ -18,10 +18,10 @@ pub trait Co5300Spec: MipidcsSpec {
 /// AM196Q410502LK_196_410x502
 pub struct AM196Q410502LK_196;
 impl MipidcsSpec for AM196Q410502LK_196 {
-    const WIDTH: u16 = 410;
-    const HEIGHT: u16 = 502;
-    const COL_OFFSET: u16 = 22;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 410;
+    const PHYSICAL_HEIGHT: u16 = 502;
+    const PHYSICAL_X_OFFSET: u16 = 22;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for AM196Q410502LK_196 {
     const INIT_PAGE_PARAM: u8 = 0x00;
@@ -31,10 +31,10 @@ impl Co5300Spec for AM196Q410502LK_196 {
 /// AM178Q368448LK_178_368x448
 pub struct AM178Q368448LK_178;
 impl MipidcsSpec for AM178Q368448LK_178 {
-    const WIDTH: u16 = 368;
-    const HEIGHT: u16 = 448;
-    const COL_OFFSET: u16 = 16;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 368;
+    const PHYSICAL_HEIGHT: u16 = 448;
+    const PHYSICAL_X_OFFSET: u16 = 16;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for AM178Q368448LK_178 {
     const INIT_PAGE_PARAM: u8 = 0x00;
@@ -44,10 +44,10 @@ impl Co5300Spec for AM178Q368448LK_178 {
 /// AM151Q466466LK_151_466x466_C
 pub struct AM151Q466466LK_151_C;
 impl MipidcsSpec for AM151Q466466LK_151_C {
-    const WIDTH: u16 = 466;
-    const HEIGHT: u16 = 466;
-    const COL_OFFSET: u16 = 6;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 466;
+    const PHYSICAL_HEIGHT: u16 = 466;
+    const PHYSICAL_X_OFFSET: u16 = 6;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for AM151Q466466LK_151_C {
     const INIT_PAGE_PARAM: u8 = 0x00;
@@ -57,10 +57,10 @@ impl Co5300Spec for AM151Q466466LK_151_C {
 /// AM200Q460460LK_200_460x460
 pub struct AM200Q460460LK_200;
 impl MipidcsSpec for AM200Q460460LK_200 {
-    const WIDTH: u16 = 460;
-    const HEIGHT: u16 = 460;
-    const COL_OFFSET: u16 = 10;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 460;
+    const PHYSICAL_HEIGHT: u16 = 460;
+    const PHYSICAL_X_OFFSET: u16 = 10;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for AM200Q460460LK_200 {
     const INIT_PAGE_PARAM: u8 = 0x00;
@@ -70,10 +70,10 @@ impl Co5300Spec for AM200Q460460LK_200 {
 /// H0198S005AMT005_V0_195_410x502
 pub struct H0198S005AMT005_V0_195;
 impl MipidcsSpec for H0198S005AMT005_V0_195 {
-    const WIDTH: u16 = 410;
-    const HEIGHT: u16 = 502;
-    const COL_OFFSET: u16 = 44;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 410;
+    const PHYSICAL_HEIGHT: u16 = 502;
+    const PHYSICAL_X_OFFSET: u16 = 44;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for H0198S005AMT005_V0_195 {
     const INIT_PAGE_PARAM: u8 = 0x00;
@@ -83,10 +83,10 @@ impl Co5300Spec for H0198S005AMT005_V0_195 {
 // Amoled, 1.85Inch 390x450
 pub struct Amoled_185Inch_390x450;
 impl MipidcsSpec for Amoled_185Inch_390x450 {
-    const WIDTH: u16 = 390;
-    const HEIGHT: u16 = 450;
-    const COL_OFFSET: u16 = 0;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 390;
+    const PHYSICAL_HEIGHT: u16 = 450;
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for Amoled_185Inch_390x450 {
     const INIT_PAGE_PARAM: u8 = 0x20;
@@ -95,10 +95,10 @@ impl Co5300Spec for Amoled_185Inch_390x450 {
 
 pub struct GenericCo5300;
 impl MipidcsSpec for GenericCo5300 {
-    const WIDTH: u16 = 240; // Default placeholder
-    const HEIGHT: u16 = 240; // Default placeholder
-    const COL_OFFSET: u16 = 0;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 240; // Default placeholder
+    const PHYSICAL_HEIGHT: u16 = 240; // Default placeholder
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 }
 impl Co5300Spec for GenericCo5300 {
     const INIT_PAGE_PARAM: u8 = 0x20;

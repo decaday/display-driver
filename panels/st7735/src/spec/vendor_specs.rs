@@ -5,10 +5,10 @@ use super::*;
 pub struct XX096T_IF09;
 
 impl MipidcsSpec for XX096T_IF09 {
-    const WIDTH: u16 = 80;
-    const HEIGHT: u16 = 160;
-    const COL_OFFSET: u16 = 26;
-    const ROW_OFFSET: u16 = 1;
+    const PHYSICAL_WIDTH: u16 = 80;
+    const PHYSICAL_HEIGHT: u16 = 160;
+    const PHYSICAL_X_OFFSET: u16 = 26;
+    const PHYSICAL_Y_OFFSET: u16 = 1;
     const INVERTED: bool = true;
     const BGR: bool = false;
 }
@@ -51,10 +51,10 @@ impl St7735Spec for XX096T_IF09 {
 pub struct P144H008_V2;
 
 impl MipidcsSpec for P144H008_V2 {
-    const WIDTH: u16 = 128;
-    const HEIGHT: u16 = 128;
-    const COL_OFFSET: u16 = 0;
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_WIDTH: u16 = 128;
+    const PHYSICAL_HEIGHT: u16 = 128;
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 
     const INVERTED: bool = false;
     const BGR: bool = true;
@@ -91,10 +91,10 @@ impl St7735Spec for P144H008_V2 {
 pub struct CL177SPI;
 
 impl MipidcsSpec for CL177SPI {
-    const WIDTH: u16 = 128;
-    const HEIGHT: u16 = 160;
-    const COL_OFFSET: u16 = 2;
-    const ROW_OFFSET: u16 = 1;
+    const PHYSICAL_WIDTH: u16 = 128;
+    const PHYSICAL_HEIGHT: u16 = 160;
+    const PHYSICAL_X_OFFSET: u16 = 2;
+    const PHYSICAL_Y_OFFSET: u16 = 1;
 
     const INVERTED: bool = true;
     const BGR: bool = true;

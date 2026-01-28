@@ -76,7 +76,7 @@ where
         start: u16,
         end: u16,
     ) -> Result<(), B::Error> {
-        let params = AddressRange::new_with_offset(start, end, S::COL_OFFSET);
+        let params = AddressRange::new_with_offset(start, end, S::PHYSICAL_X_OFFSET);
         bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], params.as_bytes())
             .await
     }
@@ -88,7 +88,7 @@ where
         start: u16,
         end: u16,
     ) -> Result<(), B::Error> {
-        let params = AddressRange::new_with_offset(start, end, S::ROW_OFFSET);
+        let params = AddressRange::new_with_offset(start, end, S::PHYSICAL_Y_OFFSET);
         bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], params.as_bytes())
             .await
     }
@@ -102,9 +102,9 @@ where
         y1: u16,
     ) -> Result<(), B::Error> {
         let (x_offset, y_offset) = if !self.address_mode.is_xy_swapped() {
-            (S::COL_OFFSET, S::ROW_OFFSET)
+            (S::PHYSICAL_X_OFFSET, S::PHYSICAL_Y_OFFSET)
         } else {
-            (S::ROW_OFFSET, S::COL_OFFSET)
+            (S::PHYSICAL_Y_OFFSET, S::PHYSICAL_X_OFFSET)
         };
 
         bus.write_cmd_with_params(
@@ -171,13 +171,13 @@ where
 /// Display Specification Trait.
 pub trait MipidcsSpec {
     /// Screen width in pixels.
-    const WIDTH: u16;
+    const PHYSICAL_WIDTH: u16;
     /// Screen height in pixels.
-    const HEIGHT: u16;
-    /// Column offset in pixels (default 0).
-    const COL_OFFSET: u16 = 0;
-    /// Row offset in pixels (default 0).
-    const ROW_OFFSET: u16 = 0;
+    const PHYSICAL_HEIGHT: u16;
+    /// Column(X) offset in pixels (default 0).
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    /// Row(Y) offset in pixels (default 0).
+    const PHYSICAL_Y_OFFSET: u16 = 0;
 
     /// Whether the display is inverted (default false).
     const INVERTED: bool = false;

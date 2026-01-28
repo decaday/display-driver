@@ -20,25 +20,25 @@ where
 
     fn width(&self) -> u16 {
         if self.address_mode.is_xy_swapped() {
-            S::HEIGHT
+            S::PHYSICAL_HEIGHT
         } else {
-            S::WIDTH
+            S::PHYSICAL_WIDTH
         }
     }
 
     fn height(&self) -> u16 {
         if self.address_mode.is_xy_swapped() {
-            S::WIDTH
+            S::PHYSICAL_WIDTH
         } else {
-            S::HEIGHT
+            S::PHYSICAL_HEIGHT
         }
     }
 
     fn size(&self) -> (u16, u16) {
         if self.address_mode.is_xy_swapped() {
-            (S::HEIGHT, S::WIDTH)
+            (S::PHYSICAL_HEIGHT, S::PHYSICAL_WIDTH)
         } else {
-            (S::WIDTH, S::HEIGHT)
+            (S::PHYSICAL_WIDTH, S::PHYSICAL_HEIGHT)
         }
     }
 
