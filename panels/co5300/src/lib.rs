@@ -21,12 +21,12 @@ pub mod consts;
 pub mod spec;
 
 use consts::*;
-use spec::DisplaySpec;
+use spec::Co5300Spec;
 
 /// Driver for the CO5300 AMOLED display controller.
 pub struct Co5300<Spec, RST, B>
 where
-    Spec: DisplaySpec,
+    Spec: Co5300Spec,
     RST: OutputPin,
     B: DisplayBus,
 {
@@ -36,7 +36,7 @@ where
 
 impl<Spec, RST, B> Co5300<Spec, RST, B>
 where
-    Spec: DisplaySpec,
+    Spec: Co5300Spec,
     RST: OutputPin,
     B: DisplayBus,
 {
@@ -111,7 +111,7 @@ where
 
 impl<Spec, RST, B> Panel<B> for Co5300<Spec, RST, B>
 where
-    Spec: DisplaySpec,
+    Spec: Co5300Spec,
     RST: OutputPin,
     B: DisplayBus,
 {

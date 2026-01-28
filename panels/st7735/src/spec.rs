@@ -1,3 +1,4 @@
+#![allow(non_camel_case_types)]
 use mipidcs::DisplaySize;
 
 /// Specification for ST7735 initialization differences.
@@ -38,17 +39,16 @@ pub trait St7735Spec: DisplaySize {
 }
 
 /// 0.96 inch TFT IPS 80x160
-/// XX096T_IF09
-pub struct ST7735_0_96_80x160;
+pub struct XX096T_IF09;
 
-impl DisplaySize for ST7735_0_96_80x160 {
+impl DisplaySize for XX096T_IF09 {
     const WIDTH: u16 = 80;
     const HEIGHT: u16 = 160;
     const COL_OFFSET: u16 = 26;
     const ROW_OFFSET: u16 = 1;
 }
 
-impl St7735Spec for ST7735_0_96_80x160 {
+impl St7735Spec for XX096T_IF09 {
     // Rate = fosc/(1x2+40) * (LINE+2C+2D)
     const FRMCTR1_PARAMS: [u8; 3] = [0x01, 0x2C, 0x2D];
     const FRMCTR2_PARAMS: [u8; 3] = [0x01, 0x2C, 0x2D];
@@ -82,18 +82,17 @@ impl St7735Spec for ST7735_0_96_80x160 {
     ]);
 }
 
-/// 1.44 inch TFT 128x128
-/// P144H008V2
-pub struct ST7735_1_44_128x128;
+/// 1.77 inch TFT 128x128 from polcd
+pub struct P144H008_V2;
 
-impl DisplaySize for ST7735_1_44_128x128 {
+impl DisplaySize for P144H008_V2 {
     const WIDTH: u16 = 128;
     const HEIGHT: u16 = 128;
     const COL_OFFSET: u16 = 0; // TODO
     const ROW_OFFSET: u16 = 0; // TODO
 }
 
-impl St7735Spec for ST7735_1_44_128x128 {
+impl St7735Spec for P144H008_V2 {
     // 80Hz
     const FRMCTR1_PARAMS: [u8; 3] = [0x02, 0x35, 0x36];
     const FRMCTR2_PARAMS: [u8; 3] = [0x02, 0x35, 0x36];
@@ -116,6 +115,53 @@ impl St7735Spec for ST7735_1_44_128x128 {
     ]);
     const GMCTRN1_PARAMS: Option<&'static [u8; 16]> = Some(&[
         0x12, 0x1C, 0x10, 0x18, 0x2D, 0x28, 0x23, 0x28, 0x28, 0x26, 0x2F, 0x3B, 0x00, 0x03, 0x03,
+        0x10,
+    ]);
+}
+
+/// 1.77 inch TFT 128x160
+pub struct CL177SPI;
+
+impl DisplaySize for CL177SPI {
+    const WIDTH: u16 = 128;
+    const HEIGHT: u16 = 160;
+    const COL_OFFSET: u16 = 2;
+    const ROW_OFFSET: u16 = 1;
+}
+
+impl St7735Spec for CL177SPI {
+    // Frame Rate Control 1 (Normal Mode) - 0xB1
+    const FRMCTR1_PARAMS: [u8; 3] = [0x00, 0x2C, 0x2B];
+    // Frame Rate Control 2 (Idle Mode) - 0xB2
+    const FRMCTR2_PARAMS: [u8; 3] = [0x00, 0x01, 0x01];
+    // Frame Rate Control 3 (Partial Mode) - 0xB3
+    const FRMCTR3_PARAMS: [u8; 6] = [0x00, 0x01, 0x01, 0x00, 0x01, 0x01];
+
+    // Display Inversion Control - 0xB4
+    const INVCTR_PARAM: u8 = 0x03;
+
+    // Power Control 1 - 0xC0
+    const PWCTR1_PARAMS: [u8; 3] = [0xA2, 0x02, 0x84];
+    // Power Control 2 - 0xC1
+    const PWCTR2_PARAM: u8 = 0x02;
+    // Power Control 3 - 0xC2
+    const PWCTR3_PARAMS: [u8; 2] = [0x0A, 0x00];
+    // Power Control 4 - 0xC3
+    const PWCTR4_PARAMS: [u8; 2] = [0x8A, 0x2A];
+    // Power Control 5 - 0xC4
+    const PWCTR5_PARAMS: [u8; 2] = [0x8A, 0xEE];
+
+    // VCOM Control 1 - 0xC5
+    const VMCTR1_PARAM: u8 = 0x09;
+
+    // Gamma Positive - 0xE0
+    const GMCTRP1_PARAMS: Option<&'static [u8; 16]> = Some(&[
+        0x0C, 0x1C, 0x1B, 0x1A, 0x2F, 0x28, 0x20, 0x24, 0x23, 0x22, 0x2A, 0x36, 0x00, 0x05, 0x00,
+        0x10,
+    ]);
+    // Gamma Negative - 0xE1
+    const GMCTRN1_PARAMS: Option<&'static [u8; 16]> = Some(&[
+        0x0C, 0x1A, 0x1A, 0x1A, 0x2E, 0x27, 0x21, 0x24, 0x24, 0x22, 0x2A, 0x35, 0x00, 0x05, 0x00,
         0x10,
     ]);
 }
