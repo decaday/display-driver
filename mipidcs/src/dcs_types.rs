@@ -154,6 +154,10 @@ impl AddressMode {
         mode.set(AddressMode::BGR, bgr);
         mode
     }
+
+    pub const fn as_bytes(&self) -> [u8; 1] {
+        [self.bits()]
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -180,4 +184,3 @@ impl AddressRange {
         &self.0
     }
 }
-

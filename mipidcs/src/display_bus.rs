@@ -7,12 +7,12 @@ use embedded_hal_async::delay::DelayNs;
 
 use crate::consts::*;
 use crate::dcs_types::*;
-use crate::{DisplaySize, GenericMipidcs};
+use crate::{GenericMipidcs, MipidcsSpec};
 
 impl<B, S, RST> Panel<B> for GenericMipidcs<B, S, RST>
 where
     B: DisplayBus,
-    S: DisplaySize,
+    S: MipidcsSpec,
     RST: OutputPin,
 {
     const CMD_LEN: usize = 1;

@@ -20,7 +20,7 @@ pub use crate::dcs_types::*;
 pub struct GenericMipidcs<B, S, RST>
 where
     B: DisplayBus,
-    S: DisplaySize,
+    S: MipidcsSpec,
     RST: OutputPin,
 {
     pub reset_pin: LCDResetOption<RST>,
@@ -32,7 +32,7 @@ where
 impl<B, S, RST> GenericMipidcs<B, S, RST>
 where
     B: DisplayBus,
-    S: DisplaySize,
+    S: MipidcsSpec,
     RST: OutputPin,
 {
     /// Creates a new generic MIPI DCS driver.
@@ -101,11 +101,17 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), B::Error> {
-        bus.write_cmd_with_params(&[SET_COLUMN_ADDRESS], AddressRange::new_with_offset(x0, x1, S::COL_OFFSET).as_bytes())
-            .await?;
+        bus.write_cmd_with_params(
+            &[SET_COLUMN_ADDRESS],
+            AddressRange::new_with_offset(x0, x1, S::COL_OFFSET).as_bytes(),
+        )
+        .await?;
 
-        bus.write_cmd_with_params(&[SET_PAGE_ADDRESS], AddressRange::new_with_offset(y0, y1, S::ROW_OFFSET).as_bytes())
-            .await
+        bus.write_cmd_with_params(
+            &[SET_PAGE_ADDRESS],
+            AddressRange::new_with_offset(y0, y1, S::ROW_OFFSET).as_bytes(),
+        )
+        .await
     }
 
     /// Set the Address Mode (Memory Data Access Control, aka. MADCTL - Command 0x36).
@@ -142,9 +148,14 @@ where
         }
     }
 
-    const INIT_STEPS: [InitStep<'_>; 4] = [
+    const INIT_STEPS: [InitStep<'_>; 6] = [
         InitStep::SingleCommand(EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
+        InitStep::select_cmd(S::INVERTED, ENTER_INVERT_MODE, EXIT_INVERT_MODE),
+        InitStep::CommandWithParams((
+            SET_ADDRESS_MODE,
+            &[if S::BGR { AddressMode::BGR.bits() } else { 0u8 }],
+        )),
         // Power On
         InitStep::SingleCommand(SET_DISPLAY_ON),
         InitStep::DelayMs(20),
@@ -152,7 +163,7 @@ where
 }
 
 /// Display Specification Trait.
-pub trait DisplaySize {
+pub trait MipidcsSpec {
     /// Screen width in pixels.
     const WIDTH: u16;
     /// Screen height in pixels.
@@ -161,4 +172,9 @@ pub trait DisplaySize {
     const COL_OFFSET: u16 = 0;
     /// Row offset in pixels (default 0).
     const ROW_OFFSET: u16 = 0;
+
+    ///
+    const INVERTED: bool = false;
+
+    const BGR: bool = false;
 }

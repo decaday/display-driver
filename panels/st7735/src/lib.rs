@@ -10,6 +10,7 @@ use display_driver::panel::{Orientation, Panel};
 
 use display_driver::{ColorFormat, DisplayError};
 
+use mipidcs::SET_ADDRESS_MODE;
 use mipidcs::{dcs_types::AddressMode, GenericMipidcs};
 
 pub mod consts;
@@ -61,7 +62,7 @@ where
     }
 
     /// Initialization sequence for ST7735.
-    const INIT_STEPS: [InitStep<'static>; 16] = [
+    const INIT_STEPS: [InitStep<'static>; 18] = [
         // Sleep Out
         InitStep::SingleCommand(mipidcs::EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
@@ -77,9 +78,23 @@ where
         InitStep::CommandWithParams((PWCTR4, &Spec::PWCTR4_PARAMS)),
         InitStep::CommandWithParams((PWCTR5, &Spec::PWCTR5_PARAMS)),
         InitStep::CommandWithParams((VMCTR1, &[Spec::VMCTR1_PARAM])),
+        // Invert mode
+        InitStep::select_cmd(
+            Spec::INVERTED,
+            mipidcs::ENTER_INVERT_MODE,
+            mipidcs::EXIT_INVERT_MODE,
+        ),
+        InitStep::CommandWithParams((
+            SET_ADDRESS_MODE,
+            &[if Spec::BGR {
+                AddressMode::BGR.bits()
+            } else {
+                0u8
+            }],
+        )),
         // Gamma Correction
-        InitStep::param_option_to_step(GMCTRP1, Spec::GMCTRP1_PARAMS),
-        InitStep::param_option_to_step(GMCTRN1, Spec::GMCTRN1_PARAMS),
+        InitStep::maybe_cmd_with(GMCTRP1, Spec::GMCTRP1_PARAMS),
+        InitStep::maybe_cmd_with(GMCTRN1, Spec::GMCTRN1_PARAMS),
         // Display On
         InitStep::SingleCommand(mipidcs::SET_DISPLAY_ON),
         InitStep::DelayMs(20), // Small delay after turning on

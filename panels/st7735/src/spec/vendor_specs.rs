@@ -1,51 +1,16 @@
 #![allow(non_camel_case_types)]
-use mipidcs::DisplaySize;
-
-/// Specification for ST7735 initialization differences.
-pub trait St7735Spec: DisplaySize {
-    /// Frame Rate Control 1 (Normal Mode) - 3 bytes
-    /// Frame rate=fosc/((RTNA x 2 + 40) x (LINE + FPA + BPA +2))
-    const FRMCTR1_PARAMS: [u8; 3];
-    /// Frame Rate Control 2 (Idle Mode) - 3 bytes
-    /// Frame rate=fosc/((RTNA x 2 + 40) x (LINE + FPA + BPA +2))
-    const FRMCTR2_PARAMS: [u8; 3];
-    /// Frame Rate Control 3 (Partial Mode) - 6 bytes
-    /// Frame rate=fosc/((RTNA x 2 + 40) x (LINE + FPA + BPA +2))
-    /// 1st parameter to 3rd parameter are used in dot inversion mode.
-    /// 4th parameter to 6th parameter are used in column inversion mode.
-    const FRMCTR3_PARAMS: [u8; 6];
-
-    /// Display Inversion Control - 1 byte
-    const INVCTR_PARAM: u8;
-
-    /// Power Control 1 - 3 bytes
-    const PWCTR1_PARAMS: [u8; 3];
-    /// Power Control 2 - 1 byte
-    const PWCTR2_PARAM: u8;
-    /// Power Control 3 - 2 bytes
-    const PWCTR3_PARAMS: [u8; 2];
-    /// Power Control 4 - 2 bytes
-    const PWCTR4_PARAMS: [u8; 2];
-    /// Power Control 5 - 2 bytes
-    const PWCTR5_PARAMS: [u8; 2];
-
-    /// VCOM Control 1 - 1 byte
-    const VMCTR1_PARAM: u8;
-
-    /// Gamma Positive - 16 bytes
-    const GMCTRP1_PARAMS: Option<&'static [u8; 16]>;
-    /// Gamma Negative - 16 bytes
-    const GMCTRN1_PARAMS: Option<&'static [u8; 16]>;
-}
+use super::*;
 
 /// 0.96 inch TFT IPS 80x160
 pub struct XX096T_IF09;
 
-impl DisplaySize for XX096T_IF09 {
+impl MipidcsSpec for XX096T_IF09 {
     const WIDTH: u16 = 80;
     const HEIGHT: u16 = 160;
     const COL_OFFSET: u16 = 26;
     const ROW_OFFSET: u16 = 1;
+    const INVERTED: bool = true;
+    const BGR: bool = false;
 }
 
 impl St7735Spec for XX096T_IF09 {
@@ -85,11 +50,14 @@ impl St7735Spec for XX096T_IF09 {
 /// 1.77 inch TFT 128x128 from polcd
 pub struct P144H008_V2;
 
-impl DisplaySize for P144H008_V2 {
+impl MipidcsSpec for P144H008_V2 {
     const WIDTH: u16 = 128;
     const HEIGHT: u16 = 128;
-    const COL_OFFSET: u16 = 0; // TODO
-    const ROW_OFFSET: u16 = 0; // TODO
+    const COL_OFFSET: u16 = 0;
+    const ROW_OFFSET: u16 = 0;
+
+    const INVERTED: bool = false;
+    const BGR: bool = true;
 }
 
 impl St7735Spec for P144H008_V2 {
@@ -122,11 +90,14 @@ impl St7735Spec for P144H008_V2 {
 /// 1.77 inch TFT 128x160
 pub struct CL177SPI;
 
-impl DisplaySize for CL177SPI {
+impl MipidcsSpec for CL177SPI {
     const WIDTH: u16 = 128;
     const HEIGHT: u16 = 160;
     const COL_OFFSET: u16 = 2;
     const ROW_OFFSET: u16 = 1;
+
+    const INVERTED: bool = true;
+    const BGR: bool = true;
 }
 
 impl St7735Spec for CL177SPI {

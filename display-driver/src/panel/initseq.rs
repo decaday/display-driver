@@ -20,14 +20,34 @@ pub enum InitStep<'a> {
 }
 
 impl InitStep<'static> {
-    pub const fn param_option_to_step<const N: usize>(
-        cmd: u8,
-        params: Option<&'static [u8; N]>,
-    ) -> InitStep<'static> {
-        match params {
-            Some(params) => InitStep::CommandWithParams((cmd, params)),
-            None => InitStep::Nop,
+    pub const fn maybe_cmd(cmd: Option<u8>) -> Self {
+        match cmd {
+            Some(cmd) => Self::SingleCommand(cmd),
+            None => Self::Nop,
         }
+    }
+
+    pub const fn cmd_if(cond: bool, cmd: u8) -> Self {
+        Self::SingleCommand(if cond { cmd } else { 0 })
+    }
+
+    pub const fn cmd_if_with<const N: usize>(
+        cond: bool,
+        cmd: u8,
+        params: &'static [u8; N],
+    ) -> Self {
+        Self::CommandWithParams((if cond { cmd } else { 0 }, params))
+    }
+
+    pub const fn maybe_cmd_with<const N: usize>(cmd: u8, params: Option<&'static [u8; N]>) -> Self {
+        match params {
+            Some(p) => Self::CommandWithParams((cmd, p)),
+            None => Self::Nop,
+        }
+    }
+
+    pub const fn select_cmd(cond: bool, cmd_true: u8, cmd_false: u8) -> Self {
+        Self::SingleCommand(if cond { cmd_true } else { cmd_false })
     }
 }
 
