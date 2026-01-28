@@ -101,15 +101,21 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), B::Error> {
+        let (x_offset, y_offset) = if !self.address_mode.is_xy_swapped() {
+            (S::COL_OFFSET, S::ROW_OFFSET)
+        } else {
+            (S::ROW_OFFSET, S::COL_OFFSET)
+        };
+
         bus.write_cmd_with_params(
             &[SET_COLUMN_ADDRESS],
-            AddressRange::new_with_offset(x0, x1, S::COL_OFFSET).as_bytes(),
+            AddressRange::new_with_offset(x0, x1, x_offset).as_bytes(),
         )
         .await?;
 
         bus.write_cmd_with_params(
             &[SET_PAGE_ADDRESS],
-            AddressRange::new_with_offset(y0, y1, S::ROW_OFFSET).as_bytes(),
+            AddressRange::new_with_offset(y0, y1, y_offset).as_bytes(),
         )
         .await
     }
@@ -173,8 +179,9 @@ pub trait MipidcsSpec {
     /// Row offset in pixels (default 0).
     const ROW_OFFSET: u16 = 0;
 
-    ///
+    /// Whether the display is inverted (default false).
     const INVERTED: bool = false;
 
+    /// Whether the display is BGR (default false).
     const BGR: bool = false;
 }

@@ -18,11 +18,29 @@ where
     const CMD_LEN: usize = 1;
     const PIXEL_WRITE_CMD: [u8; 4] = [WRITE_MEMORY_START, 0, 0, 0];
 
-    const HEIGHT: u16 = S::HEIGHT;
-    const WIDTH: u16 = S::WIDTH;
+    fn width(&self) -> u16 {
+        if self.address_mode.is_xy_swapped() {
+            S::HEIGHT
+        } else {
+            S::WIDTH
+        }
+    }
 
-    const X_ALIGNMENT: u16 = 1;
-    const Y_ALIGNMENT: u16 = 1;
+    fn height(&self) -> u16 {
+        if self.address_mode.is_xy_swapped() {
+            S::WIDTH
+        } else {
+            S::HEIGHT
+        }
+    }
+
+    fn size(&self) -> (u16, u16) {
+        if self.address_mode.is_xy_swapped() {
+            (S::HEIGHT, S::WIDTH)
+        } else {
+            (S::WIDTH, S::HEIGHT)
+        }
+    }
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset

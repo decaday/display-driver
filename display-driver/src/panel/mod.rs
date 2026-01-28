@@ -31,12 +31,23 @@ pub trait Panel<B: DisplayBus> {
     /// `&PIXEL_WRITE_CMD[0..P::CMD_LEN]` when using this.
     const PIXEL_WRITE_CMD: [u8; 4];
 
-    const WIDTH: u16;
-    const HEIGHT: u16;
+    fn width(&self) -> u16;
 
-    /// Alignment requirements for X and Y coordinates.
-    const X_ALIGNMENT: u16;
-    const Y_ALIGNMENT: u16;
+    fn height(&self) -> u16;
+
+    fn size(&self) -> (u16, u16) {
+        (self.width(), self.height())
+    }
+
+    /// Alignment requirements for X coordinates.
+    fn x_alignment(&self) -> u16 {
+        1
+    }
+
+    /// Alignment requirements for Y coordinates.
+    fn y_alignment(&self) -> u16 {
+        1
+    }
 
     /// Initializes the panel.
     async fn init<D: DelayNs>(&mut self, bus: &mut B, delay: D) -> Result<(), B::Error>;
@@ -59,7 +70,7 @@ pub trait Panel<B: DisplayBus> {
 
     /// Sets the window to the full screen size.
     async fn set_full_window(&mut self, bus: &mut B) -> Result<(), DisplayError<B::Error>> {
-        self.set_window(bus, 0, 0, Self::WIDTH - 1, Self::HEIGHT - 1)
+        self.set_window(bus, 0, 0, self.width() - 1, self.height() - 1)
             .await
     }
 

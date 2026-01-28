@@ -110,12 +110,6 @@ where
     const CMD_LEN: usize = 1;
     const PIXEL_WRITE_CMD: [u8; 4] = [mipidcs::WRITE_MEMORY_START, 0, 0, 0];
 
-    const HEIGHT: u16 = Spec::HEIGHT;
-    const WIDTH: u16 = Spec::WIDTH;
-
-    const X_ALIGNMENT: u16 = 1;
-    const Y_ALIGNMENT: u16 = 1;
-
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
         let mut reseter = LCDReseter::new(
@@ -134,6 +128,12 @@ where
 
     delegate::delegate! {
         to self.inner {
+            fn width(&self) -> u16;
+
+            fn height(&self) -> u16;
+
+            fn size(&self) -> (u16, u16);
+
             async fn set_window(
                 &mut self,
                 bus: &mut B,

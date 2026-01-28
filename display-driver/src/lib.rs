@@ -66,7 +66,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
 
     pub async fn write_frame(&mut self, buffer: &[u8]) -> Result<(), DisplayError<B::Error>> {
         self.write_pixels(
-            Area::from_origin(P::WIDTH, P::HEIGHT),
+            Area::from_origin_size(self.panel.size()),
             FrameControl::new_single(),
             buffer,
         )
@@ -99,7 +99,7 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
         color: SingleColor,
     ) -> Result<(), DisplayError<B::Error>> {
         self.fill_solid_via_bus(
-            Area::from_origin(P::WIDTH, P::HEIGHT),
+            Area::from_origin_size(self.panel.size()),
             FrameControl::new_single(),
             color,
         )
@@ -128,7 +128,7 @@ where
             .map_err(DisplayError::BusError)?;
 
         let pixel_size = color.format.size_bytes() as usize;
-        let total_pixels = area.size();
+        let total_pixels = area.total_pixels();
         let mut remaining_pixels = total_pixels;
 
         let mut buffer = [0u8; N];
@@ -162,7 +162,7 @@ where
         &mut self,
         color: SingleColor,
     ) -> Result<(), DisplayError<B::Error>> {
-        self.fill_solid_batch::<N>(Area::from_origin(P::WIDTH, P::HEIGHT), color)
+        self.fill_solid_batch::<N>(Area::from_origin_size(self.panel.size()), color)
             .await
     }
 }

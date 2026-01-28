@@ -11,11 +11,7 @@ use display_driver::panel::{Orientation, Panel};
 use display_driver::{ColorFormat, DisplayError};
 
 // Use GenericMipidcs to handle standard DCS operations
-use mipidcs::{
-    consts::*,
-    dcs_types::AddressMode,
-    GenericMipidcs,
-};
+use mipidcs::{consts::*, dcs_types::AddressMode, GenericMipidcs};
 
 pub mod consts;
 pub mod spec;
@@ -110,11 +106,13 @@ where
     const CMD_LEN: usize = 1;
     const PIXEL_WRITE_CMD: [u8; 4] = [WRITE_RAM, 0, 0, 0];
 
-    const HEIGHT: u16 = Spec::HEIGHT;
-    const WIDTH: u16 = Spec::WIDTH;
+    fn x_alignment(&self) -> u16 {
+        2
+    }
 
-    const X_ALIGNMENT: u16 = 2;
-    const Y_ALIGNMENT: u16 = 2;
+    fn y_alignment(&self) -> u16 {
+        2
+    }
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         let mut reseter = LCDReseter::new(
@@ -133,6 +131,12 @@ where
 
     delegate::delegate! {
         to self.inner {
+            fn width(&self) -> u16;
+
+            fn height(&self) -> u16;
+
+            fn size(&self) -> (u16, u16);
+
             async fn set_window(
                 &mut self,
                 bus: &mut B,

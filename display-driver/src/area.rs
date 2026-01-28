@@ -15,11 +15,20 @@ impl Area {
         Self { x: 0, y: 0, w, h }
     }
 
+    pub fn from_origin_size(size: (u16, u16)) -> Self {
+        Self {
+            x: 0,
+            y: 0,
+            w: size.0,
+            h: size.1,
+        }
+    }
+
     pub fn position(&self) -> (u16, u16) {
         (self.x, self.y)
     }
 
-    pub fn size(&self) -> usize {
+    pub fn total_pixels(&self) -> usize {
         self.w as usize * self.h as usize
     }
 

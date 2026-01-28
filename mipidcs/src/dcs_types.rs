@@ -158,6 +158,10 @@ impl AddressMode {
     pub const fn as_bytes(&self) -> [u8; 1] {
         [self.bits()]
     }
+
+    pub const fn is_xy_swapped(&self) -> bool {
+        self.contains(AddressMode::ROW_COLUMN_SWAP)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
