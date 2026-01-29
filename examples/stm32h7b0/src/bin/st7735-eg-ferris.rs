@@ -122,53 +122,14 @@ async fn main(_spawner: Spawner) {
     fb.clear(Rgb565::BLACK);
 
     // Draw L-shaped markers at the corners to verify offsets
-    {
-        use embedded_graphics::geometry::Point;
-        use embedded_graphics::primitives::Line;
-        use embedded_graphics::Drawable;
-
-        let style = embedded_graphics::primitives::PrimitiveStyle::with_stroke(Rgb565::RED, 1);
-        let (w, h) = (SCREEN_WIDTH as i32, SCREEN_HEIGHT as i32);
-        // Top-left
-        Line::new(Point::new(0, 0), Point::new(5, 0))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-        Line::new(Point::new(0, 0), Point::new(0, 5))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-
-        // Top-right
-        Line::new(Point::new(w - 1, 0), Point::new(w - 6, 0))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-        Line::new(Point::new(w - 1, 0), Point::new(w - 1, 5))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-
-        // Bottom-left
-        Line::new(Point::new(0, h - 1), Point::new(5, h - 1))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-        Line::new(Point::new(0, h - 1), Point::new(0, h - 6))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-
-        // Bottom-right
-        Line::new(Point::new(w - 1, h - 1), Point::new(w - 6, h - 1))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-        Line::new(Point::new(w - 1, h - 1), Point::new(w - 1, h - 6))
-            .into_styled(style)
-            .draw(fb)
-            .unwrap();
-    }
+    stm32h7b0_examples::LShapedMarkers::new(
+        SCREEN_WIDTH as i32,
+        SCREEN_HEIGHT as i32,
+        5,
+        Rgb565::RED,
+    )
+    .draw(fb)
+    .unwrap();
 
     // Draw Ferris
     let image_raw: embedded_graphics::image::ImageRaw<Rgb565, LittleEndian> =
