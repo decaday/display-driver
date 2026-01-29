@@ -43,18 +43,4 @@ where
         self.dc.set_high().map_err(SpiDisplayBusError::Dc)?;
         self.spi.write(data).await.map_err(SpiDisplayBusError::Spi)
     }
-
-    async fn write_cmd_with_params(
-        &mut self,
-        cmd: &[u8],
-        params: &[u8],
-    ) -> Result<(), Self::Error> {
-        self.dc.set_low().map_err(SpiDisplayBusError::Dc)?;
-        self.spi.write(cmd).await.map_err(SpiDisplayBusError::Spi)?;
-        self.dc.set_high().map_err(SpiDisplayBusError::Dc)?;
-        self.spi
-            .write(params)
-            .await
-            .map_err(SpiDisplayBusError::Spi)
-    }
 }

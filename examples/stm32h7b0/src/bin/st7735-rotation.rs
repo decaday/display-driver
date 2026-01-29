@@ -140,7 +140,7 @@ async fn main(_spawner: Spawner) {
                 }
             }
 
-            Timer::after_secs(3).await;
+            Timer::after_secs(2).await;
         }
     }
 }

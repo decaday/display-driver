@@ -1,4 +1,4 @@
-use mipidcs::MipidcsSpec;
+pub use mipidcs::MipidcsSpec;
 
 pub mod generic;
 pub mod vendor_specs;

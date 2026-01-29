@@ -171,7 +171,7 @@ impl AddressMode {
             Orientation::Deg180 => Self::MX.bits() | Self::MY.bits(),
             Orientation::Deg270 => Self::MV.bits() | Self::MY.bits(),
         };
-        Self::from_bits_truncate(bits)
+        Self::from_bits_retain(bits)
     }
 
     pub const fn orientation(&self) -> Option<Orientation> {
@@ -203,7 +203,7 @@ impl AddressRange {
 
     pub const fn new_with_offset(start: u16, end: u16, offset: u16) -> Self {
         let s = (start + offset).to_be_bytes();
-        let e = (end + offset - 1).to_be_bytes();
+        let e = (end + offset).to_be_bytes();
         Self {
             0: [s[0], s[1], e[0], e[1]],
         }

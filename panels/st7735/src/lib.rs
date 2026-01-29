@@ -123,6 +123,8 @@ where
         );
         reseter.reset().await?;
 
+        self.inner.address_mode.set(AddressMode::BGR, Spec::BGR);
+
         // Execute Initialization Sequence
         sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
     }
