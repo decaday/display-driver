@@ -2,6 +2,8 @@
 
 This crate provides an async driver for the ST7735 display controller, implementing the `Panel` trait to be used with the `display-driver` crate.
 
+![stm32h7b0-st7735-160x80](../../docs/stm32h7b0-st7735-160x80.jpg)
+
 ## Usage
 
 This driver is intended to be used as a `Panel` implementation within the `display-driver` framework. You should not use this crate directly to control the display; instead, use it to configure a `DisplayDriver` instance.
