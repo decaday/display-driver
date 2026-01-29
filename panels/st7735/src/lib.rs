@@ -17,7 +17,7 @@ pub mod consts;
 pub mod spec;
 
 use consts::*;
-use spec::St7735Spec;
+pub use spec::St7735Spec;
 
 /// Driver for the ST7735 display controller.
 pub struct St7735<Spec, RST, B>

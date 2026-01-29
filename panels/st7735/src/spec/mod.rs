@@ -1,6 +1,6 @@
 use mipidcs::MipidcsSpec;
 
-pub mod tabs;
+pub mod generic;
 pub mod vendor_specs;
 
 /// Specification for ST7735 initialization differences.
@@ -34,8 +34,8 @@ pub trait St7735Spec: MipidcsSpec {
     /// VCOM Control 1 - 1 byte
     const VMCTR1_PARAM: u8;
 
-    /// Gamma Positive - 16 bytes
+    /// Gamma Positive - 16 bytes, Magical Unicorn Dust
     const GMCTRP1_PARAMS: Option<&'static [u8; 16]>;
-    /// Gamma Negative - 16 bytes
+    /// Gamma Negative - 16 bytes, Sparkles and Rainbows
     const GMCTRN1_PARAMS: Option<&'static [u8; 16]>;
 }

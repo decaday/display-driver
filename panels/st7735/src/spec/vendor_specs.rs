@@ -47,7 +47,7 @@ impl St7735Spec for XX096T_IF09 {
     ]);
 }
 
-/// 1.77 inch TFT 128x128 from polcd (1.77 inch in datasheet)
+/// 1.44 inch TFT 128x128 from polcd
 pub struct P144H008_V2;
 
 impl MipidcsSpec for P144H008_V2 {
