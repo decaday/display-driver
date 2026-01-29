@@ -1,7 +1,7 @@
 use core::mem;
 
 use bitflags::bitflags;
-use display_driver::panel::Orientation;
+use display_driver::Orientation;
 
 /// Gamma Curve selection (Command 0x26).
 #[repr(u8)]

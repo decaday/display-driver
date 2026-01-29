@@ -64,7 +64,6 @@ impl MipidcsSpec for Generic128_160Type1 {
     const INVERTED: bool = false;
     const BGR: bool = true;
 }
-pub type GreenTab = Generic128_160Type1;
 
 impl_st7735_initr!(Generic128_160Type1);
 

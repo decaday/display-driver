@@ -8,7 +8,9 @@ pub mod panel;
 pub use crate::area::Area;
 pub use crate::bus::{BusAutoFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus};
 pub use color::{ColorFormat, ColorType, SingleColor};
-pub use panel::Panel;
+pub use panel::{reset::LCDResetOption, Orientation, Panel};
+
+use embedded_hal_async::delay::DelayNs;
 
 #[derive(Debug)]
 /// A unified error type identifying what went wrong during a display operation.
@@ -36,9 +38,35 @@ pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {
 }
 
 impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
-    /// Init your bus and panel before create a DisplayDriver
+    /// Creates a new display driver.
     pub fn new(bus: B, panel: P) -> Self {
         Self { bus, panel }
+    }
+
+    /// Initializes the display.
+    pub async fn init(&mut self, delay: &mut impl DelayNs) -> Result<(), DisplayError<B::Error>> {
+        self.panel
+            .init(&mut self.bus, delay)
+            .await
+            .map_err(DisplayError::BusError)
+    }
+
+    /// Sets the pixel color format.
+    pub async fn set_color_format(
+        &mut self,
+        color_format: ColorFormat,
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.panel
+            .set_color_format(&mut self.bus, color_format)
+            .await
+    }
+
+    /// Sets the display orientation.
+    pub async fn set_orientation(
+        &mut self,
+        orientation: Orientation,
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.panel.set_orientation(&mut self.bus, orientation).await
     }
 
     /// Writes pixels to the specified area.
