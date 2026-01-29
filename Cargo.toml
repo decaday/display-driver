@@ -5,4 +5,5 @@ members = [
     "mipidcs",
     "panels/co5300",
     "panels/st7735",
+    "buses/spi",
 ]
