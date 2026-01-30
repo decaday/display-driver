@@ -7,7 +7,7 @@ pub mod panel;
 
 pub use crate::area::Area;
 pub use crate::bus::{BusAutoFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus};
-pub use color::{ColorFormat, ColorType, SingleColor};
+pub use color::{ColorFormat, ColorType, SolidColor};
 pub use panel::{reset::LCDResetOption, Orientation, Panel};
 
 use embedded_hal_async::delay::DelayNs;
@@ -107,7 +107,7 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
         &mut self,
         area: Area,
         frame_control: FrameControl,
-        color: SingleColor,
+        color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel
@@ -124,7 +124,7 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
     /// Fills the entire screen with a solid color.
     pub async fn fill_screen_via_bus(
         &mut self,
-        color: SingleColor,
+        color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
         self.fill_solid_via_bus(
             Area::from_origin_size(self.panel.size()),
@@ -143,7 +143,7 @@ where
     pub async fn fill_solid_batch<const N: usize>(
         &mut self,
         area: Area,
-        color: SingleColor,
+        color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
         let (x1, y1) = area.bottom_right();
         self.panel
@@ -188,7 +188,7 @@ where
     /// Fills the entire screen with a solid color.
     pub async fn fill_screen_batch<const N: usize>(
         &mut self,
-        color: SingleColor,
+        color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
         self.fill_solid_batch::<N>(Area::from_origin_size(self.panel.size()), color)
             .await

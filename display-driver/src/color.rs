@@ -51,7 +51,7 @@ pub enum ColorType {
 }
 
 #[derive(Clone, PartialEq, Eq)]
-pub struct SingleColor {
+pub struct SolidColor {
     pub raw: [u8; 3],
     pub format: ColorFormat,
     pub color: ColorType,
@@ -64,11 +64,11 @@ mod eg_impls {
         raw::ToBytes, PixelColor, Rgb565, Rgb666, Rgb888, RgbColor,
     };
 
-    impl<'a> From<Rgb565> for SingleColor {
+    impl<'a> From<Rgb565> for SolidColor {
         fn from(value: Rgb565) -> Self {
             let mut raw = [0u8; 3];
             raw[0..2].copy_from_slice(&<Rgb565 as PixelColor>::Raw::from(value).to_be_bytes());
-            SingleColor {
+            SolidColor {
                 raw,
                 format: ColorFormat::RGB565,
                 color: ColorType::Rgb(value.r(), value.g(), value.b()),
@@ -77,11 +77,11 @@ mod eg_impls {
     }
 
     #[cfg(feature = "embedded-graphics")]
-    impl<'a> From<Rgb666> for SingleColor {
+    impl<'a> From<Rgb666> for SolidColor {
         fn from(value: Rgb666) -> Self {
             let mut raw = [0u8; 3];
             raw.copy_from_slice(&<Rgb666 as PixelColor>::Raw::from(value).to_be_bytes());
-            SingleColor {
+            SolidColor {
                 raw,
                 format: ColorFormat::RGB666,
                 color: ColorType::Rgb(value.r(), value.g(), value.b()),
@@ -90,11 +90,11 @@ mod eg_impls {
     }
 
     #[cfg(feature = "embedded-graphics")]
-    impl<'a> From<Rgb888> for SingleColor {
+    impl<'a> From<Rgb888> for SolidColor {
         fn from(value: Rgb888) -> Self {
             let mut raw = [0u8; 3];
             raw.copy_from_slice(&<Rgb888 as PixelColor>::Raw::from(value).to_be_bytes());
-            SingleColor {
+            SolidColor {
                 raw,
                 format: ColorFormat::RGB888,
                 color: ColorType::Rgb(value.r(), value.g(), value.b()),

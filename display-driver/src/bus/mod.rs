@@ -4,7 +4,7 @@ mod display_interface_impl;
 pub mod qspi_flash;
 pub use qspi_flash::QspiFlashBus;
 
-use crate::{Area, DisplayError, SingleColor};
+use crate::{Area, DisplayError, SolidColor};
 
 /// Error type trait.
 ///
@@ -196,7 +196,7 @@ pub trait BusAutoFill: DisplayBus {
     async fn fill_solid(
         &mut self,
         cmd: &[u8],
-        color: SingleColor,
+        color: SolidColor,
         metadata: Metadata,
     ) -> Result<(), DisplayError<Self::Error>>;
 }
