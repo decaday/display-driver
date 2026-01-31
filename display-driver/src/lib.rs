@@ -6,6 +6,7 @@ pub mod color;
 pub mod panel;
 
 pub use crate::area::Area;
+use crate::bus::BusNonAtomicCmdData;
 pub use crate::bus::{BusAutoFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus};
 pub use color::{ColorFormat, ColorType, SolidColor};
 pub use panel::{reset::LCDResetOption, Orientation, Panel};
@@ -137,7 +138,7 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
 
 impl<B, P> DisplayDriver<B, P>
 where
-    B: DisplayBus + SimpleDisplayBus,
+    B: DisplayBus + BusNonAtomicCmdData,
     P: Panel<B>,
 {
     pub async fn fill_solid_batch<const N: usize>(
@@ -151,7 +152,8 @@ where
             .await?;
         let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
 
-        <B as SimpleDisplayBus>::write_cmds(&mut self.bus, cmd)
+        self.bus
+            .write_cmds_non_atomic(cmd)
             .await
             .map_err(DisplayError::BusError)?;
 
@@ -176,7 +178,7 @@ where
             let current_pixels = remaining_pixels.min(pixels_per_chunk);
             let byte_count = current_pixels * pixel_size;
             self.bus
-                .write_data(&buffer[0..byte_count])
+                .write_data_non_atomic(&buffer[0..byte_count])
                 .await
                 .map_err(DisplayError::BusError)?;
             remaining_pixels -= current_pixels;
