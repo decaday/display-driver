@@ -176,10 +176,10 @@ where
         InitStep::SingleCommand(EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
         InitStep::select_cmd(S::INVERTED, ENTER_INVERT_MODE, EXIT_INVERT_MODE),
-        InitStep::CommandWithParams((
+        InitStep::CommandWithParams(
             SET_ADDRESS_MODE,
             &[if S::BGR { AddressMode::BGR.bits() } else { 0u8 }],
-        )),
+        ),
         // Power On
         InitStep::SingleCommand(SET_DISPLAY_ON),
         InitStep::DelayMs(20),

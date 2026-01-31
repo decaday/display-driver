@@ -8,7 +8,7 @@ pub enum InitStep<'a> {
     /// Single byte command.
     SingleCommand(u8),
     /// Command with parameters.
-    CommandWithParams((u8, &'a [u8])),
+    CommandWithParams(u8, &'a [u8]),
     /// Delay in milliseconds.
     DelayMs(u8),
     /// No Operation. Useful for placeholders or conditional logic.
@@ -36,12 +36,12 @@ impl InitStep<'static> {
         cmd: u8,
         params: &'static [u8; N],
     ) -> Self {
-        Self::CommandWithParams((if cond { cmd } else { 0 }, params))
+        Self::CommandWithParams(if cond { cmd } else { 0 }, params)
     }
 
     pub const fn maybe_cmd_with<const N: usize>(cmd: u8, params: Option<&'static [u8; N]>) -> Self {
         match params {
-            Some(p) => Self::CommandWithParams((cmd, p)),
+            Some(p) => Self::CommandWithParams(cmd, p),
             None => Self::Nop,
         }
     }
@@ -73,7 +73,7 @@ impl<'a, D: DelayNs, B: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedI
     async fn exec_atomic_step(&mut self, step: InitStep<'a>) -> Result<(), B::Error> {
         match step {
             InitStep::SingleCommand(cmd) => self.display_bus.write_cmds(&[cmd]).await,
-            InitStep::CommandWithParams((cmd, data)) => {
+            InitStep::CommandWithParams(cmd, data) => {
                 self.display_bus.write_cmd_with_params(&[cmd], data).await
             }
             InitStep::DelayMs(ms) => {

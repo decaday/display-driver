@@ -76,20 +76,20 @@ where
     /// Initialization sequence for CO5300.
     const INIT_STEPS: [InitStep<'static>; 16] = [
         // Unlock Sequence
-        InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[Spec::INIT_PAGE_PARAM])),
-        InitStep::CommandWithParams((PASSWD1, &[0x5A])),
-        InitStep::CommandWithParams((PASSWD2, &[0x59])),
+        InitStep::CommandWithParams(CMD_PAGE_SWITCH, &[Spec::INIT_PAGE_PARAM]),
+        InitStep::CommandWithParams(PASSWD1, &[0x5A]),
+        InitStep::CommandWithParams(PASSWD2, &[0x59]),
         // Lock Sequence
-        InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[0x20])),
-        InitStep::CommandWithParams((PASSWD1, &[0xA5])),
-        InitStep::CommandWithParams((PASSWD2, &[0xA5])),
+        InitStep::CommandWithParams(CMD_PAGE_SWITCH, &[0x20]),
+        InitStep::CommandWithParams(PASSWD1, &[0xA5]),
+        InitStep::CommandWithParams(PASSWD2, &[0xA5]),
         // Configuration
-        InitStep::CommandWithParams((CMD_PAGE_SWITCH, &[0x00])),
-        InitStep::CommandWithParams((SPI_MODE, &[0x80])),
-        InitStep::CommandWithParams((COLOR_MODE, &[0x55])), // Default to RGB565
-        InitStep::CommandWithParams((TEARING_EFFECT_ON, &[0x00])),
-        InitStep::CommandWithParams((WRITE_CTRL_DISPLAY, &[0x20])),
-        InitStep::CommandWithParams((WRHBMDISBV, &[0xFF])),
+        InitStep::CommandWithParams(CMD_PAGE_SWITCH, &[0x00]),
+        InitStep::CommandWithParams(SPI_MODE, &[0x80]),
+        InitStep::CommandWithParams(COLOR_MODE, &[0x55]), // Default to RGB565
+        InitStep::CommandWithParams(TEARING_EFFECT_ON, &[0x00]),
+        InitStep::CommandWithParams(WRITE_CTRL_DISPLAY, &[0x20]),
+        InitStep::CommandWithParams(WRHBMDISBV, &[0xFF]),
         // Power On
         InitStep::SingleCommand(SLEEP_OUT),
         InitStep::DelayMs(120),
