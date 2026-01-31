@@ -19,7 +19,7 @@ cortex-m = { version = "0.7.6", features = ["inline-asm", "critical-section-sing
 cortex-m-rt = { version = "0.7.0", features = ["set-sp", "set-vtor"]}
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 static_cell = "2"
-
+micromath = "2.1.0"
 
 embedded-graphics = { version = "0.8.1", features = ["defmt"] }
 embedded-hal-bus = { version = "0.3.0", features = ["async"] }

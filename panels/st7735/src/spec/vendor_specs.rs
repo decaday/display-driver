@@ -53,8 +53,11 @@ pub struct P144H008_V2;
 impl MipidcsSpec for P144H008_V2 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 128;
-    const PHYSICAL_X_OFFSET: u16 = 0; // TODO
-    const PHYSICAL_Y_OFFSET: u16 = 0; // TODO
+    const PHYSICAL_X_OFFSET: u16 = 2;
+    const PHYSICAL_Y_OFFSET: u16 = 1;
+
+    const PHYSICAL_X_OFFSET_ROTATED: u16 = 2;
+    const PHYSICAL_Y_OFFSET_ROTATED: u16 = 3;
 
     const INVERTED: bool = false;
     const BGR: bool = true;

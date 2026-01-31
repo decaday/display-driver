@@ -8,7 +8,6 @@ use {defmt_rtt as _, panic_probe as _};
 use embassy_stm32::gpio::{Level, Output, Speed};
 use embassy_stm32::spi::{self, Spi};
 use embassy_stm32::time::Hertz;
-use embassy_stm32::Config;
 
 use embedded_graphics::{
     framebuffer::{buffer_size, Framebuffer},
@@ -47,48 +46,20 @@ static FB: StaticCell<FramebufferType> = StaticCell::new();
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    // RCC config
-    let mut config = Config::default();
     info!("START");
-    {
-        use embassy_stm32::rcc::*;
-        config.rcc.hsi = Some(HSIPrescaler::DIV1);
-        config.rcc.csi = true;
-        // Needed for USB
-        config.rcc.hsi48 = Some(Hsi48Config {
-            sync_from_usb: true,
-        });
-        // External oscillator 25MHZ
-        config.rcc.hse = Some(Hse {
-            freq: Hertz(25_000_000),
-            mode: HseMode::Oscillator,
-        });
-        config.rcc.pll1 = Some(Pll {
-            source: PllSource::HSE,
-            prediv: PllPreDiv::DIV5,
-            mul: PllMul::MUL112,
-            divp: Some(PllDiv::DIV2),
-            divq: Some(PllDiv::DIV2),
-            divr: Some(PllDiv::DIV2),
-        });
-        config.rcc.sys = Sysclk::PLL1_P;
-        config.rcc.ahb_pre = AHBPrescaler::DIV2;
-        config.rcc.apb1_pre = APBPrescaler::DIV2;
-        config.rcc.apb2_pre = APBPrescaler::DIV2;
-        config.rcc.apb3_pre = APBPrescaler::DIV2;
-        config.rcc.apb4_pre = APBPrescaler::DIV2;
-        config.rcc.voltage_scale = VoltageScale::Scale0;
-    }
+
+    // RCC config
+    let config = stm32h7b0_examples::configure_rcc();
 
     // Initialize peripherals
     let p = embassy_stm32::init(config);
 
     let dc = Output::new(p.PE13, Level::Low, Speed::High);
-    let cs = Output::new(p.PE11, Level::Low, Speed::High);
+    let cs = Output::new(p.PE11, Level::High, Speed::High);
     let _lcd_led = Output::new(p.PE10, Level::Low, Speed::Low);
 
     let mut spi_config: spi::Config = Default::default();
-    spi_config.frequency = Hertz(24_000_000);
+    spi_config.frequency = Hertz(10_000_000);
 
     let spi = Spi::new_txonly(p.SPI4, p.PE12, p.PE14, p.DMA1_CH0, spi_config);
 
