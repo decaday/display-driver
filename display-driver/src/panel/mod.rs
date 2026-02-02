@@ -31,20 +31,23 @@ pub trait Panel<B: DisplayBus> {
     /// `&PIXEL_WRITE_CMD[0..P::CMD_LEN]` when using this.
     const PIXEL_WRITE_CMD: [u8; 4];
 
+    /// Returns the display width, accounting for orientation.
     fn width(&self) -> u16;
 
+    /// Returns the display height, accounting for orientation.
     fn height(&self) -> u16;
 
+    /// Returns the display size (width, height), accounting for orientation.
     fn size(&self) -> (u16, u16) {
         (self.width(), self.height())
     }
 
-    /// Alignment requirements for X coordinates.
+    /// Returns the X coordinate alignment requirements for this panel.
     fn x_alignment(&self) -> u16 {
         1
     }
 
-    /// Alignment requirements for Y coordinates.
+    /// Returns the Y coordinate alignment requirements for this panel.
     fn y_alignment(&self) -> u16 {
         1
     }
@@ -57,8 +60,8 @@ pub trait Panel<B: DisplayBus> {
     /// This method translates the abstract coordinates (x0, y0, x1, y1) into the specific "Column Address Set"
     /// and "Page Address Set" commands understood by the display controller.
     ///
-    /// Note: For some monochrome displays or AMOLED panels, coordinates must be aligned to `Self::X_ALIGNMENT`
-    /// and `Self::Y_ALIGNMENT`.
+    /// Note: For some monochrome displays or AMOLED panels, coordinates must be aligned to `self.x_alignment()`
+    /// and `self.y_alignment()`.
     async fn set_window(
         &mut self,
         bus: &mut B,

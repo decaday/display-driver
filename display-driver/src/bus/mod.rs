@@ -143,7 +143,8 @@ pub trait DisplayBus: ErrorType {
         metadata: Metadata,
     ) -> Result<(), DisplayError<Self::Error>>;
 
-    /// Reset the screen via the bus (optional).
+    /// Note: This method should only be implemented if the hardware has a physical Reset pin.
+    /// Avoid adding a Pin field to your `DisplayBus` wrapper for this purpose; use `LCDResetOption` instead.
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         let _ = reset;
         Err(DisplayError::Unsupported)

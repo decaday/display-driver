@@ -71,10 +71,6 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
     }
 
     /// Writes pixels to the specified area.
-    ///
-    /// # Arguments
-    /// * `bus` - The display bus interface.
-    /// * `buffer` - Pixel data.
     pub async fn write_pixels(
         &mut self,
         area: Area,
@@ -93,6 +89,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
         self.bus.write_pixels(cmd, buffer, metadata).await
     }
 
+    /// Writes the entire buffer to the display.
     pub async fn write_frame(&mut self, buffer: &[u8]) -> Result<(), DisplayError<B::Error>> {
         self.write_pixels(
             Area::from_origin_size(self.panel.size()),
@@ -104,6 +101,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
 }
 
 impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
+    /// Fills the area with a solid color using bus auto-fill.
     pub async fn fill_solid_via_bus(
         &mut self,
         area: Area,
@@ -122,7 +120,7 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
         self.bus.fill_solid(cmd, color, metadata).await
     }
 
-    /// Fills the entire screen with a solid color.
+    /// Fills the entire screen with a solid color using bus auto-fill.
     pub async fn fill_screen_via_bus(
         &mut self,
         color: SolidColor,
@@ -141,6 +139,7 @@ where
     B: DisplayBus + BusNonAtomicCmdData,
     P: Panel<B>,
 {
+    /// Fills the area with a solid color.
     pub async fn fill_solid_batch<const N: usize>(
         &mut self,
         area: Area,

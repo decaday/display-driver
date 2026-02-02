@@ -197,12 +197,14 @@ pub trait MipidcsSpec {
     /// Row(Y) offset in pixels (default 0).
     const PHYSICAL_Y_OFFSET: u16 = 0;
 
-    /// Column(X) offset in pixels when the screen is rotated 180° or 270° (default 0).
+    /// Column(X) offset in pixels when the screen is rotated 180° or 270°.
     /// Used for panels that are not physically centered within the frame.
+    /// If undefined, defaults to PHYSICAL_X_OFFSET.
     const PHYSICAL_X_OFFSET_ROTATED: u16 = Self::PHYSICAL_X_OFFSET;
 
-    /// Row(Y) offset in pixels when the screen is rotated 180° or 270° (default 0).
+    /// Row(Y) offset in pixels when the screen is rotated 180° or 270°.
     /// Used for panels that are not physically centered within the frame.
+    /// If undefined, defaults to PHYSICAL_Y_OFFSET.
     const PHYSICAL_Y_OFFSET_ROTATED: u16 = Self::PHYSICAL_Y_OFFSET;
 
     /// Whether the display is inverted (default false).
