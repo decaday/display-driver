@@ -22,8 +22,16 @@ pub enum DisplayError<E> {
     Unsupported,
     /// Parameter is out of valid range.
     OutOfRange,
-    ///
+    /// Invalid arguments.
     InvalidArgs,
+    /// The area is unaligned.
+    UnalignedArea,
+}
+
+impl<E> From<E> for DisplayError<E> {
+    fn from(error: E) -> Self {
+        Self::BusError(error)
+    }
 }
 
 /// The high-level driver that orchestrates drawing operations.
@@ -52,6 +60,27 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
             .map_err(DisplayError::BusError)
     }
 
+    /// Sets the window.
+    ///
+    /// Use `write_pixels` or `write_frame` if you just want to draw a buffer.
+    /// Use `fill_solid_xxx` if you just want to fill an Area.
+    pub async fn set_window(&mut self, area: Area) -> Result<(), DisplayError<B::Error>> {
+        if self.panel.x_alignment() > 1 || self.panel.y_alignment() > 1 {
+            if area.x % self.panel.x_alignment() != 0
+                || area.y % self.panel.y_alignment() != 0
+                || area.w % self.panel.x_alignment() != 0
+                || area.h % self.panel.y_alignment() != 0
+            {
+                return Err(DisplayError::UnalignedArea);
+            }
+        }
+
+        let (x1, y1) = area.bottom_right();
+        self.panel
+            .set_window(&mut self.bus, area.x, area.y, x1, y1)
+            .await
+    }
+
     /// Sets the pixel color format.
     pub async fn set_color_format(
         &mut self,
@@ -77,10 +106,7 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
         frame_control: FrameControl,
         buffer: &[u8],
     ) -> Result<(), DisplayError<B::Error>> {
-        let (x1, y1) = area.bottom_right();
-        self.panel
-            .set_window(&mut self.bus, area.x, area.y, x1, y1)
-            .await?;
+        self.set_window(area).await?;
         let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
         let metadata = Metadata {
             area: Some(area),
@@ -108,10 +134,7 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
         frame_control: FrameControl,
         color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
-        let (x1, y1) = area.bottom_right();
-        self.panel
-            .set_window(&mut self.bus, area.x, area.y, x1, y1)
-            .await?;
+        self.set_window(area).await?;
         let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
         let metadata = Metadata {
             area: Some(area),
@@ -145,10 +168,7 @@ where
         area: Area,
         color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
-        let (x1, y1) = area.bottom_right();
-        self.panel
-            .set_window(&mut self.bus, area.x, area.y, x1, y1)
-            .await?;
+        self.set_window(area).await?;
         let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
 
         self.bus
