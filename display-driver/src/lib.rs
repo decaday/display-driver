@@ -34,6 +34,82 @@ impl<E> From<E> for DisplayError<E> {
     }
 }
 
+/// A builder for configuring and initializing a [`DisplayDriver`].
+///
+/// Use [`DisplayDriver::builder`] to create a builder, then chain configuration methods
+/// and call [`init`](DisplayDriverBuilder::init) to complete initialization.
+///
+/// # Example
+/// ```ignore
+/// let mut display = DisplayDriver::builder(bus, panel)
+///     .with_color_format(ColorFormat::RGB565)
+///     .with_orientation(Orientation::Deg270)
+///     .init(&mut delay).await.unwrap();
+/// ```
+pub struct DisplayDriverBuilder<B: DisplayBus, P: Panel<B>> {
+    bus: B,
+    panel: P,
+    color_format: Option<ColorFormat>,
+    orientation: Option<Orientation>,
+}
+
+impl<B: DisplayBus, P: Panel<B>> DisplayDriverBuilder<B, P> {
+    /// Creates a new builder with the given bus and panel.
+    fn new(bus: B, panel: P) -> Self {
+        Self {
+            bus,
+            panel,
+            color_format: None,
+            orientation: None,
+        }
+    }
+
+    /// Sets the color format to be applied during initialization.
+    pub fn with_color_format(mut self, color_format: ColorFormat) -> Self {
+        self.color_format = Some(color_format);
+        self
+    }
+
+    /// Sets the orientation to be applied during initialization.
+    pub fn with_orientation(mut self, orientation: Orientation) -> Self {
+        self.orientation = Some(orientation);
+        self
+    }
+
+    /// Initializes the display and returns the configured [`DisplayDriver`].
+    ///
+    /// This method:
+    /// 1. Calls the panel's initialization sequence
+    /// 2. Applies the color format if configured
+    /// 3. Applies the orientation if configured
+    pub async fn init<D: DelayNs>(
+        mut self,
+        delay: &mut D,
+    ) -> Result<DisplayDriver<B, P>, DisplayError<B::Error>> {
+        self.panel
+            .init(&mut self.bus, delay)
+            .await
+            .map_err(DisplayError::BusError)?;
+
+        if let Some(color_format) = self.color_format {
+            self.panel
+                .set_color_format(&mut self.bus, color_format)
+                .await?;
+        }
+
+        if let Some(orientation) = self.orientation {
+            self.panel
+                .set_orientation(&mut self.bus, orientation)
+                .await?;
+        }
+
+        Ok(DisplayDriver {
+            bus: self.bus,
+            panel: self.panel,
+        })
+    }
+}
+
 /// The high-level driver that orchestrates drawing operations.
 ///
 /// This struct acts as the "glue" between the logical [`Panel`] implementation (which knows the command set)
@@ -47,7 +123,22 @@ pub struct DisplayDriver<B: DisplayBus, P: Panel<B>> {
 }
 
 impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
-    /// Creates a new display driver.
+    /// Creates a builder for configuring and initializing a display driver.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let mut display = DisplayDriver::builder(bus, panel)
+    ///     .with_color_format(ColorFormat::RGB565)
+    ///     .with_orientation(Orientation::Deg270)
+    ///     .init(&mut delay).await.unwrap();
+    /// ```
+    pub fn builder(bus: B, panel: P) -> DisplayDriverBuilder<B, P> {
+        DisplayDriverBuilder::new(bus, panel)
+    }
+
+    /// Creates a new display driver directly (without builder).
+    ///
+    /// Use [`builder`](Self::builder) for a fluent initialization API.
     pub fn new(bus: B, panel: P) -> Self {
         Self { bus, panel }
     }

@@ -41,14 +41,13 @@ let reset_opt = LCDResetOption::new_pin(reset_pin);
 // Create the Panel instance using a Spec (e.g., AM196Q410502LK_196)
 let panel = Co5300::<AM196Q410502LK_196, _, _>::new(reset_opt);
 
-// Create the DisplayDriver
+// Create the DisplayDriver using builder pattern
 // The driver orchestrates the logic, delegating transport to 'bus' and commands to 'panel'.
-let mut display = DisplayDriver::new(bus, panel);
+let mut display = DisplayDriver::builder(bus, panel)
+    .with_color_format(ColorFormat::RGB565)
+    .with_orientation(Orientation::Portrait)
+    .init(&mut delay).await.unwrap();
 
-// Async Initialization
-display.init(&mut delay).await.unwrap();
-display.set_color_format(ColorFormat::RGB565).await.unwrap();
-display.set_orientation(Orientation::Portrait).await.unwrap();
 display.panel().set_brightness(display.bus(), 200).await.unwrap();
 
 // Draw

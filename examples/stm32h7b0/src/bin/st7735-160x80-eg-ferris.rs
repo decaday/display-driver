@@ -71,15 +71,14 @@ async fn main(_spawner: Spawner) {
     // Create the Panel
     let panel = St7735::<XX096T_IF09, _, _>::new(LCDResetOption::new_software());
 
-    // Create the Driver
-    let mut disp = DisplayDriver::new(bus, panel);
-
-    // Initialize
+    // Create and initialize the Driver using builder
     info!("Initializing display...");
-    disp.init(&mut embassy_time::Delay).await.unwrap();
-
-    disp.set_color_format(ColorFormat::RGB565).await.unwrap();
-    disp.set_orientation(Orientation::Deg270).await.unwrap();
+    let mut disp = DisplayDriver::builder(bus, panel)
+        .with_color_format(ColorFormat::RGB565)
+        .with_orientation(Orientation::Deg270)
+        .init(&mut embassy_time::Delay)
+        .await
+        .unwrap();
 
     info!("Display initialized.");
 

@@ -32,15 +32,13 @@ let reset_opt = LCDResetOption::new_pin(reset_pin);
 // 2. Create the Panel instance using a Generic Spec (e.g., Generic128_160Type1)
 let panel = St7735::<Generic128_160Type1, _, _>::new(reset_opt);
 
-// 3. Bind Bus and Panel
+// 3. Bind Bus and Panel, Configure, and Initialize
 // The driver orchestrates the logic, delegating transport to 'bus' and commands to 'panel'.
-let mut display = DisplayDriver::new(bus, panel);
-
-// 4. Async Initialization
-display.init(&mut delay).await.unwrap();
-display.set_color_format(ColorFormat::RGB565).await.unwrap();
-// This framework automatically handles offsets.
-display.set_orientation(Orientation::Deg90).await.unwrap();
+let mut display = DisplayDriver::builder(bus, panel)
+    .with_color_format(ColorFormat::RGB565)
+    // This framework automatically handles offsets.
+    .with_orientation(Orientation::Deg90)
+    .init(&mut delay).await.unwrap();
 
 // Now you can use `display` to draw:
 display.write_frame(fb).await.unwrap();
