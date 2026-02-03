@@ -105,3 +105,18 @@ pub trait Panel<B: DisplayBus> {
         color_format: ColorFormat,
     ) -> Result<(), DisplayError<B::Error>>;
 }
+
+#[allow(async_fn_in_trait)]
+/// An optional trait for setting the panel’s own brightness via commands.
+///
+/// Note: Using a PWM pin to implement this trait is not recommended.
+pub trait PanelSetBrightness<B: DisplayBus>: Panel<B> {
+    /// Sets the panel’s own brightness.
+    ///
+    /// The brightness is represented as a value between 0 and 255, where 0 is the minimum brightness and 255 is the maximum brightness.
+    async fn set_brightness(
+        &mut self,
+        bus: &mut B,
+        brightness: u8,
+    ) -> Result<(), DisplayError<B::Error>>;
+}

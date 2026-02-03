@@ -2,8 +2,9 @@
 resolver = "2"
 members = [
     "display-driver",
+    "buses/spi",
     "mipidcs",
+    
     "panels/co5300",
     "panels/st7735",
-    "buses/spi",
 ]

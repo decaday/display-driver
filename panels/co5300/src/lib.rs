@@ -6,7 +6,7 @@ use embedded_hal_async::delay::DelayNs;
 use display_driver::bus::DisplayBus;
 use display_driver::panel::initseq::{sequenced_init, InitStep};
 use display_driver::panel::reset::{LCDResetOption, LCDReseter};
-use display_driver::panel::{Orientation, Panel};
+use display_driver::panel::{Orientation, Panel, PanelSetBrightness};
 
 use display_driver::{ColorFormat, DisplayError};
 
@@ -159,5 +159,22 @@ where
                 orientation: Orientation,
             ) -> Result<(), DisplayError<B::Error>>;
         }
+    }
+}
+
+impl<Spec, RST, B> PanelSetBrightness<B> for Co5300<Spec, RST, B>
+where
+    Spec: Co5300Spec,
+    RST: OutputPin,
+    B: DisplayBus,
+{
+    async fn set_brightness(
+        &mut self,
+        bus: &mut B,
+        brightness: u8,
+    ) -> Result<(), DisplayError<B::Error>> {
+        bus.write_cmd_with_params(&[WBRIGHT], &[brightness])
+            .await
+            .map_err(DisplayError::BusError)
     }
 }
