@@ -14,6 +14,18 @@ pub enum Orientation {
     Deg270,
 }
 
+impl Orientation {
+    /// Returns true if the orientation is 90° or 270°.
+    pub fn is_transposed(&self) -> bool {
+        matches!(self, Orientation::Deg90 | Orientation::Deg270)
+    }
+
+    /// Returns true if the orientation is 180° or 270°.
+    pub fn is_inverted(&self) -> bool {
+        matches!(self, Orientation::Deg180 | Orientation::Deg270)
+    }
+}
+
 #[allow(async_fn_in_trait)]
 /// A trait representing a specific display panel model (e.g., ST7789, ILI9341).
 ///

@@ -72,6 +72,7 @@ impl MipidcsSpec for Generic135x240Type1 {
     // Case 2: colstart=53, rowstart=40
     const PHYSICAL_X_OFFSET_ROTATED: u16 = 53;
     const PHYSICAL_Y_OFFSET_ROTATED: u16 = 40;
+    const INVERT_TRANSPOSED_OFFSET: bool = true;
 
     const INVERTED: bool = true;
     const BGR: bool = false;

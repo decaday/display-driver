@@ -46,6 +46,23 @@ where
         }
     }
 
+    /// Returns the column (X) and page (Y) offsets based on the current orientation
+    /// and the `INVERT_TRANSPOSED_OFFSET` setting.
+    pub fn get_offset(&self) -> (u16, u16) {
+        match (self.orientation, S::INVERT_TRANSPOSED_OFFSET) {
+            (Orientation::Deg0, _) => (S::PHYSICAL_X_OFFSET, S::PHYSICAL_Y_OFFSET),
+            (Orientation::Deg180, _) => {
+                (S::PHYSICAL_X_OFFSET_ROTATED, S::PHYSICAL_Y_OFFSET_ROTATED)
+            }
+            (Orientation::Deg90, false) | (Orientation::Deg270, true) => {
+                (S::PHYSICAL_Y_OFFSET, S::PHYSICAL_X_OFFSET)
+            }
+            (Orientation::Deg270, false) | (Orientation::Deg90, true) => {
+                (S::PHYSICAL_Y_OFFSET_ROTATED, S::PHYSICAL_X_OFFSET_ROTATED)
+            }
+        }
+    }
+
     /// Software reset on the display controller (Command 0x01).
     pub async fn soft_reset(&self, bus: &mut B) -> Result<(), B::Error> {
         bus.write_cmds(&[SOFT_RESET]).await
@@ -103,12 +120,7 @@ where
         x1: u16,
         y1: u16,
     ) -> Result<(), B::Error> {
-        let (x_offset, y_offset) = match self.orientation {
-            Orientation::Deg0 => (S::PHYSICAL_X_OFFSET, S::PHYSICAL_Y_OFFSET),
-            Orientation::Deg90 => (S::PHYSICAL_Y_OFFSET, S::PHYSICAL_X_OFFSET),
-            Orientation::Deg180 => (S::PHYSICAL_X_OFFSET_ROTATED, S::PHYSICAL_Y_OFFSET_ROTATED),
-            Orientation::Deg270 => (S::PHYSICAL_Y_OFFSET_ROTATED, S::PHYSICAL_X_OFFSET_ROTATED),
-        };
+        let (x_offset, y_offset) = self.get_offset();
 
         bus.write_cmd_with_params(
             &[SET_COLUMN_ADDRESS],
@@ -206,6 +218,24 @@ pub trait MipidcsSpec {
     /// Used for panels that are not physically centered within the frame.
     /// If undefined, defaults to PHYSICAL_Y_OFFSET.
     const PHYSICAL_Y_OFFSET_ROTATED: u16 = Self::PHYSICAL_Y_OFFSET;
+
+    /// Whether the offset is inverted when the screen is rotated 90° or 270°.
+    ///
+    /// Used for panels that are not physically centered within the frame
+    /// (PHYSICAL_*_OFFSET_ROTATED != PHYSICAL_*_OFFSET)
+    ///
+    /// Example: offset = (2, 1), offset_rotated = (2, 3)
+    /// INVERT_TRANSPOSED_OFFSET |  false |  true  |
+    /// Deg0                     | (2, 1) | (2, 1) |
+    /// Deg90(MV, MX)            | (1, 2) | (3, 2) |
+    /// Deg180(MX, MY)           | (2, 3) | (2, 3) |
+    /// Deg270(MV, MY)           | (3, 2) | (1, 2) |
+    ///
+    /// This issue likely relates to how the driver IC’s internal RAM is organized
+    /// or written to.
+    /// It is also possible that `true` actually represents the non-inverted state,
+    /// but in practice `false` appears to be the more common case.
+    const INVERT_TRANSPOSED_OFFSET: bool = false;
 
     /// Whether the display is inverted (default false).
     const INVERTED: bool = false;
