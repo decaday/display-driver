@@ -1,7 +1,8 @@
 #![allow(non_camel_case_types)]
 use super::*;
 
-/// 1.54 inch square IPS 240x240, offset = (0, 0)
+/// 1.54 inch 240x240, offset = (0, 0)
+/// Generic Model: Generic240_240_Type1
 pub struct TB154;
 
 impl MipidcsSpec for TB154 {
@@ -9,6 +10,9 @@ impl MipidcsSpec for TB154 {
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 0;
     const PHYSICAL_Y_OFFSET: u16 = 0;
+
+    const PHYSICAL_X_OFFSET_ROTATED: u16 = 0;
+    const PHYSICAL_Y_OFFSET_ROTATED: u16 = 80;
 
     const INVERTED: bool = true;
     const BGR: bool = false;
@@ -31,7 +35,8 @@ impl St7789Spec for TB154 {
     ];
 }
 
-/// 1.14 inch IPS 135x240
+/// 1.14 inch 135x240
+/// Generic Model: Generic135_240_Type1
 pub struct GMT114_02;
 
 impl MipidcsSpec for GMT114_02 {
@@ -67,7 +72,8 @@ impl St7789Spec for GMT114_02 {
     const EQCTRL_PARAMS: Option<&'static [u8; 3]> = Some(&[0x09, 0x09, 0x08]);
 }
 
-/// 1.14 inch IPS 135x240
+/// 1.14 inch 135x240
+/// Generic Model: Generic135_240_Type1
 pub struct N114_2413THBIG01_H13;
 
 impl MipidcsSpec for N114_2413THBIG01_H13 {
@@ -75,6 +81,10 @@ impl MipidcsSpec for N114_2413THBIG01_H13 {
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 52;
     const PHYSICAL_Y_OFFSET: u16 = 40;
+
+    const PHYSICAL_X_OFFSET_ROTATED: u16 = 53;
+    const PHYSICAL_Y_OFFSET_ROTATED: u16 = 40;
+    const INVERT_TRANSPOSED_OFFSET: bool = true;
 
     const INVERTED: bool = true;
     const BGR: bool = false;

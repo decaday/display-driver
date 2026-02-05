@@ -40,7 +40,7 @@ impl MipidcsSpec for Generic240x320Type1 {
 impl_st7789_generic!(Generic240x320Type1);
 
 /// Generic ST7789 spec for 240x240 displays (Type 1)
-/// 240x240, offset = (0, 0), offset_rotated = (0, 80), Inverted = true, BGR = true
+/// 240x240, offset = (0, 0), offset_rotated = (0, 80), Inverted = true, RGB
 pub struct Generic240x240Type1;
 
 impl MipidcsSpec for Generic240x240Type1 {
@@ -58,7 +58,7 @@ impl MipidcsSpec for Generic240x240Type1 {
 impl_st7789_generic!(Generic240x240Type1);
 
 /// Generic ST7789 spec for 135x240 displays (Type 1)
-/// 135x240, offset = (52, 40), offset_rotated = (53, 40), Inverted = true, BGR = true
+/// 135x240, offset = (52, 40), offset_rotated = (53, 40), Inverted = true, RGB
 pub struct Generic135x240Type1;
 
 impl MipidcsSpec for Generic135x240Type1 {
@@ -81,7 +81,7 @@ impl MipidcsSpec for Generic135x240Type1 {
 impl_st7789_generic!(Generic135x240Type1);
 
 /// Generic ST7789 spec for 240x280 displays (1.69") (Type 1)
-/// 240x280, offset = (0, 20), Inverted = true, BGR = true
+/// 240x280, offset = (0, 20), Inverted = true, RGB
 pub struct Generic240x280Type1;
 
 impl MipidcsSpec for Generic240x280Type1 {
@@ -98,7 +98,7 @@ impl MipidcsSpec for Generic240x280Type1 {
 impl_st7789_generic!(Generic240x280Type1);
 
 /// Generic ST7789 spec for 172x320 displays (1.47") (Type 1)
-/// 172x320, offset = (34, 0), Inverted = true, BGR = true
+/// 172x320, offset = (34, 0), Inverted = true, RGB
 pub struct Generic172x320Type1;
 
 impl MipidcsSpec for Generic172x320Type1 {
@@ -115,7 +115,7 @@ impl MipidcsSpec for Generic172x320Type1 {
 impl_st7789_generic!(Generic172x320Type1);
 
 /// Generic ST7789 spec for 170x320 displays (Type 1)
-/// 170x320, offset = (35, 0), Inverted = true, BGR = true
+/// 170x320, offset = (35, 0), Inverted = true, RGB
 pub struct Generic170x320Type1;
 
 impl MipidcsSpec for Generic170x320Type1 {

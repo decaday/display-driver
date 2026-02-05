@@ -2,6 +2,7 @@
 use super::*;
 
 /// 0.96 inch TFT IPS 80x160
+/// Generic Model: Generic80_160_Type2
 pub struct XX096T_IF09;
 
 impl MipidcsSpec for XX096T_IF09 {
@@ -48,6 +49,7 @@ impl St7735Spec for XX096T_IF09 {
 }
 
 /// 1.44 inch TFT 128x128 from polcd
+/// Generic Model: Generic128_128_Type1
 pub struct P144H008_V2;
 
 impl MipidcsSpec for P144H008_V2 {
@@ -91,6 +93,7 @@ impl St7735Spec for P144H008_V2 {
 }
 
 /// 1.77 inch TFT 128x160
+/// Generic Model: Generic128_160_Type3
 pub struct CL177SPI;
 
 impl MipidcsSpec for CL177SPI {

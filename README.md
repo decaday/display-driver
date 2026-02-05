@@ -56,6 +56,8 @@ display.write_frame(fb).await.unwrap();
 
 - [st7735](./panels/st7735): ST7735, commonly used in TFT LCD.
 
+- [st7789](./panels/st7789): ST7789, commonly used in TFT LCD.
+
 - [co5300](./panels/co5300): CO5300, commonly used in AMOLED.
 
 ## Examples
