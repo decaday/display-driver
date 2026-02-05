@@ -1,17 +1,33 @@
+//! ST7735 Command Set (Based on ST7735S Datasheet)
+
+/// Read Display ID.
+///
+/// Parameters: 0 (Returns 3 bytes)
+pub const RDDID: u8 = 0x04;
+
+/// Read Display Status.
+///
+/// Parameters: 0 (Returns 4 bytes)
+pub const RDDST: u8 = 0x09;
+
 /// Read ID1 Value.
 ///
-/// Parameters: 0
+/// Parameters: 0 (Returns 1 bytes)
 pub const RDID1: u8 = 0xDA;
 
 /// Read ID2 Value.
 ///
-/// Parameters: 0
+/// Parameters: 0 (Returns 1 bytes)
 pub const RDID2: u8 = 0xDB;
 
 /// Read ID3 Value.
 ///
-/// Parameters: 0
+/// Parameters: 0 (Returns 1 bytes)
 pub const RDID3: u8 = 0xDC;
+
+// ---------------------------------------------------
+// System Function Command Table 2
+// ---------------------------------------------------
 
 /// Frame Rate Control (In normal mode/ Full colors).
 ///

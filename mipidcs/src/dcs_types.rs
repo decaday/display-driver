@@ -69,6 +69,10 @@ impl PixelFormat {
     pub const fn dbi_and_dpi(value: PixelFormatType) -> Self {
         Self(((value as u8) << 4) | (value as u8))
     }
+
+    pub const fn as_bytes(self) -> [u8; 1] {
+        [self.0]
+    }
 }
 
 bitflags! {
