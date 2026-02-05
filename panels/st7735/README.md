@@ -1,12 +1,12 @@
 # ST7735 Display Driver
 
-This crate provides an async driver for the ST7735 display controller, implementing the `Panel` trait to be used with the `display-driver` crate.
+This crate provides an async driver for the ST7735 display controller, implementing the `Panel` trait to be used with the [display-driver](https://github.com/decaday/display-driver) crate.
 
 ![stm32h7b0-st7735-160x80](../../docs/stm32h7b0-st7735-160x80.jpg)
 
 ## Usage
 
-This driver is intended to be used as a `Panel` implementation within the [display-driver crate](https://github.com/decaday/display-driver).
+Please use the `DisplayDriver` struct from the [display-driver crate](https://github.com/decaday/display-driver) to drive the display.
 
 ### 1. Choose a Spec
 The ST7735 has many variations (often distinguished by "Tab" colors in other libraries). This crate provides `Generic` types that map to these common variations.

@@ -48,7 +48,7 @@ display.write_frame(fb).await.unwrap();
 
 - [spi](./buses/spi): SPI bus implementation.
 
-- SF32 LCDC: Bus Implementation for SF32LB52x LCDC Hardware.
+- [SF32 LCDC](https://github.com/OpenSiFli/sifli-rs/tree/main/sifli-hal): Bus Implementation for SF32LB52x LCDC Hardware.
 
 ## Display Panel Implementations
 
@@ -63,6 +63,12 @@ display.write_frame(fb).await.unwrap();
 ## Examples
 
 check [Examples](./examples) for more.
+
+## TODOs
+
+- Other Driver ICs and Panels
+
+- Tearing Effect Control
 
 ## License
 

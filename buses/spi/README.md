@@ -1,6 +1,6 @@
 # display-driver-spi
 
-This crate provides a `SimpleDisplayBus` implementation for SPI based displays that require a separate Data/Command (DC) pin.
+This crate implements the `SimpleDisplayBus` trait from [display-driver](https://github.com/decaday/display-driver) for SPI based displays that require a separate Data/Command (DC) pin.
 
 ## Usage
 

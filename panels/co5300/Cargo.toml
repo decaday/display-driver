@@ -2,8 +2,9 @@
 name = "dd-co5300"
 version = "0.1.0"
 edition = "2021"
-description = "Display driver for CO5300 panel"
+description = "Display Driver for CO5300"
 license = "Apache-2.0"
+readme = "../README.md"
 
 [dependencies]
 display-driver = { path = "../../display-driver" }
