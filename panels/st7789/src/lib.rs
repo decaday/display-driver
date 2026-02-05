@@ -63,7 +63,7 @@ where
     }
 
     /// Initialization sequence for ST7789.
-    const INIT_STEPS: [InitStep<'static>; 18] = [
+    const INIT_STEPS: [InitStep<'static>; 21] = [
         // Sleep Out
         InitStep::SingleCommand(mipidcs::EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
@@ -90,6 +90,12 @@ where
         InitStep::CommandWithParams(FRCTRL2, &[Spec::FRCTRL2_PARAM]),
         // Power Control 1
         InitStep::CommandWithParams(PWCTRL1, &Spec::PWCTRL1_PARAMS),
+        // Power Control 2 (Optional)
+        InitStep::maybe_cmd_with(PWCTRL2, Spec::PWCTRL2_PARAMS),
+        // Equalize time control (Optional)
+        InitStep::maybe_cmd_with(EQCTRL, Spec::EQCTRL_PARAMS),
+        // Gate Output Selection (Optional)
+        InitStep::maybe_cmd_with(GATESEL, Spec::GATESEL_PARAMS),
         // Gamma
         InitStep::CommandWithParams(PVGAMCTRL, &Spec::PVGAMCTRL_PARAMS),
         InitStep::CommandWithParams(NVGAMCTRL, &Spec::NVGAMCTRL_PARAMS),

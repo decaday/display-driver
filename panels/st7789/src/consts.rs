@@ -1,4 +1,4 @@
-//! ST7789 Command Set (Based on ST7789V and ST7789VW Datasheet)
+//! ST7789 Command Set (Based on ST7789V, ST7789VW, ST7789P3 Datasheet)
 
 /// Read Display ID.
 ///
@@ -55,6 +55,14 @@ pub const RDCABCMB: u8 = 0x5F;
 /// Parameters: 1
 pub const RDABCSDR: u8 = 0x68;
 
+/// Gate Output Selection in Sleep In Mode.
+///
+/// Available in: P3
+/// Not available in: V, VW
+///
+/// Parameters: 1
+pub const GATESEL: u8 = 0xD6;
+
 /// Read ID1.
 ///
 /// Parameters: 0 (Returns 1 byte)
@@ -99,6 +107,14 @@ pub const FRCTRL1: u8 = 0xB3;
 /// Parameters: 1
 pub const PARCTRL: u8 = 0xB5;
 
+/// Power Saving Control.
+///
+/// Available in: P3
+/// Not available in: V, VW
+///
+/// Parameters: 1
+pub const PWRSAVCTRL: u8 = 0xB6;
+
 /// Gate Control.
 ///
 /// Parameters: 1
@@ -122,7 +138,7 @@ pub const VCOMS: u8 = 0xBB;
 /// Power Saving Mode.
 ///
 /// Available in: VW
-/// Not available in: V
+/// Not available in: V, P3
 ///
 /// Parameters: 1
 pub const POWSAVE: u8 = 0xBC;
@@ -130,7 +146,7 @@ pub const POWSAVE: u8 = 0xBC;
 /// Display off power save.
 ///
 /// Available in: VW
-/// Not available in: V
+/// Not available in: V, P3
 ///
 /// Parameters: 1
 pub const DLPOFFSAVE: u8 = 0xBD;
@@ -156,6 +172,9 @@ pub const VDVVRHEN: u8 = 0xC2;
 pub const VRHS: u8 = 0xC3;
 
 /// VDV Set.
+///
+/// Available in: VW, V
+/// Not available in: P3
 ///
 /// Parameters: 1
 pub const VDVS: u8 = 0xC4;

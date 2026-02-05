@@ -59,6 +59,8 @@ impl St7789Spec for GMT114_02 {
     const NVGAMCTRL_PARAMS: [u8; 14] = [
         0xD0, 0x05, 0x09, 0x09, 0x08, 0x03, 0x24, 0x32, 0x32, 0x3B, 0x14, 0x13, 0x28, 0x2F,
     ];
+    const PWCTRL2_PARAMS: Option<&'static [u8; 1]> = Some(&[0x03]);
+    const EQCTRL_PARAMS: Option<&'static [u8; 3]> = Some(&[0x09, 0x09, 0x08]);
 }
 
 /// 1.14 inch IPS 135x240
@@ -83,6 +85,7 @@ impl St7789Spec for N114_2413THBIG01_H13 {
     const VDVS_PARAM: u8 = 0x20;
     const FRCTRL2_PARAM: u8 = 0x0F;
     const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
+    const GATESEL_PARAMS: Option<&'static [u8; 1]> = Some(&[0xA1]);
     const PVGAMCTRL_PARAMS: [u8; 14] = [
         0x70, 0x06, 0x0C, 0x08, 0x09, 0x27, 0x2E, 0x34, 0x46, 0x37, 0x13, 0x13, 0x25, 0x2A,
     ];

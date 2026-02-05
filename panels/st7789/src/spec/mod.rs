@@ -34,4 +34,15 @@ pub trait St7789Spec: MipidcsSpec {
 
     /// Negative Voltage Gamma Control (0xE1) - 14 bytes
     const NVGAMCTRL_PARAMS: [u8; 14];
+
+    /// Power Control 2 (0xE8) - 1 byte
+    const PWCTRL2_PARAMS: Option<&'static [u8; 1]> = None;
+
+    /// Equalize time control (0xE9) - 3 bytes
+    const EQCTRL_PARAMS: Option<&'static [u8; 3]> = None;
+
+    /// Gate Output Selection (0xD6) - 1 byte
+    ///
+    /// Note: Avalible in P3, Not Avalible in V, VW
+    const GATESEL_PARAMS: Option<&'static [u8; 1]> = None;
 }
