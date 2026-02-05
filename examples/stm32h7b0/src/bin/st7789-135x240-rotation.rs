@@ -18,18 +18,18 @@ use embedded_graphics::{
     },
 };
 
-use dd_st7735::{spec::vendor_specs::P144H008_V2, spec::MipidcsSpec, St7735};
+use dd_st7789::{spec::vendor_specs::GMT114_02, spec::MipidcsSpec, St7789};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;
 
 // Native dimensions (Portrait 0 degree)
-const P_WIDTH: usize = P144H008_V2::PHYSICAL_WIDTH as usize;
-const P_HEIGHT: usize = P144H008_V2::PHYSICAL_HEIGHT as usize;
+const P_WIDTH: usize = GMT114_02::PHYSICAL_WIDTH as usize;
+const P_HEIGHT: usize = GMT114_02::PHYSICAL_HEIGHT as usize;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    info!("START ROTATION DEMO - 128x128");
+    info!("START ST7789 ROTATION DEMO");
 
     // RCC config
     let config = stm32h7b0_examples::configure_rcc();
@@ -39,8 +39,8 @@ async fn main(_spawner: Spawner) {
 
     let dc = Output::new(p.PE13, Level::Low, Speed::High);
     let cs = Output::new(p.PE9, Level::High, Speed::High);
+    let rst = Output::new(p.PE15, Level::High, Speed::High);
     let _lcd_led = Output::new(p.PE10, Level::Low, Speed::Low);
-    let rst = Output::new(p.PE15, Level::High, Speed::Low);
 
     let mut spi_config: spi::Config = Default::default();
     spi_config.frequency = Hertz(10_000_000);
@@ -52,7 +52,7 @@ async fn main(_spawner: Spawner) {
     let bus = SpiDisplayBus::new(spi_device, dc);
 
     // Create the Panel
-    let panel = St7735::<P144H008_V2, _, _>::new(LCDResetOption::new_pin(rst));
+    let panel = St7789::<GMT114_02, _, _>::new(LCDResetOption::new_pin(rst));
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");
@@ -81,19 +81,36 @@ async fn main(_spawner: Spawner) {
             disp.set_orientation(rot).await.unwrap();
 
             // Create framebuffer on stack and draw
-            // For 128x128 display, dimensions are the same in all orientations
-            let mut fb = Framebuffer::<
-                Rgb565,
-                RawU16,
-                BigEndian,
-                P_WIDTH,
-                P_HEIGHT,
-                { buffer_size::<Rgb565>(P_WIDTH, P_HEIGHT) },
-            >::new();
-            stm32h7b0_examples::draw_rotation_scene(&mut fb, P_WIDTH, P_HEIGHT, rot_str);
-            disp.write_frame(fb.data()).await.unwrap();
+            match rot {
+                Orientation::Deg0 | Orientation::Deg180 => {
+                    // Portrait: W=135, H=240
+                    let mut fb = Framebuffer::<
+                        Rgb565,
+                        RawU16,
+                        BigEndian,
+                        P_WIDTH,
+                        P_HEIGHT,
+                        { buffer_size::<Rgb565>(P_WIDTH, P_HEIGHT) },
+                    >::new();
+                    stm32h7b0_examples::draw_rotation_scene(&mut fb, P_WIDTH, P_HEIGHT, rot_str);
+                    disp.write_frame(fb.data()).await.unwrap();
+                }
+                Orientation::Deg90 | Orientation::Deg270 => {
+                    // Landscape: W=240, H=135
+                    let mut fb = Framebuffer::<
+                        Rgb565,
+                        RawU16,
+                        BigEndian,
+                        P_HEIGHT,
+                        P_WIDTH,
+                        { buffer_size::<Rgb565>(P_HEIGHT, P_WIDTH) },
+                    >::new();
+                    stm32h7b0_examples::draw_rotation_scene(&mut fb, P_HEIGHT, P_WIDTH, rot_str);
+                    disp.write_frame(fb.data()).await.unwrap();
+                }
+            }
 
-            Timer::after_secs(2).await;
+            Timer::after_secs(3).await;
         }
     }
 }

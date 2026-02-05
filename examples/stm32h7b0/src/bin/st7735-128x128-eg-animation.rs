@@ -195,12 +195,12 @@ async fn main(_spawner: Spawner) {
     let p = embassy_stm32::init(config);
 
     let dc = Output::new(p.PE13, Level::Low, Speed::High);
-    let cs = Output::new(p.PE11, Level::High, Speed::High);
+    let cs = Output::new(p.PE9, Level::High, Speed::High);
     let _lcd_led = Output::new(p.PE10, Level::Low, Speed::Low);
     let rst = Output::new(p.PE15, Level::High, Speed::Low);
 
     let mut spi_config: spi::Config = Default::default();
-    spi_config.frequency = Hertz(24_000_000);
+    spi_config.frequency = Hertz(10_000_000);
 
     let spi = Spi::new_txonly(p.SPI4, p.PE12, p.PE14, p.DMA1_CH0, spi_config);
 

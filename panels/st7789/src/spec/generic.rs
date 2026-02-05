@@ -41,7 +41,6 @@ impl_st7789_generic!(Generic240x320Type1);
 
 /// Generic ST7789 spec for 240x240 displays (Type 1)
 /// 240x240, offset = (0, 0), offset_rotated = (0, 80), Inverted = true, BGR = true
-/// Reference: TFT_eSPI (ST7789_Defines.h, ST7789_Rotation.h)
 pub struct Generic240x240Type1;
 
 impl MipidcsSpec for Generic240x240Type1 {
@@ -49,13 +48,11 @@ impl MipidcsSpec for Generic240x240Type1 {
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 0;
     const PHYSICAL_Y_OFFSET: u16 = 0;
-
-    // Case 2 in ST7789_Rotation.h: colstart=0, rowstart=80
     const PHYSICAL_X_OFFSET_ROTATED: u16 = 0;
     const PHYSICAL_Y_OFFSET_ROTATED: u16 = 80;
 
     const INVERTED: bool = true;
-    const BGR: bool = true;
+    const BGR: bool = false;
 }
 
 impl_st7789_generic!(Generic240x240Type1);
@@ -77,7 +74,7 @@ impl MipidcsSpec for Generic135x240Type1 {
     const PHYSICAL_Y_OFFSET_ROTATED: u16 = 40;
 
     const INVERTED: bool = true;
-    const BGR: bool = true;
+    const BGR: bool = false;
 }
 
 impl_st7789_generic!(Generic135x240Type1);
@@ -94,7 +91,7 @@ impl MipidcsSpec for Generic240x280Type1 {
     const PHYSICAL_Y_OFFSET: u16 = 20;
 
     const INVERTED: bool = true;
-    const BGR: bool = true;
+    const BGR: bool = false;
 }
 
 impl_st7789_generic!(Generic240x280Type1);
@@ -111,7 +108,7 @@ impl MipidcsSpec for Generic172x320Type1 {
     const PHYSICAL_Y_OFFSET: u16 = 0;
 
     const INVERTED: bool = true;
-    const BGR: bool = true;
+    const BGR: bool = false;
 }
 
 impl_st7789_generic!(Generic172x320Type1);
@@ -128,7 +125,7 @@ impl MipidcsSpec for Generic170x320Type1 {
     const PHYSICAL_Y_OFFSET: u16 = 0;
 
     const INVERTED: bool = true;
-    const BGR: bool = true;
+    const BGR: bool = false;
 }
 
 impl_st7789_generic!(Generic170x320Type1);

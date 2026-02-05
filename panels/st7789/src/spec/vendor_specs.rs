@@ -40,7 +40,10 @@ impl MipidcsSpec for GMT114_02 {
     const PHYSICAL_X_OFFSET: u16 = 52;
     const PHYSICAL_Y_OFFSET: u16 = 40;
 
-    const INVERTED: bool = false;
+    const PHYSICAL_X_OFFSET_ROTATED: u16 = 53;
+    const PHYSICAL_Y_OFFSET_ROTATED: u16 = 40;
+
+    const INVERTED: bool = true;
     const BGR: bool = false;
 }
 
