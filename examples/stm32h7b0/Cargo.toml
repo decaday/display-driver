@@ -28,6 +28,7 @@ display-driver = { path = "../../display-driver" }
 display-driver-spi = { path = "../../buses/spi" }
 display-driver-st7735 = { path = "../../panels/st7735" }
 display-driver-st7789 = { path = "../../panels/st7789" }
+display-driver-gc9a01 = { path = "../../panels/gc9a01" }
 
 # cargo build/run
 [profile.dev]
