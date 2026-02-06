@@ -34,9 +34,9 @@ where
     SPI: SpiDevice,
     DC: OutputPin,
 {
-    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
+    async fn write_cmds(&mut self, cmds: &[u8]) -> Result<(), Self::Error> {
         self.dc.set_low().map_err(SpiDisplayBusError::Dc)?;
-        self.spi.write(cmd).await.map_err(SpiDisplayBusError::Spi)
+        self.spi.write(cmds).await.map_err(SpiDisplayBusError::Spi)
     }
 
     async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error> {

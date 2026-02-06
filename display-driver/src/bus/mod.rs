@@ -24,7 +24,7 @@ pub struct FrameControl {
 }
 
 impl FrameControl {
-    pub fn new_single() -> Self {
+    pub fn new_standalone() -> Self {
         Self {
             first: true,
             last: true,
@@ -79,7 +79,7 @@ impl Metadata {
     /// Creates metadata for continuing a stream of pixel data without resetting the area or frame markers.
     ///
     /// Use this when splitting a large frame into multiple smaller chunks for transfer.
-    pub fn new_stream_continue() -> Self {
+    pub fn new_continue_stream() -> Self {
         Self {
             area: None,
             frame_control: FrameControl {
@@ -107,16 +107,18 @@ impl Metadata {
 /// It accommodates a wide range of hardware, from simple 2-wire interfaces to complex high-speed buses.
 ///
 /// The interface distinguishes between two types of traffic:
-/// - **Commands**: Small, latency-sensitive messages used for configuration (handled by `write_cmds` and `write_cmd_with_params`).
+/// - **Commands**: Small, latency-sensitive messages used for configuration (handled by `write_cmd` and `write_cmd_with_params`).
 /// - **Pixels**: Large, throughput-critical data streams used for changing the visual content (handled by `write_pixels`).
 ///
 /// This separation allows for optimizations. For instance, `write_pixels` accepts [`Metadata`], enabling the underlying implementation
 /// to utilize hardware accelerators (like DMA or QSPI peripherals) that can handle address setting and bulk data transfer efficiently.
 pub trait DisplayBus: ErrorType {
-    /// Writes a sequence of commands to the display.
+    /// Writes a command to the display.
     ///
     /// This is typically used for setting registers or sending configuration opcodes.
-    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
+    async fn write_cmd(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
+
+    // async fn write_cmds(&mut self, cmds: &[u8]) -> Result<(), Self::Error>;
 
     /// Writes a command followed immediately by its parameters.
     ///
@@ -157,7 +159,7 @@ pub trait DisplayBus: ErrorType {
 /// Filling a large area with a single color is a common operation (e.g., clearing the screen).
 /// If the hardware supports it (e.g., via a 2D GPU or a DMA channel with a non-incrementing source address),
 /// this trait allows the driver to offload that work, significantly reducing CPU usage and bus traffic.
-pub trait BusAutoFill: DisplayBus {
+pub trait BusHardwareFill: DisplayBus {
     /// Fills a specific region of the display with a solid color.
     ///
     /// The implementation should leverage available hardware acceleration to perform this operation efficiently.
@@ -165,7 +167,7 @@ pub trait BusAutoFill: DisplayBus {
         &mut self,
         cmd: &[u8],
         color: SolidColor,
-        metadata: Metadata,
+        area: Area,
     ) -> Result<(), DisplayError<Self::Error>>;
 }
 
@@ -201,14 +203,14 @@ pub trait BusRead: DisplayBus {
 /// Some buses, such as SPI, support sending commands and data in a single transaction,
 /// while others require separate transactions for commands and data.
 #[allow(async_fn_in_trait)]
-pub trait BusNonAtomicCmdData: DisplayBus {
+pub trait BusBytesIo: DisplayBus {
     /// Writes a sequence of commands to the bus.
     ///
     /// This is typically used for sending register addresses or command opcodes.
-    async fn write_cmds_non_atomic(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
+    async fn write_cmd_bytes(&mut self, cmd: &[u8]) -> Result<(), Self::Error>;
 
     /// Writes a sequence of data bytes to the bus.
     ///
     /// This is used for sending command parameters or pixel data.
-    async fn write_data_non_atomic(&mut self, data: &[u8]) -> Result<(), Self::Error>;
+    async fn write_data_bytes(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 }

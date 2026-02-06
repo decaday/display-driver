@@ -65,27 +65,27 @@ where
 
     /// Software reset on the display controller (Command 0x01).
     pub async fn soft_reset(&self, bus: &mut B) -> Result<(), B::Error> {
-        bus.write_cmds(&[SOFT_RESET]).await
+        bus.write_cmd(&[SOFT_RESET]).await
     }
 
     /// Enter Sleep Mode (Command 0x10).
     pub async fn enter_sleep_mode(&self, bus: &mut B) -> Result<(), B::Error> {
-        bus.write_cmds(&[ENTER_SLEEP_MODE]).await
+        bus.write_cmd(&[ENTER_SLEEP_MODE]).await
     }
 
     /// Exit Sleep Mode (Command 0x11).
     pub async fn exit_sleep_mode(&self, bus: &mut B) -> Result<(), B::Error> {
-        bus.write_cmds(&[EXIT_SLEEP_MODE]).await
+        bus.write_cmd(&[EXIT_SLEEP_MODE]).await
     }
 
     /// Turn the display panel OFF (Command 0x28).
     pub async fn set_display_off(&self, bus: &mut B) -> Result<(), B::Error> {
-        bus.write_cmds(&[SET_DISPLAY_OFF]).await
+        bus.write_cmd(&[SET_DISPLAY_OFF]).await
     }
 
     /// Turn the display panel ON (Command 0x29).
     pub async fn set_display_on(&self, bus: &mut B) -> Result<(), B::Error> {
-        bus.write_cmds(&[SET_DISPLAY_ON]).await
+        bus.write_cmd(&[SET_DISPLAY_ON]).await
     }
 
     /// Set the column address window (Command 0x2A).
@@ -179,8 +179,8 @@ where
     /// `true` enters Invert Mode (0x21), `false` exits Invert Mode (0x20).
     pub async fn set_invert_mode(&self, bus: &mut B, inverted: bool) -> Result<(), B::Error> {
         match inverted {
-            true => bus.write_cmds(&[ENTER_INVERT_MODE]).await,
-            false => bus.write_cmds(&[EXIT_INVERT_MODE]).await,
+            true => bus.write_cmd(&[ENTER_INVERT_MODE]).await,
+            false => bus.write_cmd(&[EXIT_INVERT_MODE]).await,
         }
     }
 

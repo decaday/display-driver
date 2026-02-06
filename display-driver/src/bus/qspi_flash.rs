@@ -1,4 +1,6 @@
-use super::{DisplayBus, DisplayError, ErrorType, Metadata};
+use crate::{Area, SolidColor};
+
+use super::{BusHardwareFill, BusRead, DisplayBus, DisplayError, ErrorType, Metadata};
 
 /// An adapter that bridges a standard [`DisplayBus`] to a QSPI-connected display.
 ///
@@ -15,15 +17,34 @@ impl<B: DisplayBus> QspiFlashBus<B> {
         Self { inner }
     }
 
+    #[inline]
+    fn assert_cmd_len(&self, cmd: &[u8]) {
+        assert_eq!(
+            cmd.len(),
+            1,
+            "QspiFlashBus only supports single byte commands"
+        );
+    }
+
+    #[inline]
     /// Formats the command and address for QSPI transfer.
-    pub fn to_cmd_and_addr(&self, cmd: &[u8], pixel_data: bool) -> [u8; 4] {
-        if cmd.len() != 1 {
-            panic!("QSPI command must be 1 byte")
-        }
+    /// This is used for common write commands except WRITE_RAM.
+    pub fn to_cmd_and_addr_command(&self, cmd: u8) -> [u8; 4] {
+        [0x02, 0x00, cmd, 0x00]
+    }
 
-        let flash_command: u8 = if pixel_data { 0x32 } else { 0x02 };
+    #[inline]
+    /// Formats the command and address for QSPI transfer.
+    /// This is used for WRITE_RAM command.
+    pub fn to_cmd_and_addr_write_ram(&self, cmd: u8) -> [u8; 4] {
+        [0x32, 0x00, cmd, 0x00]
+    }
 
-        [flash_command, 0x00, cmd[0], 0x00]
+    #[inline]
+    /// Formats the command and address for QSPI transfer.
+    /// This is used for read commands.
+    pub fn to_cmd_and_addr_read(&self, cmd: u8) -> [u8; 4] {
+        [0x03, 0x00, cmd, 0x00]
     }
 }
 
@@ -38,9 +59,10 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
     //     self.inner.configure(config)
     // }
 
-    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
-        let cmd = self.to_cmd_and_addr(cmd, false);
-        self.inner.write_cmds(&cmd).await
+    async fn write_cmd(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
+        self.assert_cmd_len(cmd);
+        let cmd = self.to_cmd_and_addr_command(cmd[0]);
+        self.inner.write_cmd(&cmd).await
     }
 
     async fn write_cmd_with_params(
@@ -48,7 +70,8 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
         cmd: &[u8],
         params: &[u8],
     ) -> Result<(), Self::Error> {
-        let cmd = self.to_cmd_and_addr(cmd, false);
+        self.assert_cmd_len(cmd);
+        let cmd = self.to_cmd_and_addr_command(cmd[0]);
         self.inner.write_cmd_with_params(&cmd, params).await
     }
 
@@ -58,11 +81,38 @@ impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
         data: &[u8],
         metadata: Metadata,
     ) -> Result<(), DisplayError<Self::Error>> {
-        let cmd = self.to_cmd_and_addr(cmd, true);
+        self.assert_cmd_len(cmd);
+        let cmd = self.to_cmd_and_addr_write_ram(cmd[0]);
         self.inner.write_pixels(&cmd, data, metadata).await
     }
 
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         self.inner.set_reset(reset)
+    }
+}
+
+impl<B: DisplayBus + BusHardwareFill> BusHardwareFill for QspiFlashBus<B> {
+    async fn fill_solid(
+        &mut self,
+        cmd: &[u8],
+        color: SolidColor,
+        area: Area,
+    ) -> Result<(), DisplayError<Self::Error>> {
+        self.assert_cmd_len(cmd);
+        let cmd = self.to_cmd_and_addr_write_ram(cmd[0]);
+        self.inner.fill_solid(&cmd, color, area).await
+    }
+}
+
+impl<B: DisplayBus + BusRead> BusRead for QspiFlashBus<B> {
+    async fn read_data(
+        &mut self,
+        cmd: &[u8],
+        params: &[u8],
+        buffer: &mut [u8],
+    ) -> Result<(), DisplayError<Self::Error>> {
+        self.assert_cmd_len(cmd);
+        let cmd = self.to_cmd_and_addr_read(cmd[0]);
+        self.inner.read_data(&cmd, params, buffer).await
     }
 }

@@ -31,6 +31,7 @@ pub trait SimpleDisplayBus: ErrorType {
     }
 
     /// Reset the screen via the bus (optional).
+    ///
     /// Note: This method should only be implemented if the hardware has a physical Reset pin.
     /// Avoid adding a Pin field to your `DisplayBus` wrapper for this purpose; use `LCDResetOption` instead.
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
@@ -39,18 +40,18 @@ pub trait SimpleDisplayBus: ErrorType {
     }
 }
 
-impl<T: SimpleDisplayBus> BusNonAtomicCmdData for T {
-    async fn write_cmds_non_atomic(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
-        T::write_cmds(self, cmd).await
+impl<T: SimpleDisplayBus> BusBytesIo for T {
+    async fn write_cmd_bytes(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
+        T::write_cmd(self, cmd).await
     }
 
-    async fn write_data_non_atomic(&mut self, data: &[u8]) -> Result<(), Self::Error> {
+    async fn write_data_bytes(&mut self, data: &[u8]) -> Result<(), Self::Error> {
         T::write_data(self, data).await
     }
 }
 
 impl<T: SimpleDisplayBus> DisplayBus for T {
-    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
+    async fn write_cmd(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
         T::write_cmds(self, cmd).await
     }
 

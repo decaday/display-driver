@@ -6,8 +6,9 @@ pub mod color;
 pub mod panel;
 
 pub use crate::area::Area;
-use crate::bus::BusNonAtomicCmdData;
-pub use crate::bus::{BusAutoFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus};
+pub use crate::bus::{
+    BusBytesIo, BusHardwareFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus,
+};
 pub use color::{ColorFormat, ColorType, SolidColor};
 pub use panel::{reset::LCDResetOption, Orientation, Panel};
 
@@ -210,28 +211,23 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
     pub async fn write_frame(&mut self, buffer: &[u8]) -> Result<(), DisplayError<B::Error>> {
         self.write_pixels(
             Area::from_origin_size(self.panel.size()),
-            FrameControl::new_single(),
+            FrameControl::new_standalone(),
             buffer,
         )
         .await
     }
 }
 
-impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
+impl<B: DisplayBus + BusHardwareFill, P: Panel<B>> DisplayDriver<B, P> {
     /// Fills the area with a solid color using bus auto-fill.
     pub async fn fill_solid_via_bus(
         &mut self,
-        area: Area,
-        frame_control: FrameControl,
         color: SolidColor,
+        area: Area,
     ) -> Result<(), DisplayError<B::Error>> {
         self.set_window(area).await?;
         let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
-        let metadata = Metadata {
-            area: Some(area),
-            frame_control,
-        };
-        self.bus.fill_solid(cmd, color, metadata).await
+        self.bus.fill_solid(cmd, color, area).await
     }
 
     /// Fills the entire screen with a solid color using bus auto-fill.
@@ -239,31 +235,27 @@ impl<B: DisplayBus + BusAutoFill, P: Panel<B>> DisplayDriver<B, P> {
         &mut self,
         color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
-        self.fill_solid_via_bus(
-            Area::from_origin_size(self.panel.size()),
-            FrameControl::new_single(),
-            color,
-        )
-        .await
+        self.fill_solid_via_bus(color, Area::from_origin_size(self.panel.size()))
+            .await
     }
 }
 
 impl<B, P> DisplayDriver<B, P>
 where
-    B: DisplayBus + BusNonAtomicCmdData,
+    B: DisplayBus + BusBytesIo,
     P: Panel<B>,
 {
     /// Fills the area with a solid color.
     pub async fn fill_solid_batch<const N: usize>(
         &mut self,
-        area: Area,
         color: SolidColor,
+        area: Area,
     ) -> Result<(), DisplayError<B::Error>> {
         self.set_window(area).await?;
         let cmd = &P::PIXEL_WRITE_CMD[0..P::CMD_LEN];
 
         self.bus
-            .write_cmds_non_atomic(cmd)
+            .write_cmd_bytes(cmd)
             .await
             .map_err(DisplayError::BusError)?;
 
@@ -288,7 +280,7 @@ where
             let current_pixels = remaining_pixels.min(pixels_per_chunk);
             let byte_count = current_pixels * pixel_size;
             self.bus
-                .write_data_non_atomic(&buffer[0..byte_count])
+                .write_data_bytes(&buffer[0..byte_count])
                 .await
                 .map_err(DisplayError::BusError)?;
             remaining_pixels -= current_pixels;
@@ -302,7 +294,7 @@ where
         &mut self,
         color: SolidColor,
     ) -> Result<(), DisplayError<B::Error>> {
-        self.fill_solid_batch::<N>(Area::from_origin_size(self.panel.size()), color)
+        self.fill_solid_batch::<N>(color, Area::from_origin_size(self.panel.size()))
             .await
     }
 }

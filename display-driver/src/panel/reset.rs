@@ -66,7 +66,7 @@ impl LCDResetOption<NoResetPin> {
 }
 
 /// Helper to handle LCD hardware reset.
-pub struct LCDReseter<'a, P: OutputPin, B: DisplayBus, D: DelayNs> {
+pub struct LCDResetHandler<'a, P: OutputPin, B: DisplayBus, D: DelayNs> {
     option: &'a mut LCDResetOption<P>,
     bus: &'a mut B,
     delay: &'a mut D,
@@ -75,8 +75,8 @@ pub struct LCDReseter<'a, P: OutputPin, B: DisplayBus, D: DelayNs> {
     software_reset_cmd: Option<&'a [u8]>,
 }
 
-impl<'a, P: OutputPin, B: DisplayBus, D: DelayNs> LCDReseter<'a, P, B, D> {
-    /// Creates a new LCDReseter.
+impl<'a, P: OutputPin, B: DisplayBus, D: DelayNs> LCDResetHandler<'a, P, B, D> {
+    /// Creates a new LCDResetHandler.
     pub fn new(
         option: &'a mut LCDResetOption<P>,
         bus: &'a mut B,
@@ -126,7 +126,7 @@ impl<'a, P: OutputPin, B: DisplayBus, D: DelayNs> LCDReseter<'a, P, B, D> {
     pub async fn reset(&mut self) -> Result<(), B::Error> {
         if matches!(self.option, LCDResetOption::Software) {
             if let Some(cmd) = self.software_reset_cmd {
-                self.bus.write_cmds(cmd).await?;
+                self.bus.write_cmd(cmd).await?;
                 self.delay.delay_ms(self.wait_ms as u32).await;
             }
             return Ok(());

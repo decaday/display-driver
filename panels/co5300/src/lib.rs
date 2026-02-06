@@ -5,7 +5,7 @@ use embedded_hal_async::delay::DelayNs;
 
 use display_driver::bus::DisplayBus;
 use display_driver::panel::initseq::{sequenced_init, InitStep};
-use display_driver::panel::reset::{LCDResetOption, LCDReseter};
+use display_driver::panel::reset::{LCDResetOption, LCDResetHandler};
 use display_driver::panel::{Orientation, Panel, PanelSetBrightness};
 
 use display_driver::{ColorFormat, DisplayError};
@@ -116,7 +116,7 @@ where
     }
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
-        let mut reseter = LCDReseter::new(
+        let mut reseter = LCDResetHandler::new(
             &mut self.inner.reset_pin,
             bus,
             &mut delay,

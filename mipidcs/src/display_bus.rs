@@ -1,5 +1,5 @@
 use display_driver::bus::DisplayBus;
-use display_driver::panel::{initseq::sequenced_init, reset::LCDReseter, Orientation, Panel};
+use display_driver::panel::{initseq::sequenced_init, reset::LCDResetHandler, Orientation, Panel};
 
 use display_driver::{ColorFormat, DisplayError};
 use embedded_hal::digital::OutputPin;
@@ -44,7 +44,7 @@ where
 
     async fn init<D: DelayNs>(&mut self, bus: &mut B, mut delay: D) -> Result<(), B::Error> {
         // Hardware Reset
-        let mut reseter = LCDReseter::new(
+        let mut reseter = LCDResetHandler::new(
             &mut self.reset_pin,
             bus,
             &mut delay,

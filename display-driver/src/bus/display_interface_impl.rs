@@ -8,8 +8,8 @@ impl<DI: AsyncWriteOnlyDataCommand> ErrorType for DI {
 }
 
 impl<DI: AsyncWriteOnlyDataCommand> SimpleDisplayBus for DI {
-    async fn write_cmds(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
-        self.send_commands(DataFormat::U8(cmd)).await
+    async fn write_cmds(&mut self, cmds: &[u8]) -> Result<(), Self::Error> {
+        self.send_commands(DataFormat::U8(cmds)).await
     }
 
     async fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error> {

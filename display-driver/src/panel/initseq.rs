@@ -72,7 +72,7 @@ impl<'a, D: DelayNs, B: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedI
     /// Does not handle recursion; ignores Nested variants if passed directly.
     async fn exec_atomic_step(&mut self, step: InitStep<'a>) -> Result<(), B::Error> {
         match step {
-            InitStep::SingleCommand(cmd) => self.display_bus.write_cmds(&[cmd]).await,
+            InitStep::SingleCommand(cmd) => self.display_bus.write_cmd(&[cmd]).await,
             InitStep::CommandWithParams(cmd, data) => {
                 self.display_bus.write_cmd_with_params(&[cmd], data).await
             }
