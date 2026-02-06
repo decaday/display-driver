@@ -181,7 +181,8 @@ where
         self.inner.address_mode.set(AddressMode::BGR, Spec::BGR);
 
         // Execute Initialization Sequence
-        sequenced_init(Self::INIT_STEPS.iter().cloned(), &mut delay, bus).await
+        // `copied()` only copies the items during iteration; it does not copy the entire sequence
+        sequenced_init(Self::INIT_STEPS.iter().copied(), &mut delay, bus).await
     }
 
     delegate::delegate! {

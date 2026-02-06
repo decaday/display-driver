@@ -63,7 +63,7 @@ where
     }
 
     /// Initialization sequence for ST7789.
-    const INIT_STEPS: [InitStep<'static>; 21] = [
+    const INIT_STEPS: &'static [InitStep<'static>] = &[
         // Sleep Out
         InitStep::SingleCommand(mipidcs::EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
@@ -144,7 +144,8 @@ where
         self.inner.address_mode.set(AddressMode::BGR, Spec::BGR);
 
         // Execute Initialization Sequence
-        sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
+        // copied() only copies the items during iteration; it does not copy the entire sequence
+        sequenced_init(Self::INIT_STEPS.iter().copied(), &mut delay, bus).await
     }
 
     delegate::delegate! {

@@ -74,7 +74,7 @@ where
     }
 
     /// Initialization sequence for CO5300.
-    const INIT_STEPS: [InitStep<'static>; 16] = [
+    const INIT_STEPS: &'static [InitStep<'static>] = &[
         // Unlock Sequence
         InitStep::CommandWithParams(CMD_PAGE_SWITCH, &[Spec::INIT_PAGE_PARAM]),
         InitStep::CommandWithParams(PASSWD1, &[0x5A]),
@@ -127,7 +127,8 @@ where
         reseter.reset().await?;
 
         // Execute Initialization Sequence
-        sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
+        // copied() only copies the items during iteration; it does not copy the entire sequence
+        sequenced_init(Self::INIT_STEPS.iter().copied(), &mut delay, bus).await
     }
 
     delegate::delegate! {

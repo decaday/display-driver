@@ -4,14 +4,14 @@ use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
 use display_driver::bus::DisplayBus;
-use display_driver::panel::initseq::{InitStep, sequenced_init};
+use display_driver::panel::initseq::{sequenced_init, InitStep};
 use display_driver::panel::reset::{LCDResetOption, LCDReseter};
 use display_driver::panel::{Orientation, Panel};
 
 use display_driver::{ColorFormat, DisplayError};
 
 use display_driver_mipidcs as mipidcs;
-use display_driver_mipidcs::{GenericMipidcs, dcs_types::AddressMode};
+use display_driver_mipidcs::{dcs_types::AddressMode, GenericMipidcs};
 
 pub mod consts;
 pub mod spec;
@@ -63,7 +63,7 @@ where
     }
 
     /// Initialization sequence for ST7735.
-    const INIT_STEPS: [InitStep<'static>; 18] = [
+    const INIT_STEPS: &'static [InitStep<'static>] = &[
         // Sleep Out
         InitStep::SingleCommand(mipidcs::EXIT_SLEEP_MODE),
         InitStep::DelayMs(120),
@@ -126,7 +126,8 @@ where
         self.inner.address_mode.set(AddressMode::BGR, Spec::BGR);
 
         // Execute Initialization Sequence
-        sequenced_init(Self::INIT_STEPS.into_iter(), &mut delay, bus).await
+        // copied() only copies the items during iteration; it does not copy the entire sequence
+        sequenced_init(Self::INIT_STEPS.iter().copied(), &mut delay, bus).await
     }
 
     delegate::delegate! {
