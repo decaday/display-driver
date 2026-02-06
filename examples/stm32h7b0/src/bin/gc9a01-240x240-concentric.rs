@@ -24,7 +24,6 @@ use embedded_graphics::{
         Rgb565,
     },
     prelude::*,
-    primitives::{Circle, PrimitiveStyle},
     text::{Alignment, Text},
 };
 use micromath::F32Ext;
@@ -219,10 +218,8 @@ where
 
             let color = Rgb565::new(r5, g6, b5);
 
-            // Draw single pixel using a 1x1 circle (more efficient than Rectangle)
-            let _ = Circle::with_center(Point::new(x, y), 1)
-                .into_styled(PrimitiveStyle::with_fill(color))
-                .draw(target);
+            // Draw single pixel
+            let _ = Pixel(Point::new(x, y), color).draw(target);
         }
     }
 }

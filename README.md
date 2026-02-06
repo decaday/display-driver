@@ -1,5 +1,15 @@
 # display-driver
 
+[![Crates.io][badge-license]][crates]
+[![Crates.io][badge-version]][crates]
+[![docs.rs][badge-docsrs]][docsrs]
+
+[badge-license]: https://img.shields.io/crates/l/display-driver?style=for-the-badge
+[badge-version]: https://img.shields.io/crates/v/display-driver?style=for-the-badge
+[badge-docsrs]: https://img.shields.io/docsrs/display-driver?style=for-the-badge
+[crates]: https://crates.io/crates/display-driver
+[docsrs]: https://docs.rs/display-driver
+
 An Async display driver framework designed to provide a unified interface for various LCD panels.
 
 <img src="./docs/assets/combined1.jpg" style="zoom:50%;" />
@@ -21,10 +31,8 @@ An Async display driver framework designed to provide a unified interface for va
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
-use display_driver_st7735::{St7735, 
-
-// The `Spec` (Generic128x160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
-spec::generic::Generic128x160Type1};
+// The `Spec` (Generic128x160Type1) defines the hardware-specific constants (Gamma, Voltage).
+use display_driver_st7735::{St7735, spec::generic::Generic128x160Type1};
 
 // 1. Configure Reset
 let reset_opt = LCDResetOption::new_pin(reset_pin);
@@ -76,4 +84,4 @@ check [Examples](./examples) for more.
 
 ## License
 
-This project is under Apache License, Version 2.0 ([LICENSE](LICENSE) or <http://www.apache.org/licenses/LICENSE-2.0>).
+This project is under Apache License, Version 2.0 ([LICENSE](./LICENSE) or <http://www.apache.org/licenses/LICENSE-2.0>).

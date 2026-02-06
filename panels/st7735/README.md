@@ -1,8 +1,18 @@
 # ST7735 Display Driver
 
+[![Crates.io][badge-license]][crates]
+[![Crates.io][badge-version]][crates]
+[![docs.rs][badge-docsrs]][docsrs]
+
+[badge-license]: https://img.shields.io/crates/l/display-driver-st7735?style=for-the-badge
+[badge-version]: https://img.shields.io/crates/v/display-driver-st7735?style=for-the-badge
+[badge-docsrs]: https://img.shields.io/docsrs/display-driver-st7735?style=for-the-badge
+[crates]: https://crates.io/crates/display-driver-st7735
+[docsrs]: https://docs.rs/display-driver-st7735
+
 This crate provides an async driver for the ST7735 display controller, implementing the `Panel` trait to be used with the [display-driver](https://github.com/decaday/display-driver) crate.
 
-![stm32h7b0-st7735-160x80](../../docs/stm32h7b0-st7735-160x80.jpg)
+![stm32h7b0-st7735-160x80](../../docs/assets/stm32h7b0-st7735.jpg)
 
 ## Usage
 
@@ -15,10 +25,8 @@ The ST7735 has many variations (often distinguished by "Tab" colors in other lib
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
-use display_driver_st7735::{St7735, 
-
-// The `Spec` (Generic128x160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
-spec::generic::Generic128x160Type1};
+// The `Spec` (Generic128x160Type1) defines the hardware-specific constants (Gamma, Voltage).
+use display_driver_st7735::{St7735, spec::generic::Generic128x160Type1};
 
 // 1. Configure Reset
 let reset_opt = LCDResetOption::new_pin(reset_pin);

@@ -1,8 +1,18 @@
 # CO5300 AMOLED Display Driver
 
+[![Crates.io][badge-license]][crates]
+[![Crates.io][badge-version]][crates]
+[![docs.rs][badge-docsrs]][docsrs]
+
+[badge-license]: https://img.shields.io/crates/l/display-driver-co5300?style=for-the-badge
+[badge-version]: https://img.shields.io/crates/v/display-driver-co5300?style=for-the-badge
+[badge-docsrs]: https://img.shields.io/docsrs/display-driver-co5300?style=for-the-badge
+[crates]: https://crates.io/crates/display-driver-co5300
+[docsrs]: https://docs.rs/display-driver-co5300
+
 This crate provides a driver for the CO5300 AMOLED display controller, often found in high-resolution wearables (e.g., 454x454 or 466x466).
 
-![sf32-slint-co5300-amoled](../../docs/sf32-slint-co5300-amoled.jpg)
+![sf32-slint-co5300-amoled](../../docs/assets/slint-co5300.jpg)
 
 ## Constraints
 

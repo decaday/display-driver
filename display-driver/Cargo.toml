@@ -2,8 +2,14 @@
 name = "display-driver"
 version = "0.1.0"
 edition = "2021"
-description = "Async display driver traits and interfaces"
+authors = ["Decaday <myDecaday@outlook.com>"]
+categories = ["embedded", "hardware-support", "no-std"]
+keywords = ["st7735", "st7789", "display"]
+repository = "https://github.com/decaday/display-driver"
+documentation = "https://docs.rs/display-driver"
+description = "Async display driver for embedded systems, supporting various display panels and buses."
 license = "Apache-2.0"
+readme = "../README.md"
 
 [dependencies]
 display-interface = { version = "0.5", optional = true }

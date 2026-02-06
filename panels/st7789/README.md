@@ -1,5 +1,15 @@
 # ST7789 Display Driver
 
+[![Crates.io][badge-license]][crates]
+[![Crates.io][badge-version]][crates]
+[![docs.rs][badge-docsrs]][docsrs]
+
+[badge-license]: https://img.shields.io/crates/l/display-driver-st7789?style=for-the-badge
+[badge-version]: https://img.shields.io/crates/v/display-driver-st7789?style=for-the-badge
+[badge-docsrs]: https://img.shields.io/docsrs/display-driver-st7789?style=for-the-badge
+[crates]: https://crates.io/crates/display-driver-st7789
+[docsrs]: https://docs.rs/display-driver-st7789
+
 This crate provides an async driver for the ST7789 display controller, implementing the `Panel` trait to be used with the [display-driver](https://github.com/decaday/display-driver) crate.
 
 <img src="../../docs/assets/st7789.jpg" style="zoom:50%;" />
@@ -16,6 +26,7 @@ The ST7789 has many variations in resolution and internal offsets. This crate pr
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
+// The `Spec` (Generic240x240Type1) defines the hardware-specific constants (Gamma, Voltage).
 use display_driver_st7789::{St7789, spec::generic::Generic240x240Type1};
 
 // 1. Configure Reset

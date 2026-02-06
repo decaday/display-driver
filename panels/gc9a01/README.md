@@ -1,5 +1,15 @@
 # GC9A01 Display Driver
 
+[![Crates.io][badge-license]][crates]
+[![Crates.io][badge-version]][crates]
+[![docs.rs][badge-docsrs]][docsrs]
+
+[badge-license]: https://img.shields.io/crates/l/display-driver-gc9a01?style=for-the-badge
+[badge-version]: https://img.shields.io/crates/v/display-driver-gc9a01?style=for-the-badge
+[badge-docsrs]: https://img.shields.io/docsrs/display-driver-gc9a01?style=for-the-badge
+[crates]: https://crates.io/crates/display-driver-gc9a01
+[docsrs]: https://docs.rs/display-driver-gc9a01
+
 This crate provides an async driver for the GC9A01 display controller, implementing the `Panel` trait to be used with the [display-driver](https://github.com/decaday/display-driver) crate.
 
 This driver is commonly used for round LCD displays (often 240x240).
@@ -17,6 +27,7 @@ The GC9A01 panels typically come in 240x240 resolution, but 128x128 variants als
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
+// The `Spec` (Generic240x240Type1) defines the hardware-specific constants (Gamma, Voltage).
 use display_driver_gc9a01::{Gc9a01, spec::{Generic240x240Type1}};
 
 // 1. Configure Reset
