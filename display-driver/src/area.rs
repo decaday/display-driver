@@ -1,3 +1,4 @@
+/// A simple struct representing a rectangular area.
 #[derive(Debug, Clone, Copy)]
 pub struct Area {
     /// Start X coordinate.

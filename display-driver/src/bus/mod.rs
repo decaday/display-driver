@@ -48,8 +48,10 @@ impl FrameControl {
 
 /// Metadata about the pixel data transfer.
 ///
-/// Advanced display buses (like MIPI DSI or QSPI with DMA) often require more context than just the raw pixel bytes.
-/// This struct carries that side-band information, allowing the bus implementation to orchestrate the transfer correctly.
+/// Advanced display buses (like MIPI DSI or QSPI with DMA) often require more context than just the
+/// raw pixel bytes.
+/// This struct carries that side-band information, allowing the bus implementation to orchestrate 
+/// the transfer correctly.
 #[derive(Clone, Copy, Debug)]
 pub struct Metadata {
     /// The rectangular area on the display this data corresponds to.
@@ -64,7 +66,8 @@ pub struct Metadata {
 impl Metadata {
     /// Creates metadata for a full screen update.
     ///
-    /// This sets the area to the full display dimensions and marks the transfer as both the start and end of a frame.
+    /// This sets the area to the full display dimensions and marks the transfer as both the start
+    /// and end of a frame.
     /// Use this for standard full-frame refreshing.
     pub fn new_full_screen(w: u16, h: u16) -> Self {
         Self {
@@ -76,7 +79,8 @@ impl Metadata {
         }
     }
 
-    /// Creates metadata for continuing a stream of pixel data without resetting the area or frame markers.
+    /// Creates metadata for continuing a stream of pixel data without resetting the area or frame
+    /// markers.
     ///
     /// Use this when splitting a large frame into multiple smaller chunks for transfer.
     pub fn new_continue_stream() -> Self {
@@ -103,15 +107,19 @@ impl Metadata {
 #[allow(async_fn_in_trait)]
 /// The core interface for all display bus implementations.
 ///
-/// This trait serves as the abstraction layer between the high-level drawing logic and the low-level transport protocol.
-/// It accommodates a wide range of hardware, from simple 2-wire interfaces to complex high-speed buses.
+/// This trait serves as the abstraction layer between the high-level drawing logic and the
+/// low-level transport protocol. It accommodates a wide range of hardware, from simple 2-wire
+/// interfaces to complex high-speed buses.
 ///
 /// The interface distinguishes between two types of traffic:
-/// - **Commands**: Small, latency-sensitive messages used for configuration (handled by `write_cmd` and `write_cmd_with_params`).
-/// - **Pixels**: Large, throughput-critical data streams used for changing the visual content (handled by `write_pixels`).
+/// - **Commands**: Small, latency-sensitive messages used for configuration (handled by `write_cmd`
+///   and `write_cmd_with_params`).
+/// - **Pixels**: Large, throughput-critical data streams used for changing the visual content 
+///   (handled by `write_pixels`).
 ///
-/// This separation allows for optimizations. For instance, `write_pixels` accepts [`Metadata`], enabling the underlying implementation
-/// to utilize hardware accelerators (like DMA or QSPI peripherals) that can handle address setting and bulk data transfer efficiently.
+/// This separation allows for optimizations. For instance, `write_pixels` accepts [`Metadata`], 
+/// enabling the underlying implementation to utilize hardware accelerators (like DMA or QSPI 
+/// peripherals) that can handle address setting and bulk data transfer efficiently.
 pub trait DisplayBus: ErrorType {
     /// Writes a command to the display.
     ///
@@ -122,9 +130,9 @@ pub trait DisplayBus: ErrorType {
 
     /// Writes a command followed immediately by its parameters.
     ///
-    /// This guarantees an atomic transaction where the command and parameters are sent without interruption.
-    /// This is critical for many display controllers that expect the parameter bytes to immediately follow the command byte
-    /// while the Chip Select (CS) line remains active.
+    /// This guarantees an atomic transaction where the command and parameters are sent without 
+    /// interruption. This is critical for many display controllers that expect the parameter bytes
+    /// to immediately follow the command byte while the Chip Select (CS) line remains active.
     async fn write_cmd_with_params(&mut self, cmd: &[u8], params: &[u8])
         -> Result<(), Self::Error>;
 
@@ -133,11 +141,11 @@ pub trait DisplayBus: ErrorType {
     /// # Arguments
     /// * `cmd` - The memory write command (e.g., `0x2C` for standard MIPI DCS).
     /// * `data` - The raw pixel data bytes.
-    /// * `metadata` - Contextual information about this transfer, including the target area and frame boundaries.
+    /// * `metadata` - Contextual information about this transfer, including the target area and
+    ///   frame boundaries.
     ///
-    /// # Implementation Note
-    /// Implementations should use the `metadata` to handle frame synchronization (VSYNC/TE) before sending the pixel data.
-    /// This method is often the primary candidate for DMA or hardware acceleration.
+    /// Implementations should use the `metadata` to handle frame synchronization (VSYNC/TE) before
+    /// sending the pixel data.
     async fn write_pixels(
         &mut self,
         cmd: &[u8],
@@ -145,8 +153,11 @@ pub trait DisplayBus: ErrorType {
         metadata: Metadata,
     ) -> Result<(), DisplayError<Self::Error>>;
 
+    /// Resets the screen via the bus (optional).
+    /// 
     /// Note: This method should only be implemented if the hardware has a physical Reset pin.
-    /// Avoid adding a Pin field to your `DisplayBus` wrapper for this purpose; use `LCDResetOption` instead.
+    /// Avoid adding a Pin field to your `DisplayBus` wrapper for this purpose; use `LCDResetOption`
+    /// instead.
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         let _ = reset;
         Err(DisplayError::Unsupported)
@@ -157,12 +168,14 @@ pub trait DisplayBus: ErrorType {
 /// An optional trait for buses that support hardware-accelerated solid color filling.
 ///
 /// Filling a large area with a single color is a common operation (e.g., clearing the screen).
-/// If the hardware supports it (e.g., via a 2D GPU or a DMA channel with a non-incrementing source address),
-/// this trait allows the driver to offload that work, significantly reducing CPU usage and bus traffic.
+/// If the hardware supports it (e.g., via a 2D GPU or a DMA channel with a non-incrementing source
+/// address), this trait allows the driver to offload that work, significantly reducing CPU usage
+/// and bus traffic.
 pub trait BusHardwareFill: DisplayBus {
     /// Fills a specific region of the display with a solid color.
     ///
-    /// The implementation should leverage available hardware acceleration to perform this operation efficiently.
+    /// The implementation should leverage available hardware acceleration to perform this operation
+    /// efficiently.
     async fn fill_solid(
         &mut self,
         cmd: &[u8],
@@ -179,7 +192,8 @@ pub trait BusHardwareFill: DisplayBus {
 /// - Checking status registers.
 /// - Reading back frame memory (e.g., for screenshots), though this is less common.
 ///
-/// Not all physical interfaces support bi-directional communication (e.g., 3-wire SPI is often write-only).
+/// Not all physical interfaces support bi-directional communication (e.g., SPI TFT is often 
+/// write-only).
 pub trait BusRead: DisplayBus {
     /// Reads data from the display.
     ///
@@ -200,8 +214,8 @@ pub trait BusRead: DisplayBus {
 
 /// An optional trait for buses that support non-atomic command and data writing.
 ///
-/// Some buses, such as SPI, support sending commands and data in a single transaction,
-/// while others require separate transactions for commands and data.
+/// Some buses, such as SPI, support sending commands and data in a single transaction, while others
+/// require separate transactions for commands and data.
 #[allow(async_fn_in_trait)]
 pub trait BusBytesIo: DisplayBus {
     /// Writes a sequence of commands to the bus.

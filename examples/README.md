@@ -1,6 +1,8 @@
-# STM32H7B0 Examples
+# Examples
 
-<img src="../docs/stm32h7b0-st7735-160x80.jpg" alt="stm32h7b0-st7735-160x80" style="zoom:50%;" />
+<img src="../docs/assets/combined1.jpg" style="zoom:50%;" />
+
+## STM32H7B0 Examples
 
 | example bins                                                 | Spec                                   | Graphics                          | Description                                    |
 | ------------------------------------------------------------ | -------------------------------------- | --------------------------------- | ---------------------------------------------- |

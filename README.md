@@ -2,7 +2,7 @@
 
 An Async display driver framework designed to provide a unified interface for various LCD panels.
 
-<img src="./docs/sf32-slint-co5300-amoled.jpg" alt="sf32-slint-co5300-amoled" style="zoom:50%;" />
+<img src="./docs/assets/combined1.jpg" style="zoom:50%;" />
 
 ## Features
 
@@ -58,6 +58,8 @@ display.write_frame(fb).await.unwrap();
 
 - [st7789](./panels/st7789): ST7789, commonly used in TFT LCD.
 
+- [gc9a01](./panels/gc9a01): GC9A01, commonly used in round screens.
+
 - [co5300](./panels/co5300): CO5300, commonly used in AMOLED.
 
 ## Examples
@@ -67,6 +69,8 @@ check [Examples](./examples) for more.
 ## TODOs
 
 - Other Driver ICs and Panels
+
+- Use Macros to replace `InitStep::maybe_cmd_with`
 
 - Tearing Effect Control
 

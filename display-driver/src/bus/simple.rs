@@ -1,12 +1,13 @@
 use super::*;
 
 #[allow(async_fn_in_trait)]
-/// A simplified interface for display buses that don't need atomic command with params, complex frame
-/// control, ROI information, etc. (e.g., standard SPI, I2C).
+/// A simplified interface for display buses that don't need atomic command with params, complex
+/// frame control, ROI information, etc. (e.g., standard SPI, I2C).
 ///
-/// This trait abstracts over simple serial interfaces where commands and data are just streams of bytes.
-/// It provides a convenient way to implement the full [`DisplayBus`] trait without worrying about
-/// frame metadata or pixel-specific handling, as those are handled by the blanket implementation.
+/// This trait abstracts over simple serial interfaces where commands and data are just streams of
+/// bytes. It provides a convenient way to implement the full [`DisplayBus`] trait without worrying
+/// about frame metadata or pixel-specific handling, as those are handled by the blanket 
+/// implementation.
 ///
 /// Implementors only need to define how to send raw command bytes and raw data bytes.
 pub trait SimpleDisplayBus: ErrorType {
@@ -33,7 +34,8 @@ pub trait SimpleDisplayBus: ErrorType {
     /// Reset the screen via the bus (optional).
     ///
     /// Note: This method should only be implemented if the hardware has a physical Reset pin.
-    /// Avoid adding a Pin field to your `DisplayBus` wrapper for this purpose; use `LCDResetOption` instead.
+    /// Avoid adding a Pin field to your `DisplayBus` wrapper for this purpose; use `LCDResetOption` 
+    /// instead.
     fn set_reset(&mut self, reset: bool) -> Result<(), DisplayError<Self::Error>> {
         let _ = reset;
         Err(DisplayError::Unsupported)

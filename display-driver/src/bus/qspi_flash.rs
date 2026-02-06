@@ -26,23 +26,23 @@ impl<B: DisplayBus> QspiFlashBus<B> {
         );
     }
 
-    #[inline]
     /// Formats the command and address for QSPI transfer.
     /// This is used for common write commands except WRITE_RAM.
+    #[inline]
     pub fn to_cmd_and_addr_command(&self, cmd: u8) -> [u8; 4] {
         [0x02, 0x00, cmd, 0x00]
     }
 
-    #[inline]
     /// Formats the command and address for QSPI transfer.
     /// This is used for WRITE_RAM command.
+    #[inline]
     pub fn to_cmd_and_addr_write_ram(&self, cmd: u8) -> [u8; 4] {
         [0x32, 0x00, cmd, 0x00]
     }
 
-    #[inline]
     /// Formats the command and address for QSPI transfer.
     /// This is used for read commands.
+    #[inline]
     pub fn to_cmd_and_addr_read(&self, cmd: u8) -> [u8; 4] {
         [0x03, 0x00, cmd, 0x00]
     }
@@ -53,12 +53,6 @@ impl<B: DisplayBus> ErrorType for QspiFlashBus<B> {
 }
 
 impl<B: DisplayBus> DisplayBus for QspiFlashBus<B> {
-    // fn configure(&mut self, config: Config) -> Result<(), DisplayError<Self::Error>> {
-    //     let mut config = config;
-    //     config.cmd_size_bytes = 4;
-    //     self.inner.configure(config)
-    // }
-
     async fn write_cmd(&mut self, cmd: &[u8]) -> Result<(), Self::Error> {
         self.assert_cmd_len(cmd);
         let cmd = self.to_cmd_and_addr_command(cmd[0]);

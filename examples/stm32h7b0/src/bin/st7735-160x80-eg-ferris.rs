@@ -20,13 +20,14 @@ use embedded_graphics::{
     text::Text,
 };
 
-use display_driver_st7735::{spec::vendor_specs::XX096T_IF09, spec::PanelSpec, St7735};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;
+use display_driver_st7735::{spec::vendor_specs::XX096T_IF09, spec::PanelSpec, St7735};
 use static_cell::StaticCell;
 
 const IMAGE_WIDTH: usize = 86;
+#[allow(unused)]
 const IMAGE_HEIGHT: usize = 64;
 
 // Rotation 90 or 270

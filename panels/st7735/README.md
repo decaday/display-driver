@@ -6,7 +6,7 @@ This crate provides an async driver for the ST7735 display controller, implement
 
 ## Usage
 
-Please use the `DisplayDriver` struct from the [display-driver crate](https://github.com/decaday/display-driver) to drive the display.
+This driver is designed to work with the [display-driver crate](https://github.com/decaday/display-driver). You can use the `DisplayDriver` struct to drive the display.
 
 ### 1. Choose a Spec
 The ST7735 has many variations (often distinguished by "Tab" colors in other libraries). This crate provides `Generic` types that map to these common variations.

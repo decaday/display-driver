@@ -14,6 +14,7 @@ pub enum InitStep<'a> {
     /// No Operation. Useful for placeholders or conditional logic.
     Nop,
     /// Nested sequence.
+    /// 
     /// NOTE: Only supports one level of nesting (cannot nest a Nested inside a Nested)
     /// to avoid recursion issues in async no_std environments.
     Nested(&'a [InitStep<'a>]),

@@ -18,7 +18,7 @@ This crate provides a driver for the CO5300 AMOLED display controller, often fou
 
 ## Usage
 
-This driver is designed to work with the [display-driver crate](https://github.com/decaday/display-driver).
+This driver is designed to work with the [display-driver crate](https://github.com/decaday/display-driver). You can use the `DisplayDriver` struct to drive the display.
 
 ### 1. Choose a Spec
 
@@ -91,6 +91,8 @@ impl PanelSpec for MyNewPanel {
     const PHYSICAL_HEIGHT: u16 = 454;
     const PHYSICAL_X_OFFSET: u16 = 0;
     const PHYSICAL_Y_OFFSET: u16 = 0;
+
+    // See the code comments for other optional configurations.
 }
 
 impl Co5300Spec for MyNewPanel {

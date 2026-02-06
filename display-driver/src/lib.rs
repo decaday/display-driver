@@ -10,12 +10,12 @@ pub use crate::bus::{
     BusBytesIo, BusHardwareFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus,
 };
 pub use color::{ColorFormat, ColorType, SolidColor};
-pub use panel::{reset::LCDResetOption, Orientation, Panel};
+pub use panel::{reset::LCDResetOption, Orientation, Panel, PanelSetBrightness};
 
 use embedded_hal_async::delay::DelayNs;
 
+/// Error type for display operations.
 #[derive(Debug)]
-/// A unified error type identifying what went wrong during a display operation.
 pub enum DisplayError<E> {
     /// Error propagated from the underlying bus.
     BusError(E),
@@ -215,6 +215,13 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
             buffer,
         )
         .await
+    }
+}
+
+impl<B: DisplayBus, P: Panel<B> + PanelSetBrightness<B>> DisplayDriver<B, P> {
+    /// Sets the display brightness (if supported by the panel).
+    pub async fn set_brightness(&mut self, brightness: u8) -> Result<(), DisplayError<B::Error>> {
+        self.panel.set_brightness(&mut self.bus, brightness).await
     }
 }
 

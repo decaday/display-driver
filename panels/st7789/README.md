@@ -2,11 +2,14 @@
 
 This crate provides an async driver for the ST7789 display controller, implementing the `Panel` trait to be used with the [display-driver](https://github.com/decaday/display-driver) crate.
 
+<img src="../../docs/assets/st7789.jpg" style="zoom:50%;" />
+
 ## Usage
 
-Please use the `DisplayDriver` struct from the [display-driver crate](https://github.com/decaday/display-driver) to drive the display.
+This driver is designed to work with the [display-driver crate](https://github.com/decaday/display-driver). You can use the `DisplayDriver` struct to drive the display.
 
 ### 1. Choose a Spec
+
 The ST7789 has many variations in resolution and internal offsets. This crate provides `Generic` types that map to common variations, as well as specific `Vendor` specs for known modules.
 
 ### 2. Implementation Example
