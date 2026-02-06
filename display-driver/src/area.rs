@@ -11,11 +11,15 @@ pub struct Area {
 }
 
 impl Area {
-    pub fn from_origin(w: u16, h: u16) -> Self {
+    pub const fn new(x: u16, y: u16, w: u16, h: u16) -> Self {
+        Self { x, y, w, h }
+    }
+
+    pub const fn from_origin(w: u16, h: u16) -> Self {
         Self { x: 0, y: 0, w, h }
     }
 
-    pub fn from_origin_size(size: (u16, u16)) -> Self {
+    pub const fn from_origin_size(size: (u16, u16)) -> Self {
         Self {
             x: 0,
             y: 0,
@@ -24,15 +28,15 @@ impl Area {
         }
     }
 
-    pub fn position(&self) -> (u16, u16) {
+    pub const fn position(&self) -> (u16, u16) {
         (self.x, self.y)
     }
 
-    pub fn total_pixels(&self) -> usize {
+    pub const fn total_pixels(&self) -> usize {
         self.w as usize * self.h as usize
     }
 
-    pub fn bottom_right(&self) -> (u16, u16) {
+    pub const fn bottom_right(&self) -> (u16, u16) {
         (self.x + self.w - 1, self.y + self.h - 1)
     }
 }
@@ -57,6 +61,7 @@ impl Area {
 #[cfg(feature = "embedded-graphics")]
 mod eg_impls {
     use super::*;
+    use embedded_graphics_core::prelude::*;
     use embedded_graphics_core::primitives::Rectangle;
 
     impl From<Rectangle> for Area {
@@ -66,6 +71,15 @@ mod eg_impls {
                 y: value.top_left.y as _,
                 w: value.size.width as _,
                 h: value.size.height as _,
+            }
+        }
+    }
+
+    impl From<Area> for Rectangle {
+        fn from(value: Area) -> Self {
+            Rectangle {
+                top_left: Point::new(value.x as _, value.y as _),
+                size: Size::new(value.w as _, value.h as _),
             }
         }
     }
