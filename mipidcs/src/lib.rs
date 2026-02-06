@@ -20,7 +20,7 @@ pub use crate::dcs_types::*;
 pub struct GenericMipidcs<B, S, RST>
 where
     B: DisplayBus,
-    S: MipidcsSpec,
+    S: PanelSpec,
     RST: OutputPin,
 {
     pub reset_pin: LCDResetOption<RST>,
@@ -33,7 +33,7 @@ where
 impl<B, S, RST> GenericMipidcs<B, S, RST>
 where
     B: DisplayBus,
-    S: MipidcsSpec,
+    S: PanelSpec,
     RST: OutputPin,
 {
     /// Creates a new generic MIPI DCS driver.
@@ -199,7 +199,7 @@ where
 }
 
 /// Display Specification Trait.
-pub trait MipidcsSpec {
+pub trait PanelSpec {
     /// Screen width in pixels.
     const PHYSICAL_WIDTH: u16;
     /// Screen height in pixels.

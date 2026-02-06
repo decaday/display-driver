@@ -11,7 +11,7 @@ use display_driver::panel::{Orientation, Panel, PanelSetBrightness};
 use display_driver::{ColorFormat, DisplayError};
 
 // Use GenericMipidcs to handle standard DCS operations
-use mipidcs::{consts::*, dcs_types::AddressMode, GenericMipidcs};
+use display_driver_mipidcs::{consts::*, dcs_types::AddressMode, GenericMipidcs};
 
 pub mod consts;
 pub mod spec;

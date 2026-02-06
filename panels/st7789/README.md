@@ -13,7 +13,7 @@ The ST7789 has many variations in resolution and internal offsets. This crate pr
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
-use dd_st7789::{St7789, spec::generic::Generic240x240Type1};
+use display_driver_st7789::{St7789, spec::generic::Generic240x240Type1};
 
 // 1. Configure Reset
 let reset_opt = LCDResetOption::new_pin(reset_pin);
@@ -35,7 +35,7 @@ Full examples can be found at [examples](../../examples/README.md)
 
 ## Specs
 
-Because ST7789 panels come in various resolutions and offsets, we use a `Spec` trait (combining `MipidcsSpec` and `St7789Spec`).
+Because ST7789 panels come in various resolutions and offsets, we use a `Spec` trait (combining `PanelSpec` and `St7789Spec`).
 
 ### Generic Specs (`spec::generic`)
 
@@ -64,13 +64,13 @@ If the built-in specs don't match your display, you can define your own.
 > You can use the `impl_st7789_generic!` macro to use standard initialization parameters (Gamma, Voltages, etc.) while customizing resolution and offsets.
 
 ```rust
-use dd_st7789::{MipidcsSpec, St7789Spec, impl_st7789_generic};
+use display_driver_st7789::{PanelSpec, St7789Spec, impl_st7789_generic};
 
 // 1. Define your type
 pub struct MyCustomPanel;
 
 // 2. Configure Resolution & Offsets
-impl MipidcsSpec for MyCustomPanel {
+impl PanelSpec for MyCustomPanel {
     const PHYSICAL_WIDTH: u16 = 240;
     const PHYSICAL_HEIGHT: u16 = 240;
 

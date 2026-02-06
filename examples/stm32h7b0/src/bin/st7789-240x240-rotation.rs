@@ -18,10 +18,10 @@ use embedded_graphics::{
     },
 };
 
-use dd_st7789::{spec::vendor_specs::TB154, spec::MipidcsSpec, St7789};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{Area, DisplayDriver, FrameControl, Orientation};
 use display_driver_spi::SpiDisplayBus;
+use display_driver_st7789::{spec::vendor_specs::TB154, spec::PanelSpec, St7789};
 
 // Native dimensions (Portrait 0 degree)
 const P_WIDTH: usize = TB154::PHYSICAL_WIDTH as usize;

@@ -15,7 +15,7 @@ The ST7735 has many variations (often distinguished by "Tab" colors in other lib
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
-use dd_st7735::{St7735, 
+use display_driver_st7735::{St7735, 
 
 // The `Spec` (Generic128_160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
 spec::generic::Generic128_160Type1};
@@ -73,13 +73,13 @@ If the built-in Generic or Vendor specs don't match your display (e.g., incorrec
 > You can use the `impl_st7735_initr!` macro to use standard "InitR" values (common parameters from Adafruit_ST7735) for the complex registers.
 
 ```rust
-use dd_st7735::{MipidcsSpec, St7735Spec, impl_st7735_initr};
+use display_driver_st7735::{PanelSpec, St7735Spec, impl_st7735_initr};
 
 // 1. Define your type
 pub struct MyCustomPanel;
 
 // 2. Configure Resolution & Offsets
-impl MipidcsSpec for MyCustomPanel {
+impl PanelSpec for MyCustomPanel {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 160;
 

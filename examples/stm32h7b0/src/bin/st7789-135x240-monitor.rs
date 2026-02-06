@@ -30,10 +30,10 @@ use embedded_graphics::{
     text::Text,
 };
 
-use dd_st7789::{spec::vendor_specs::GMT114_02, spec::MipidcsSpec, St7789};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;
+use display_driver_st7789::{spec::vendor_specs::GMT114_02, spec::PanelSpec, St7789};
 use static_cell::StaticCell;
 
 // Portrait mode: 135x240

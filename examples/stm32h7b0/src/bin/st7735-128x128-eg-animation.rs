@@ -24,7 +24,7 @@ use embedded_graphics::{
 
 use micromath::F32Ext;
 
-use dd_st7735::{spec::vendor_specs::P144H008_V2, spec::MipidcsSpec, St7735};
+use display_driver_st7735::{spec::vendor_specs::P144H008_V2, spec::PanelSpec, St7735};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;

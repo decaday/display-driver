@@ -11,8 +11,8 @@ The crate provides a generic driver structure (`GenericMipidcs`) that implements
 
 Driver implementers can embed `GenericMipidcs` to get standard DCS functionality out of the box.
 
-## `MipidcsSpec`
-To support the vast variety of display panels, this crate uses the `MipidcsSpec` trait. This trait defines the physical properties of a panel, allowing the generic driver to automatically handle hardware differences. 
+## `PanelSpec`
+To support the vast variety of display panels, this crate uses the `PanelSpec` trait. This trait defines the physical properties of a panel, allowing the generic driver to automatically handle hardware differences. 
 
 It serves as a central configuration point for resolution, physical offsets (which often vary with rotation), and color settings such as pixel inversion and RGB/BGR ordering.
 

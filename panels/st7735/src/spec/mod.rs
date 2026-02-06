@@ -1,10 +1,10 @@
-pub use mipidcs::MipidcsSpec;
+pub use display_driver_mipidcs::PanelSpec;
 
 pub mod generic;
 pub mod vendor_specs;
 
 /// Specification for ST7735 initialization differences.
-pub trait St7735Spec: MipidcsSpec {
+pub trait St7735Spec: PanelSpec {
     /// Frame Rate Control 1 (Normal Mode) - 3 bytes
     /// Frame rate=fosc/((RTNA x 2 + 40) x (LINE + FPA + BPA +2))
     const FRMCTR1_PARAMS: [u8; 3];

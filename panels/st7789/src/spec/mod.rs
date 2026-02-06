@@ -1,10 +1,10 @@
-pub use mipidcs::MipidcsSpec;
+pub use display_driver_mipidcs::PanelSpec;
 
 pub mod generic;
 pub mod vendor_specs;
 
 /// Specification for ST7789 initialization differences.
-pub trait St7789Spec: MipidcsSpec {
+pub trait St7789Spec: PanelSpec {
     /// Porch Setting (0xB2) - 5 bytes
     const PORCTRL_PARAMS: [u8; 5];
 

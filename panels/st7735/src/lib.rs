@@ -4,14 +4,14 @@ use embedded_hal::digital::OutputPin;
 use embedded_hal_async::delay::DelayNs;
 
 use display_driver::bus::DisplayBus;
-use display_driver::panel::initseq::{sequenced_init, InitStep};
+use display_driver::panel::initseq::{InitStep, sequenced_init};
 use display_driver::panel::reset::{LCDResetOption, LCDReseter};
 use display_driver::panel::{Orientation, Panel};
 
 use display_driver::{ColorFormat, DisplayError};
 
-use mipidcs::SET_ADDRESS_MODE;
-use mipidcs::{dcs_types::AddressMode, GenericMipidcs};
+use display_driver_mipidcs as mipidcs;
+use display_driver_mipidcs::{GenericMipidcs, dcs_types::AddressMode};
 
 pub mod consts;
 pub mod spec;
@@ -86,7 +86,7 @@ where
             mipidcs::EXIT_INVERT_MODE,
         ),
         InitStep::CommandWithParams(
-            SET_ADDRESS_MODE,
+            mipidcs::SET_ADDRESS_MODE,
             &[if Spec::BGR {
                 AddressMode::BGR.bits()
             } else {

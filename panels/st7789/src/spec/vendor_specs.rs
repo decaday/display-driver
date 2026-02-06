@@ -5,7 +5,7 @@ use super::*;
 /// Generic Model: Generic240_240_Type1
 pub struct TB154;
 
-impl MipidcsSpec for TB154 {
+impl PanelSpec for TB154 {
     const PHYSICAL_WIDTH: u16 = 240;
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 0;
@@ -39,7 +39,7 @@ impl St7789Spec for TB154 {
 /// Generic Model: Generic135_240_Type1
 pub struct GMT114_02;
 
-impl MipidcsSpec for GMT114_02 {
+impl PanelSpec for GMT114_02 {
     const PHYSICAL_WIDTH: u16 = 135;
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 52;
@@ -76,7 +76,7 @@ impl St7789Spec for GMT114_02 {
 /// Generic Model: Generic135_240_Type1
 pub struct N114_2413THBIG01_H13;
 
-impl MipidcsSpec for N114_2413THBIG01_H13 {
+impl PanelSpec for N114_2413THBIG01_H13 {
     const PHYSICAL_WIDTH: u16 = 135;
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 52;

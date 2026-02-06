@@ -27,7 +27,7 @@ macro_rules! impl_st7789_generic {
 /// 240x320, offset = (0, 0), Inverted = true, RGB
 pub struct Generic240x320Type1;
 
-impl MipidcsSpec for Generic240x320Type1 {
+impl PanelSpec for Generic240x320Type1 {
     const PHYSICAL_WIDTH: u16 = 240;
     const PHYSICAL_HEIGHT: u16 = 320;
     const PHYSICAL_X_OFFSET: u16 = 0;
@@ -43,7 +43,7 @@ impl_st7789_generic!(Generic240x320Type1);
 /// 240x240, offset = (0, 0), offset_rotated = (0, 80), Inverted = true, RGB
 pub struct Generic240x240Type1;
 
-impl MipidcsSpec for Generic240x240Type1 {
+impl PanelSpec for Generic240x240Type1 {
     const PHYSICAL_WIDTH: u16 = 240;
     const PHYSICAL_HEIGHT: u16 = 240;
     const PHYSICAL_X_OFFSET: u16 = 0;
@@ -61,7 +61,7 @@ impl_st7789_generic!(Generic240x240Type1);
 /// 135x240, offset = (52, 40), offset_rotated = (53, 40), Inverted = true, RGB
 pub struct Generic135x240Type1;
 
-impl MipidcsSpec for Generic135x240Type1 {
+impl PanelSpec for Generic135x240Type1 {
     const PHYSICAL_WIDTH: u16 = 135;
     const PHYSICAL_HEIGHT: u16 = 240;
 
@@ -84,7 +84,7 @@ impl_st7789_generic!(Generic135x240Type1);
 /// 240x280, offset = (0, 20), Inverted = true, RGB
 pub struct Generic240x280Type1;
 
-impl MipidcsSpec for Generic240x280Type1 {
+impl PanelSpec for Generic240x280Type1 {
     const PHYSICAL_WIDTH: u16 = 240;
     const PHYSICAL_HEIGHT: u16 = 280;
 
@@ -101,7 +101,7 @@ impl_st7789_generic!(Generic240x280Type1);
 /// 172x320, offset = (34, 0), Inverted = true, RGB
 pub struct Generic172x320Type1;
 
-impl MipidcsSpec for Generic172x320Type1 {
+impl PanelSpec for Generic172x320Type1 {
     const PHYSICAL_WIDTH: u16 = 172;
     const PHYSICAL_HEIGHT: u16 = 320;
 
@@ -118,7 +118,7 @@ impl_st7789_generic!(Generic172x320Type1);
 /// 170x320, offset = (35, 0), Inverted = true, RGB
 pub struct Generic170x320Type1;
 
-impl MipidcsSpec for Generic170x320Type1 {
+impl PanelSpec for Generic170x320Type1 {
     const PHYSICAL_WIDTH: u16 = 170;
     const PHYSICAL_HEIGHT: u16 = 320;
 

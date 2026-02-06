@@ -1,5 +1,5 @@
 [package]
-name = "dd-st7735"
+name = "display-driver-st7735"
 version = "0.1.0"
 edition = "2021"
 description = "Display Driver for ST7735"
@@ -7,7 +7,7 @@ license = "Apache-2.0"
 
 [dependencies]
 display-driver = { path = "../../display-driver" }
-mipidcs = { path = "../../mipidcs" }
+display-driver-mipidcs = { path = "../../mipidcs" }
 embedded-hal = "1.0"
 embedded-hal-async = "1.0"
 delegate = "0.13"

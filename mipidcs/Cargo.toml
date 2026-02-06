@@ -1,5 +1,5 @@
 [package]
-name = "mipidcs"
+name = "display-driver-mipidcs"
 version = "0.1.0"
 edition = "2021"
 description = "MIPI DCS for display-drivers"

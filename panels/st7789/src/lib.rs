@@ -10,8 +10,8 @@ use display_driver::panel::{Orientation, Panel, PanelSetBrightness};
 
 use display_driver::{ColorFormat, DisplayError};
 
-use mipidcs::SET_ADDRESS_MODE;
-use mipidcs::{dcs_types::AddressMode, GenericMipidcs};
+use display_driver_mipidcs as mipidcs;
+use display_driver_mipidcs::{AddressMode, GenericMipidcs};
 
 pub mod consts;
 pub mod spec;
@@ -106,7 +106,7 @@ where
             mipidcs::EXIT_INVERT_MODE,
         ),
         InitStep::CommandWithParams(
-            SET_ADDRESS_MODE,
+            mipidcs::SET_ADDRESS_MODE,
             &[if Spec::BGR {
                 AddressMode::BGR.bits()
             } else {

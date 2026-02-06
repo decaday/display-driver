@@ -55,7 +55,7 @@ macro_rules! impl_st7735_initr {
 /// 128x160, offset = (0, 0), Inverted = false, BGR = true
 /// aka. RedTab(Adafruit and TFT_eSPI)
 pub struct Generic128_160Type1;
-impl MipidcsSpec for Generic128_160Type1 {
+impl PanelSpec for Generic128_160Type1 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 0;
@@ -70,7 +70,7 @@ impl_st7735_initr!(Generic128_160Type1);
 /// 128x160, offset = (0, 0), Inverted = false, BGR = false
 /// aka. BLACKTAB(Adafruit and TFT_eSPI)
 pub struct Generic128_160Type2;
-impl MipidcsSpec for Generic128_160Type2 {
+impl PanelSpec for Generic128_160Type2 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 0;
@@ -85,7 +85,7 @@ impl_st7735_initr!(Generic128_160Type2);
 /// 128x160, offset = (2, 1), Inverted = false, BGR = true
 /// aka. GREENTAB(Adafruit and TFT_eSPI)
 pub struct Generic128_160Type3;
-impl MipidcsSpec for Generic128_160Type3 {
+impl PanelSpec for Generic128_160Type3 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 2;
@@ -100,7 +100,7 @@ impl_st7735_initr!(Generic128_160Type3);
 /// 128x160, offset = (2, 1), Inverted = false, BGR = false
 /// aka. GREENTAB2(TFT_eSPI) or BOE Panel
 pub struct Generic128_160Type4;
-impl MipidcsSpec for Generic128_160Type4 {
+impl PanelSpec for Generic128_160Type4 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 2;
@@ -115,7 +115,7 @@ impl_st7735_initr!(Generic128_160Type4);
 /// 128x160, offset = (2, 1) and (2, 3) (after rotated), Inverted = false, BGR = true
 /// aka. GREENTAB3(TFT_eSPI)
 pub struct Generic128_160Type5;
-impl MipidcsSpec for Generic128_160Type5 {
+impl PanelSpec for Generic128_160Type5 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 2;
@@ -133,7 +133,7 @@ impl_st7735_initr!(Generic128_160Type5);
 /// 80x160, offset = (24, 0), Inverted = false, BGR = false
 /// aka. MINI160x80(Adafruit), BOE Panel
 pub struct Generic80_160_Type1;
-impl MipidcsSpec for Generic80_160_Type1 {
+impl PanelSpec for Generic80_160_Type1 {
     const PHYSICAL_WIDTH: u16 = 80;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 24;
@@ -148,7 +148,7 @@ impl_st7735_initr!(Generic80_160_Type1);
 /// 80x160, offset = (24, 0), Inverted = false, BGR = true
 /// aka. REDTAB160x80(TFT_eSPI)
 pub struct Generic80_160_Type2;
-impl MipidcsSpec for Generic80_160_Type2 {
+impl PanelSpec for Generic80_160_Type2 {
     const PHYSICAL_WIDTH: u16 = 80;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 24;
@@ -163,7 +163,7 @@ impl_st7735_initr!(Generic80_160_Type2);
 /// 80x160, offset = (26, 1), Inverted = true, BGR = true
 /// aka. MINI160x80PLUGIN(Adafruit), GREENTAB160x80(TFT_eSPI), HannStar Panel
 pub struct Generic80_160_Type3;
-impl MipidcsSpec for Generic80_160_Type3 {
+impl PanelSpec for Generic80_160_Type3 {
     const PHYSICAL_WIDTH: u16 = 80;
     const PHYSICAL_HEIGHT: u16 = 160;
     const PHYSICAL_X_OFFSET: u16 = 26;
@@ -178,7 +178,7 @@ impl_st7735_initr!(Generic80_160_Type3);
 /// 128x128, offset = (2, 1) and (2, 3) (after rotated), Inverted = false, BGR = true
 /// aka. 144GREENTAB(Adafruit), HALLOWING(Adafruit)
 pub struct Generic128_128_Type1;
-impl MipidcsSpec for Generic128_128_Type1 {
+impl PanelSpec for Generic128_128_Type1 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 128;
     const PHYSICAL_X_OFFSET: u16 = 2;
@@ -196,7 +196,7 @@ impl_st7735_initr!(Generic128_128_Type1);
 /// 128x128, offset = (0, 0) and (0, 32) (after rotated), Inverted = false, BGR = true
 /// aka. GREENTAB128(TFT_eSPI)
 pub struct Generic128_128_Type2;
-impl MipidcsSpec for Generic128_128_Type2 {
+impl PanelSpec for Generic128_128_Type2 {
     const PHYSICAL_WIDTH: u16 = 128;
     const PHYSICAL_HEIGHT: u16 = 128;
     const PHYSICAL_X_OFFSET: u16 = 0;

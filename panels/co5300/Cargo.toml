@@ -1,5 +1,5 @@
 [package]
-name = "dd-co5300"
+name = "display-driver-co5300"
 version = "0.1.0"
 edition = "2021"
 description = "Display Driver for CO5300"
@@ -8,7 +8,7 @@ readme = "../README.md"
 
 [dependencies]
 display-driver = { path = "../../display-driver" }
-mipidcs = { path = "../../mipidcs" }
+display-driver-mipidcs = { path = "../../mipidcs" }
 embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
 delegate = "0.13.5"

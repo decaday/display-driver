@@ -31,7 +31,7 @@ You must choose a Spec that matches your hardware from the [Built-in Panel Specs
 
 ```rust
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption, FrameControl, Area};
-use dd_co5300::{Co5300, spec::AM196Q410502LK_196};
+use display_driver_co5300::{Co5300, spec::AM196Q410502LK_196};
 
 // ... Setup SPI/QSPI bus and Reset Pin ...
 
@@ -82,11 +82,11 @@ The following panels are defined in `src/spec.rs`. Use the corresponding struct 
 To support a new panel, implement the `Co5300Spec` trait.
 
 ```rust
-use dd_co5300::{Co5300Spec, MipidcsSpec};
+use display_driver_co5300::{Co5300Spec, PanelSpec};
 
 pub struct MyNewPanel;
 
-impl MipidcsSpec for MyNewPanel {
+impl PanelSpec for MyNewPanel {
     const PHYSICAL_WIDTH: u16 = 454;
     const PHYSICAL_HEIGHT: u16 = 454;
     const PHYSICAL_X_OFFSET: u16 = 0;
