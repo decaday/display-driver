@@ -2,7 +2,7 @@
 use super::*;
 
 /// 1.54 inch 240x240, offset = (0, 0)
-/// Generic Model: Generic240_240_Type1
+/// Generic Model: Generic240x240Type1
 pub struct TB154;
 
 impl PanelSpec for TB154 {
@@ -36,7 +36,7 @@ impl St7789Spec for TB154 {
 }
 
 /// 1.14 inch 135x240
-/// Generic Model: Generic135_240_Type1
+/// Generic Model: Generic135x240Type1
 pub struct GMT114_02;
 
 impl PanelSpec for GMT114_02 {
@@ -73,7 +73,7 @@ impl St7789Spec for GMT114_02 {
 }
 
 /// 1.14 inch 135x240
-/// Generic Model: Generic135_240_Type1
+/// Generic Model: Generic135x240Type1
 pub struct N114_2413THBIG01_H13;
 
 impl PanelSpec for N114_2413THBIG01_H13 {

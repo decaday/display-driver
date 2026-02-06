@@ -18,14 +18,14 @@ use embedded_graphics::{
     },
 };
 
-use display_driver_st7735::{spec::vendor_specs::P144H008_V2, spec::PanelSpec, St7735};
+use display_driver_st7735::{spec::generic::Generic128x128Type1, spec::PanelSpec, St7735};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;
 
 // Native dimensions (Portrait 0 degree)
-const P_WIDTH: usize = P144H008_V2::PHYSICAL_WIDTH as usize;
-const P_HEIGHT: usize = P144H008_V2::PHYSICAL_HEIGHT as usize;
+const P_WIDTH: usize = Generic128x128Type1::PHYSICAL_WIDTH as usize;
+const P_HEIGHT: usize = Generic128x128Type1::PHYSICAL_HEIGHT as usize;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
@@ -52,7 +52,7 @@ async fn main(_spawner: Spawner) {
     let bus = SpiDisplayBus::new(spi_device, dc);
 
     // Create the Panel
-    let panel = St7735::<P144H008_V2, _, _>::new(LCDResetOption::new_pin(rst));
+    let panel = St7735::<Generic128x128Type1, _, _>::new(LCDResetOption::new_pin(rst));
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");

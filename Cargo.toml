@@ -8,4 +8,5 @@ members = [
     "panels/co5300",
     "panels/st7735",
     "panels/st7789",
+    "panels/gc9a01",
 ]

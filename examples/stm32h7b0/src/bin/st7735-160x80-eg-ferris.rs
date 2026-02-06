@@ -23,7 +23,7 @@ use embedded_graphics::{
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;
-use display_driver_st7735::{spec::vendor_specs::XX096T_IF09, spec::PanelSpec, St7735};
+use display_driver_st7735::{spec::generic::Generic80x160Type3, spec::PanelSpec, St7735};
 use static_cell::StaticCell;
 
 const IMAGE_WIDTH: usize = 86;
@@ -31,8 +31,8 @@ const IMAGE_WIDTH: usize = 86;
 const IMAGE_HEIGHT: usize = 64;
 
 // Rotation 90 or 270
-const SCREEN_WIDTH: usize = XX096T_IF09::PHYSICAL_HEIGHT as _;
-const SCREEN_HEIGHT: usize = XX096T_IF09::PHYSICAL_WIDTH as _;
+const SCREEN_WIDTH: usize = Generic80x160Type3::PHYSICAL_HEIGHT as _;
+const SCREEN_HEIGHT: usize = Generic80x160Type3::PHYSICAL_WIDTH as _;
 
 type FramebufferType = Framebuffer<
     Rgb565,
@@ -70,7 +70,7 @@ async fn main(_spawner: Spawner) {
     let bus = SpiDisplayBus::new(spi_device, dc);
 
     // Create the Panel
-    let panel = St7735::<XX096T_IF09, _, _>::new(LCDResetOption::new_software());
+    let panel = St7735::<Generic80x160Type3, _, _>::new(LCDResetOption::new_software());
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");

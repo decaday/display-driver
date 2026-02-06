@@ -23,14 +23,14 @@ An Async display driver framework designed to provide a unified interface for va
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
 use display_driver_st7735::{St7735, 
 
-// The `Spec` (Generic128_160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
-spec::generic::Generic128_160Type1};
+// The `Spec` (Generic128x160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
+spec::generic::Generic128x160Type1};
 
 // 1. Configure Reset
 let reset_opt = LCDResetOption::new_pin(reset_pin);
 
-// 2. Create the Panel instance using a Generic Spec (e.g., Generic128_160Type1)
-let panel = St7735::<Generic128_160Type1, _, _>::new(reset_opt);
+// 2. Create the Panel instance using a Generic Spec (e.g., Generic128x160Type1)
+let panel = St7735::<Generic128x160Type1, _, _>::new(reset_opt);
 
 // 3. Bind Bus and Panel, Configure, and Initialize
 // The driver orchestrates the logic, delegating transport to 'bus' and commands to 'panel'.

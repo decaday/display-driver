@@ -17,14 +17,14 @@ The ST7735 has many variations (often distinguished by "Tab" colors in other lib
 use display_driver::{ColorFormat, DisplayDriver, Orientation, LCDResetOption};
 use display_driver_st7735::{St7735, 
 
-// The `Spec` (Generic128_160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
-spec::generic::Generic128_160Type1};
+// The `Spec` (Generic128x160Type1) defines the hardware-specific constants (Gamma, Voltage) typesafe-ly.
+spec::generic::Generic128x160Type1};
 
 // 1. Configure Reset
 let reset_opt = LCDResetOption::new_pin(reset_pin);
 
-// 2. Create the Panel instance using a Generic Spec (e.g., Generic128_160Type1)
-let panel = St7735::<Generic128_160Type1, _, _>::new(reset_opt);
+// 2. Create the Panel instance using a Generic Spec (e.g., Generic128x160Type1)
+let panel = St7735::<Generic128x160Type1, _, _>::new(reset_opt);
 
 // 3. Bind Bus and Panel, Configure, and Initialize
 // The driver orchestrates the logic, delegating transport to 'bus' and commands to 'panel'.
@@ -54,16 +54,16 @@ The following table maps the provided `Generic` types to common names used in th
 
 | Generic Type | Adafruit Name | TFT_eSPI Name | Vendor Specs |
 | :--- | :--- | :--- | :--- |
-| `Generic128_160Type1` | RedTab | RedTab | - |
-| `Generic128_160Type2` | BLACKTAB | BLACKTAB | - |
-| `Generic128_160Type3` | GREENTAB | GREENTAB | `CL177SPI` (1.77") |
-| `Generic128_160Type4` | - | GREENTAB2 | - |
-| `Generic128_160Type5` | - | GREENTAB3 | - |
-| `Generic80_160_Type1` | MINI160x80 | - | - |
-| `Generic80_160_Type2` | - | REDTAB160x80 | - |
-| `Generic80_160_Type3` | MINI160x80PLUGIN | GREENTAB160x80 | `XX096T_IF09` (0.96") |
-| `Generic128_128_Type1` | 144GREENTAB / HALLOWING | - | - |
-| `Generic128_128_Type2` | - | GREENTAB128 | `P144H008_V2` (1.44") |
+| `Generic128x160Type1` | RedTab | RedTab | - |
+| `Generic128x160Type2` | BLACKTAB | BLACKTAB | - |
+| `Generic128x160Type3` | GREENTAB | GREENTAB | `CL177SPI` (1.77") |
+| `Generic128x160Type4` | - | GREENTAB2 | - |
+| `Generic128x160Type5` | - | GREENTAB3 | - |
+| `Generic80x160Type1` | MINI160x80 | - | - |
+| `Generic80x160Type2` | - | REDTAB160x80 | - |
+| `Generic80x160Type3` | MINI160x80PLUGIN | GREENTAB160x80 | `XX096T_IF09` (0.96") |
+| `Generic128x128Type1` | 144GREENTAB / HALLOWING | - | - |
+| `Generic128x128Type2` | - | GREENTAB128 | `P144H008_V2` (1.44") |
 
 ### Implementing a Custom Spec
 

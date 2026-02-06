@@ -21,11 +21,11 @@ use embedded_graphics::{
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{Area, DisplayDriver, FrameControl, Orientation};
 use display_driver_spi::SpiDisplayBus;
-use display_driver_st7789::{spec::vendor_specs::TB154, spec::PanelSpec, St7789};
+use display_driver_st7789::{spec::generic::Generic240x240Type1, spec::PanelSpec, St7789};
 
 // Native dimensions (Portrait 0 degree)
-const P_WIDTH: usize = TB154::PHYSICAL_WIDTH as usize;
-const P_HEIGHT: usize = TB154::PHYSICAL_HEIGHT as usize;
+const P_WIDTH: usize = Generic240x240Type1::PHYSICAL_WIDTH as usize;
+const P_HEIGHT: usize = Generic240x240Type1::PHYSICAL_HEIGHT as usize;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
@@ -52,7 +52,7 @@ async fn main(_spawner: Spawner) {
     let bus = SpiDisplayBus::new(spi_device, dc);
 
     // Create the Panel
-    let panel = St7789::<TB154, _, _>::new(LCDResetOption::new_pin(rst));
+    let panel = St7789::<Generic240x240Type1, _, _>::new(LCDResetOption::new_pin(rst));
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");

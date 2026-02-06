@@ -33,12 +33,12 @@ use embedded_graphics::{
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
 use display_driver_spi::SpiDisplayBus;
-use display_driver_st7789::{spec::vendor_specs::GMT114_02, spec::PanelSpec, St7789};
+use display_driver_st7789::{spec::generic::Generic135x240Type1, spec::PanelSpec, St7789};
 use static_cell::StaticCell;
 
 // Portrait mode: 135x240
-const SCREEN_WIDTH: usize = GMT114_02::PHYSICAL_WIDTH as usize;
-const SCREEN_HEIGHT: usize = GMT114_02::PHYSICAL_HEIGHT as usize;
+const SCREEN_WIDTH: usize = Generic135x240Type1::PHYSICAL_WIDTH as usize;
+const SCREEN_HEIGHT: usize = Generic135x240Type1::PHYSICAL_HEIGHT as usize;
 
 type FramebufferType = Framebuffer<
     Rgb565,
@@ -91,7 +91,7 @@ async fn main(_spawner: Spawner) {
     let bus = SpiDisplayBus::new(spi_device, dc);
 
     // Create the Panel
-    let panel = St7789::<GMT114_02, _, _>::new(LCDResetOption::new_pin(rst));
+    let panel = St7789::<Generic135x240Type1, _, _>::new(LCDResetOption::new_pin(rst));
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");
