@@ -151,13 +151,21 @@ impl AddressMode {
     /// Creates a simplified AddressMode for common rotation/color scenarios.
     ///
     /// This mimics the old constructor for easier migration.
-    pub fn new_simple(mx: bool, my: bool, mv: bool, bgr: bool) -> Self {
-        let mut mode = Self::empty();
-        mode.set(AddressMode::MX, mx);
-        mode.set(AddressMode::MY, my);
-        mode.set(AddressMode::MV, mv);
-        mode.set(AddressMode::BGR, bgr);
-        mode
+    pub const fn new_simple(mx: bool, my: bool, mv: bool, bgr: bool) -> Self {
+        let mut bits = 0;
+        if mx {
+            bits |= Self::MX.bits();
+        }
+        if my {
+            bits |= Self::MY.bits();
+        }
+        if mv {
+            bits |= Self::MV.bits();
+        }
+        if bgr {
+            bits |= Self::BGR.bits();
+        }
+        Self::from_bits_retain(bits)
     }
 
     pub const fn as_bytes(&self) -> [u8; 1] {
@@ -180,9 +188,12 @@ impl AddressMode {
 
     pub const fn orientation(&self) -> Option<Orientation> {
         let bits = self.bits();
-        match bits {
+        match bits & (Self::MV.bits() | Self::MX.bits() | Self::MY.bits()) {
             0 => Some(Orientation::Deg0),
-            _ => None,
+            b if b == (Self::MV.bits() | Self::MX.bits()) => Some(Orientation::Deg90),
+            b if b == (Self::MX.bits() | Self::MY.bits()) => Some(Orientation::Deg180),
+            b if b == (Self::MV.bits() | Self::MY.bits()) => Some(Orientation::Deg270),
+            _ => None, // Invalid combination for orientation
         }
     }
 
