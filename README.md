@@ -74,6 +74,16 @@ display.write_frame(fb).await.unwrap();
 
 check [Examples](./examples) for more.
 
+## Display framework
+
+- embedded-graphics
+  
+  `display-driver` is built around async operation and efficient batched transfers, so it does not implement `embedded-graphics`'s `DrawTarget` directly. Use a framebuffer or a tiled buffer when integrating with `embedded-graphics`; see the [Examples](./examples) for practical patterns.
+
+- Slint
+
+  A [**Slint example for SF32**](https://github.com/decaday/sf32-slint-example) is also available.
+
 ## TODOs
 
 - Other Driver ICs and Panels

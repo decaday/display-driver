@@ -58,7 +58,7 @@ let mut display = DisplayDriver::builder(bus, panel)
     .with_orientation(Orientation::Portrait)
     .init(&mut delay).await.unwrap();
 
-display.panel().set_brightness(display.bus(), 200).await.unwrap();
+display.set_brightness(200).await.unwrap();
 
 // Draw
 display.write_pixels(

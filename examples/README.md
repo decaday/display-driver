@@ -15,3 +15,7 @@
 | [st7789-240x240-rotation](./stm32h7b0/src/bin/st7789-240x240-rotation.rs) | TB154<br/>(Generic240x240Type1) | embedded-graphics<br/>FrameBuffer | Rotate in four directions to check for offset. |
 | [gc9a01-240x240-concentric](./stm32h7b0/src/bin/gc9a01-240x240-concentric.rs) | Generic240x240Type1 | embedded-graphics<br/>FrameBuffer<br/>Dithering | Concentric gradient demo with ordered dithering for GC9A01. |
 
+CO5300 AMOLED display driver example for SF32LB52x LCDC hardware: https://github.com/OpenSiFli/sifli-rs/blob/main/examples/sf32lb52x/src/bin/lcdc_eg_co5300.rs
+
+Slint UI example for the SF32LB52x platform:
+https://github.com/decaday/sf32-slint-example
