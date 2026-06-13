@@ -14,7 +14,7 @@ pub enum InitStep<'a> {
     /// No Operation. Useful for placeholders or conditional logic.
     Nop,
     /// Nested sequence.
-    /// 
+    ///
     /// NOTE: Only supports one level of nesting (cannot nest a Nested inside a Nested)
     /// to avoid recursion issues in async no_std environments.
     Nested(&'a [InitStep<'a>]),
@@ -83,7 +83,8 @@ impl<'a, D: DelayNs, B: DisplayBus, I: Iterator<Item = InitStep<'a>>> SequencedI
             }
             InitStep::Nop => Ok(()),
             InitStep::Nested(_) => {
-                panic!("We only support 1 level in InitStep.");
+                // InitStep::Nested cannot be nested inside another InitStep::Nested
+                panic!("Only one level of nesting is supported");
             }
         }
     }

@@ -38,6 +38,7 @@ impl Area {
     }
 
     pub const fn bottom_right(&self) -> (u16, u16) {
+        debug_assert!(self.w > 0 && self.h > 0);
         (self.x + self.w - 1, self.y + self.h - 1)
     }
 }

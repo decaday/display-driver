@@ -167,6 +167,10 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
             }
         }
 
+        if area.w == 0 || area.h == 0 {
+            return Err(DisplayError::InvalidArgs);
+        }
+
         let (x1, y1) = area.bottom_right();
         self.panel
             .set_window(&mut self.bus, area.x, area.y, x1, y1)
