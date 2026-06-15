@@ -22,6 +22,7 @@ use embedded_graphics::{
 
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
+use display_driver::eg::FrameBufferedDisplayDriver;
 use display_driver_spi::SpiDisplayBus;
 use display_driver_st7735::{spec::generic::Generic80x160Type3, spec::PanelSpec, St7735};
 use static_cell::StaticCell;
@@ -90,7 +91,10 @@ async fn main(_spawner: Spawner) {
 
     // Framebuffer
     let fb = FB.init(Framebuffer::new());
-    fb.clear(Rgb565::BLACK);
+
+    // Create the buffered display wrapper taking ownership of disp
+    let mut fb_display = FrameBufferedDisplayDriver::new(disp, fb);
+    fb_display.clear(Rgb565::BLACK).unwrap();
 
     // Draw L-shaped markers at the corners to verify offsets
     stm32h7b0_examples::LShapedMarkers::new(
@@ -99,7 +103,7 @@ async fn main(_spawner: Spawner) {
         5,
         Rgb565::RED,
     )
-    .draw(fb)
+    .draw(&mut fb_display)
     .unwrap();
 
     // Draw Ferris
@@ -117,18 +121,18 @@ async fn main(_spawner: Spawner) {
         },
     );
 
-    image.draw(fb).unwrap();
+    image.draw(&mut fb_display).unwrap();
 
     // Draw Text
     let style = MonoTextStyle::new(&FONT_6X10, Rgb565::WHITE);
     Text::new("powered by display-driver", Point::new(5, 75), style)
-        .draw(fb)
+        .draw(&mut fb_display)
         .unwrap();
 
     // Flush to display
     info!("Flushing to display...");
 
-    disp.write_frame(fb.data()).await.unwrap();
+    fb_display.flush().await.unwrap();
 
     info!("Drawing finished.");
 

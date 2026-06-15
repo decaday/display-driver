@@ -27,6 +27,7 @@ use micromath::F32Ext;
 use display_driver_st7735::{spec::generic::Generic128x128Type1, spec::PanelSpec, St7735};
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
+use display_driver::eg::FrameBufferedDisplayDriver;
 use display_driver_spi::SpiDisplayBus;
 use static_cell::StaticCell;
 
@@ -40,8 +41,8 @@ type FramebufferType =
 static FB: StaticCell<FramebufferType> = StaticCell::new();
 
 /// Draw a creative animated scene with geometric patterns
-fn draw_creative_scene(fb: &mut FramebufferType, frame: u32) {
-    fb.clear(Rgb565::BLACK).unwrap();
+fn draw_creative_scene(fb: &mut impl DrawTarget<Color = Rgb565>, frame: u32) {
+    fb.clear(Rgb565::BLACK).unwrap_or(());
 
     let center_x = (WIDTH / 2) as i32;
     let center_y = (HEIGHT / 2) as i32;
@@ -213,7 +214,7 @@ async fn main(_spawner: Spawner) {
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");
-    let mut disp = DisplayDriver::builder(bus, panel)
+    let disp = DisplayDriver::builder(bus, panel)
         .with_color_format(ColorFormat::RGB565)
         .with_orientation(Orientation::Deg0)
         .init(&mut embassy_time::Delay)
@@ -224,6 +225,9 @@ async fn main(_spawner: Spawner) {
     // Initialize global framebuffer
     let fb = FB.init(Framebuffer::new());
 
+    // Create the buffered display wrapper taking ownership of disp
+    let mut fb_display = FrameBufferedDisplayDriver::new(disp, fb);
+
     // Animation loop with FPS control
     let mut frame: u32 = 0;
     let target_fps = 30;
@@ -233,8 +237,8 @@ async fn main(_spawner: Spawner) {
     info!("Measuring first frame rendering time...");
     let start = Instant::now();
 
-    draw_creative_scene(fb, 0);
-    disp.write_frame(fb.data()).await.unwrap();
+    draw_creative_scene(&mut fb_display, 0);
+    fb_display.flush().await.unwrap();
 
     let first_frame_duration = start.elapsed();
     let first_frame_ms = first_frame_duration.as_millis();
@@ -265,8 +269,8 @@ async fn main(_spawner: Spawner) {
     loop {
         let frame_start = Instant::now();
 
-        draw_creative_scene(fb, frame);
-        disp.write_frame(fb.data()).await.unwrap();
+        draw_creative_scene(&mut fb_display, frame);
+        fb_display.flush().await.unwrap();
 
         frame = frame.wrapping_add(1);
 

@@ -32,6 +32,7 @@ use embedded_graphics::{
 
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{DisplayDriver, Orientation};
+use display_driver::eg::FrameBufferedDisplayDriver;
 use display_driver_spi::SpiDisplayBus;
 use display_driver_st7789::{spec::generic::Generic135x240Type1, spec::PanelSpec, St7789};
 use static_cell::StaticCell;
@@ -95,7 +96,7 @@ async fn main(_spawner: Spawner) {
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");
-    let mut disp = DisplayDriver::builder(bus, panel)
+    let disp = DisplayDriver::builder(bus, panel)
         .with_color_format(ColorFormat::RGB565)
         .with_orientation(Orientation::Deg0)
         .init(&mut embassy_time::Delay)
@@ -107,11 +108,14 @@ async fn main(_spawner: Spawner) {
     // Initialize framebuffer
     let fb = FB.init(Framebuffer::new());
 
-    draw_ui(fb);
+    // Create the buffered display wrapper taking ownership of disp
+    let mut fb_display = FrameBufferedDisplayDriver::new(disp, fb);
+
+    draw_ui(&mut fb_display);
 
     // Flush to display
     info!("Flushing to display...");
-    disp.write_frame(fb.data()).await.unwrap();
+    fb_display.flush().await.unwrap();
 
     info!("Beautiful UI rendered!");
 
