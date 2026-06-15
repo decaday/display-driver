@@ -5,6 +5,9 @@ pub mod bus;
 pub mod color;
 pub mod panel;
 
+#[cfg(feature = "embedded-graphics")]
+pub mod eg;
+
 pub use crate::area::Area;
 pub use crate::bus::{
     BusBytesIo, BusHardwareFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus,
