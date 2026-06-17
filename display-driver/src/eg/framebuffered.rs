@@ -1,7 +1,7 @@
 use crate::{
     bus::DisplayBus,
     color::ColorFormat,
-    panel::{Orientation, Panel, PanelSetBrightness},
+    panel::{Orientation, Panel, PanelSetBrightness, PanelTeControl},
     Area, DisplayDriver, DisplayError, FrameControl,
 };
 use delegate::delegate;
@@ -209,6 +209,21 @@ where
         to self.driver {
             /// Sets the display brightness (if supported by the panel).
             pub async fn set_brightness(&mut self, brightness: u8) -> Result<(), DisplayError<B::Error>>;
+        }
+    }
+}
+
+impl<'a, B, P, C, R, BO, const W: usize, const H: usize, const N: usize>
+    FrameBufferedDisplayDriver<'a, B, P, C, R, BO, W, H, N>
+where
+    B: DisplayBus,
+    P: Panel<B> + PanelTeControl<B>,
+    C: PixelColor<Raw = R>,
+{
+    delegate! {
+        to self.driver {
+            /// Sets the tearing effect (TE) output mode (if supported by the panel).
+            pub async fn set_tearing_effect(&mut self, enable: bool) -> Result<(), DisplayError<B::Error>>;
         }
     }
 }
