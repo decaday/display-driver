@@ -6,7 +6,7 @@ use embedded_hal_async::delay::DelayNs;
 use display_driver::bus::DisplayBus;
 use display_driver::panel::initseq::{sequenced_init, InitStep};
 use display_driver::panel::reset::{LCDResetOption, LCDResetHandler};
-use display_driver::panel::{Orientation, Panel, PanelSetBrightness};
+use display_driver::panel::{Orientation, Panel, PanelTeControl, PanelSetBrightness};
 
 use display_driver::{ColorFormat, DisplayError};
 
@@ -160,6 +160,21 @@ where
                 orientation: Orientation,
             ) -> Result<(), DisplayError<B::Error>>;
         }
+    }
+}
+
+impl<Spec, RST, B> PanelTeControl<B> for Co5300<Spec, RST, B>
+where
+    Spec: Co5300Spec,
+    RST: OutputPin,
+    B: DisplayBus,
+{
+    async fn set_tearing_effect(
+        &mut self,
+        bus: &mut B,
+        enable: bool,
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.inner.set_tearing_effect(bus, enable).await
     }
 }
 
