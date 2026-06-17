@@ -38,6 +38,20 @@ impl<E> From<E> for DisplayError<E> {
     }
 }
 
+impl<E> DisplayError<E> {
+    /// Maps a `DisplayError<E>` to `DisplayError<O>` by applying a function to a contained `BusError` value,
+    /// leaving all other variants untouched.
+    pub fn map_bus_error<O, F: FnOnce(E) -> O>(self, op: F) -> DisplayError<O> {
+        match self {
+            DisplayError::BusError(e) => DisplayError::BusError(op(e)),
+            DisplayError::Unsupported => DisplayError::Unsupported,
+            DisplayError::OutOfRange => DisplayError::OutOfRange,
+            DisplayError::InvalidArgs => DisplayError::InvalidArgs,
+            DisplayError::UnalignedArea => DisplayError::UnalignedArea,
+        }
+    }
+}
+
 /// A builder for configuring and initializing a [`DisplayDriver`].
 ///
 /// Use [`DisplayDriver::builder`] to create a builder, then chain configuration methods
