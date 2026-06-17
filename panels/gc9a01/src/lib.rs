@@ -177,8 +177,6 @@ where
         );
         reseter.reset().await?;
 
-        // Initialize address mode cache
-        self.inner.address_mode.set(AddressMode::BGR, Spec::BGR);
 
         // Execute Initialization Sequence
         // `copied()` only copies the items during iteration; it does not copy the entire sequence

@@ -38,9 +38,11 @@ where
 {
     /// Creates a new generic MIPI DCS driver.
     pub fn new(reset_pin: LCDResetOption<RST>) -> Self {
+        let mut address_mode = AddressMode::empty();
+        address_mode.set(AddressMode::BGR, S::BGR);
         Self {
             reset_pin,
-            address_mode: AddressMode::empty(),
+            address_mode,
             orientation: Orientation::Deg0,
             _phantom: PhantomData,
         }
