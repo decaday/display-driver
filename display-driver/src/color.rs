@@ -79,8 +79,11 @@ mod eg_impls {
     #[cfg(feature = "embedded-graphics")]
     impl<'a> From<Rgb666> for SolidColor {
         fn from(value: Rgb666) -> Self {
-            let mut raw = [0u8; 3];
-            raw.copy_from_slice(&<Rgb666 as PixelColor>::Raw::from(value).to_be_bytes());
+            let raw = [
+                (value.r() & 0x3F) << 2,
+                (value.g() & 0x3F) << 2,
+                (value.b() & 0x3F) << 2,
+            ];
             SolidColor {
                 raw,
                 format: ColorFormat::RGB666,
