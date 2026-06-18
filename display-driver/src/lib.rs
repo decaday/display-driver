@@ -13,7 +13,7 @@ pub use crate::bus::{
     BusBytesIo, BusHardwareFill, DisplayBus, FrameControl, Metadata, SimpleDisplayBus,
 };
 pub use color::{ColorFormat, ColorType, SolidColor};
-pub use panel::{reset::LCDResetOption, Orientation, Panel, PanelSetBrightness};
+pub use panel::{reset::LCDResetOption, Orientation, Panel, PanelSetBrightness, PanelTeControl};
 
 use embedded_hal_async::delay::DelayNs;
 
@@ -35,6 +35,20 @@ pub enum DisplayError<E> {
 impl<E> From<E> for DisplayError<E> {
     fn from(error: E) -> Self {
         Self::BusError(error)
+    }
+}
+
+impl<E> DisplayError<E> {
+    /// Maps a `DisplayError<E>` to `DisplayError<O>` by applying a function to a contained `BusError` value,
+    /// leaving all other variants untouched.
+    pub fn map_bus_error<O, F: FnOnce(E) -> O>(self, op: F) -> DisplayError<O> {
+        match self {
+            DisplayError::BusError(e) => DisplayError::BusError(op(e)),
+            DisplayError::Unsupported => DisplayError::Unsupported,
+            DisplayError::OutOfRange => DisplayError::OutOfRange,
+            DisplayError::InvalidArgs => DisplayError::InvalidArgs,
+            DisplayError::UnalignedArea => DisplayError::UnalignedArea,
+        }
     }
 }
 
@@ -229,6 +243,13 @@ impl<B: DisplayBus, P: Panel<B> + PanelSetBrightness<B>> DisplayDriver<B, P> {
     /// Sets the display brightness (if supported by the panel).
     pub async fn set_brightness(&mut self, brightness: u8) -> Result<(), DisplayError<B::Error>> {
         self.panel.set_brightness(&mut self.bus, brightness).await
+    }
+}
+
+impl<B: DisplayBus, P: Panel<B> + PanelTeControl<B>> DisplayDriver<B, P> {
+    /// Sets the tearing effect (TE) output mode (if supported by the panel).
+    pub async fn set_tearing_effect(&mut self, enable: bool) -> Result<(), DisplayError<B::Error>> {
+        self.panel.set_tearing_effect(&mut self.bus, enable).await
     }
 }
 

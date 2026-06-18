@@ -134,3 +134,19 @@ pub trait PanelSetBrightness<B: DisplayBus>: Panel<B> {
         brightness: u8,
     ) -> Result<(), DisplayError<B::Error>>;
 }
+
+/// An optional trait for panels that support Tearing Effect (TE) output configuration.
+#[allow(async_fn_in_trait)]
+pub trait PanelTeControl<B: DisplayBus>: Panel<B> {
+    /// Sets the tearing effect output mode.
+    ///
+    /// - `true`: Enables TE output.
+    /// - `false`: Disables TE output.
+    ///
+    /// TODO: Support more fine-grained control like V-Blanking only vs V-Blanking and H-Blanking.
+    async fn set_tearing_effect(
+        &mut self,
+        bus: &mut B,
+        enable: bool,
+    ) -> Result<(), DisplayError<B::Error>>;
+}
