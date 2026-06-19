@@ -1,8 +1,6 @@
 #[cfg(feature = "display-interface")]
 mod display_interface_impl;
 
-pub mod qspi_flash;
-pub use qspi_flash::QspiFlashBus;
 
 pub mod simple;
 pub use simple::SimpleDisplayBus;

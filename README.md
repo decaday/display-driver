@@ -54,7 +54,9 @@ display.write_frame(fb).await.unwrap();
 
 ## Display Bus Implementations
 
-- [spi](./buses/spi): SPI bus implementation.
+- [SPI](./buses/spi): SPI bus implementation.
+
+- [QSPI](./buses/qspi): QSPI bus implementation.
 
 - [SF32 LCDC](https://github.com/OpenSiFli/sifli-rs/tree/main/sifli-hal): Bus Implementation for SF32LB52x LCDC Hardware.
 
