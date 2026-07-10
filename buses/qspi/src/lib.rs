@@ -13,9 +13,9 @@ const WRITE_CMD_INST: u8 = 0x02;
 const WRITE_RAM_INST: u8 = 0x32;
 const READ_INST: u8 = 0x03;
 
-/// The core QSPI flash command mapping.
-/// It encapsulates the mapping from a 1-byte DCS command
-/// to a QSPI flash instruction and address.
+/// QSPI flash command mapping.
+/// It encapsulates the mapping from a 1-byte DCS command to a QSPI flash instruction
+/// and address.
 #[derive(Debug, Clone, Copy)]
 pub struct QspiFlashCommand {
     pub inst: u8,
