@@ -39,6 +39,22 @@ impl PanelSpec for Generic240x320Type1 {
 
 impl_st7789_generic!(Generic240x320Type1);
 
+/// Generic ST7789 spec for 240x320 displays (Type 2)
+/// 240x320, offset = (0, 0), Inverted = false, RGB
+pub struct Generic240x320Type2;
+
+impl PanelSpec for Generic240x320Type2 {
+    const PHYSICAL_WIDTH: u16 = 240;
+    const PHYSICAL_HEIGHT: u16 = 320;
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
+
+    const INVERTED: bool = false;
+    const BGR: bool = false;
+}
+
+impl_st7789_generic!(Generic240x320Type2);
+
 /// Generic ST7789 spec for 240x240 displays (Type 1)
 /// 240x240, offset = (0, 0), offset_rotated = (0, 80), Inverted = true, RGB
 pub struct Generic240x240Type1;

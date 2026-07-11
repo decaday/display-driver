@@ -1,6 +1,37 @@
 #![allow(non_camel_case_types)]
 use super::*;
 
+/// CL28CK1083 2.8 inch 240x320, offset = (0, 0)
+/// Generic Model: Generic240x320Type2
+pub struct CL28CK1083;
+
+impl PanelSpec for CL28CK1083 {
+    const PHYSICAL_WIDTH: u16 = 240;
+    const PHYSICAL_HEIGHT: u16 = 320;
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
+
+    const INVERTED: bool = false;
+    const BGR: bool = false;
+}
+
+impl St7789Spec for CL28CK1083 {
+    const PORCTRL_PARAMS: [u8; 5] = [0x0C, 0x0C, 0x00, 0x33, 0x33];
+    const GCTRL_PARAM: u8 = 0x35;
+    const VCOMS_PARAM: u8 = 0x28;
+    const LCMCTRL_PARAM: u8 = 0x2C;
+    const VRHS_PARAM: u8 = 0x0B;
+    const VDVS_PARAM: u8 = 0x20;
+    const FRCTRL2_PARAM: u8 = 0x0F;
+    const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
+    const PVGAMCTRL_PARAMS: [u8; 14] = [
+        0xD0, 0x01, 0x08, 0x0F, 0x11, 0x2A, 0x36, 0x55, 0x44, 0x3A, 0x0B, 0x06, 0x11, 0x20,
+    ];
+    const NVGAMCTRL_PARAMS: [u8; 14] = [
+        0xD0, 0x02, 0x07, 0x0A, 0x0B, 0x18, 0x34, 0x43, 0x4A, 0x2B, 0x1B, 0x1C, 0x22, 0x1F,
+    ];
+}
+
 /// 1.54 inch 240x240, offset = (0, 0)
 /// Generic Model: Generic240x240Type1
 pub struct TB154;
