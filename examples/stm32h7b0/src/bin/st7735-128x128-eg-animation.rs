@@ -185,6 +185,10 @@ fn draw_creative_scene(fb: &mut impl DrawTarget<Color = Rgb565>, frame: u32) {
     .ok();
 }
 
+embassy_stm32::bind_interrupts!(struct Irqs {
+    DMA1_STREAM0 => embassy_stm32::dma::InterruptHandler<embassy_stm32::peripherals::DMA1_CH0>;
+});
+
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     info!("START EG ANIMATION DEMO - 128x128");
@@ -203,7 +207,7 @@ async fn main(_spawner: Spawner) {
     let mut spi_config: spi::Config = Default::default();
     spi_config.frequency = Hertz(10_000_000);
 
-    let spi = Spi::new_txonly(p.SPI4, p.PE12, p.PE14, p.DMA1_CH0, spi_config);
+    let spi = Spi::new_txonly(p.SPI4, p.PE12, p.PE14, p.DMA1_CH0, Irqs, spi_config);
 
     // Create the SPI Bus
     let spi_device = embedded_hal_bus::spi::ExclusiveDevice::new_no_delay(spi, cs).unwrap();
