@@ -22,7 +22,8 @@ use embedded_graphics::{
 };
 
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
-use display_driver::{Area, DisplayDriver, FrameControl, Orientation};
+use display_driver::{DisplayDriver, FrameControl, Orientation};
+use display_driver::eg::FrameBufferedDisplayDriver;
 use display_driver_spi::SpiDisplayBus;
 use display_driver_st7789::{spec::generic::Generic240x320Type2, spec::PanelSpec, St7789};
 
@@ -165,26 +166,13 @@ async fn main(_spawner: Spawner) {
     // Helper macro to flush framebuffer in chunks
     macro_rules! flush_fb {
         () => {
-            let chunk_lines = 80;
-            let chunk_bytes = chunk_lines * 320 * 2;
+            let mut fb_display = FrameBufferedDisplayDriver::new(disp, fb);
             
-            disp.write_pixels(
-                Area::from_origin(320, chunk_lines as u16),
-                FrameControl::new_first(),
-                &fb.data()[0..chunk_bytes],
-            ).await.unwrap();
-
-            disp.write_pixels(
-                Area::new(0, chunk_lines as u16, 320, chunk_lines as u16),
-                FrameControl { first: false, last: false },
-                &fb.data()[chunk_bytes..chunk_bytes * 2],
-            ).await.unwrap();
-
-            disp.write_pixels(
-                Area::new(0, (chunk_lines * 2) as u16, 320, chunk_lines as u16),
-                FrameControl::new_last(),
-                &fb.data()[chunk_bytes * 2..chunk_bytes * 3],
-            ).await.unwrap();
+            fb_display.flush_lines_with_frame_control(0, 79, FrameControl::new_first()).await.unwrap();
+            fb_display.flush_lines_with_frame_control(80, 159, FrameControl { first: false, last: false }).await.unwrap();
+            fb_display.flush_lines_with_frame_control(160, 239, FrameControl::new_last()).await.unwrap();
+            
+            disp = fb_display.into_inner();
         }
     }
 

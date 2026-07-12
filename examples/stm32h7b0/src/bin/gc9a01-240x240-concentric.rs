@@ -30,6 +30,7 @@ use micromath::F32Ext;
 
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
 use display_driver::{Area, DisplayDriver, FrameControl, Orientation};
+use display_driver::eg::FrameBufferedDisplayDriver;
 use display_driver_gc9a01::{spec::Generic240x240Type1, Gc9a01};
 use display_driver_spi::SpiDisplayBus;
 use static_cell::StaticCell;
@@ -80,7 +81,7 @@ async fn main(_spawner: Spawner) {
 
     // Create and initialize the Driver using builder
     info!("Initializing display...");
-    let mut disp = DisplayDriver::builder(bus, panel)
+    let disp = DisplayDriver::builder(bus, panel)
         .with_color_format(ColorFormat::RGB565)
         .with_orientation(Orientation::Deg180)
         .init(&mut embassy_time::Delay)
@@ -91,10 +92,12 @@ async fn main(_spawner: Spawner) {
 
     // Initialize framebuffer
     let fb = FB.init(Framebuffer::new());
+    
+    let mut fb_display = FrameBufferedDisplayDriver::new(disp, fb);
 
     // Draw content
-    draw_concentric_gradient(fb);
-    draw_text(fb);
+    draw_concentric_gradient(&mut fb_display);
+    draw_text(&mut fb_display);
 
     // Flush to display
     info!("Flushing to display...");
@@ -102,26 +105,12 @@ async fn main(_spawner: Spawner) {
     // Split transfer into two chunks because STM32 DMA limit is 65535 bytes
     // Total size: 240 * 240 * 2 = 115200 bytes
     // Half size: 115200 / 2 = 57600 bytes
-    let data = fb.data();
-    let (first, second) = data.split_at(data.len() / 2);
-
+    
     // Send first half (Top 240x120)
-    disp.write_pixels(
-        Area::from_origin(WIDTH as u16, (HEIGHT / 2) as u16),
-        FrameControl::new_first(),
-        first,
-    )
-    .await
-    .unwrap();
-
+    fb_display.flush_lines_with_frame_control(0, (HEIGHT / 2 - 1) as u16, FrameControl::new_first()).await.unwrap();
+    
     // Send second half (Bottom 240x120)
-    disp.write_pixels(
-        Area::new(0, (HEIGHT / 2) as u16, WIDTH as u16, (HEIGHT / 2) as u16),
-        FrameControl::new_last(),
-        second,
-    )
-    .await
-    .unwrap();
+    fb_display.flush_lines_with_frame_control((HEIGHT / 2) as u16, (HEIGHT - 1) as u16, FrameControl::new_last()).await.unwrap();
 
     info!("Done!");
 

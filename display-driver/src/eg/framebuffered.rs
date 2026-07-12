@@ -181,6 +181,57 @@ where
             .await
     }
 
+    /// Flushes a specific range of lines from the framebuffer to the display.
+    ///
+    /// This is useful when the entire framebuffer exceeds the DMA transfer limits of the
+    /// microcontroller (e.g., >65535 bytes on STM32) or when only a portion of the screen
+    /// needs to be updated.
+    ///
+    /// # Arguments
+    /// * `y_start` - The starting line (inclusive).
+    /// * `y_end` - The ending line (inclusive).
+    pub async fn flush_lines(
+        &mut self,
+        y_start: u16,
+        y_end: u16,
+    ) -> Result<(), DisplayError<B::Error>> {
+        self.flush_lines_with_frame_control(y_start, y_end, FrameControl::new_standalone())
+            .await
+    }
+
+    /// Flushes a specific range of lines from the framebuffer to the display using custom frame control settings.
+    ///
+    /// # Arguments
+    /// * `y_start` - The starting line (inclusive).
+    /// * `y_end` - The ending line (inclusive).
+    /// * `frame_control` - The frame synchronization/control flags to use for the write.
+    pub async fn flush_lines_with_frame_control(
+        &mut self,
+        y_start: u16,
+        y_end: u16,
+        frame_control: FrameControl,
+    ) -> Result<(), DisplayError<B::Error>> {
+        if y_start > y_end || y_end >= H as u16 {
+            return Err(DisplayError::InvalidArgs);
+        }
+
+        let bpp = core::mem::size_of::<R>();
+        let start_idx = (y_start as usize * W) * bpp;
+        let end_idx = ((y_end as usize + 1) * W) * bpp;
+
+        let data = self.framebuffer.data();
+        let slice = &data[start_idx..end_idx];
+
+        let area = Area::new(
+            self.area.x,
+            self.area.y + y_start,
+            W as u16,
+            y_end - y_start + 1,
+        );
+
+        self.driver.write_pixels(area, frame_control, slice).await
+    }
+
     /// Returns the inner DisplayDriver.
     pub fn into_inner(self) -> DisplayDriver<B, P> {
         self.driver
