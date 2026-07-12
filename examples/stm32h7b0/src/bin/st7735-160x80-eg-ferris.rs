@@ -106,7 +106,7 @@ async fn main(_spawner: Spawner) {
     fb_display.clear(Rgb565::BLACK).unwrap();
 
     // Draw L-shaped markers at the corners to verify offsets
-    stm32h7b0_examples::LShapedMarkers::new(
+    display_driver::eg::utils::LShapedMarkers::new(
         SCREEN_WIDTH as i32,
         SCREEN_HEIGHT as i32,
         5,

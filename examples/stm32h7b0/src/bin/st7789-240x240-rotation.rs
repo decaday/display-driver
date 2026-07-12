@@ -100,7 +100,7 @@ async fn main(_spawner: Spawner) {
                         P_HEIGHT,
                         { buffer_size::<Rgb565>(P_WIDTH, P_HEIGHT) },
                     >::new();
-                    stm32h7b0_examples::draw_rotation_scene(&mut fb, P_WIDTH, P_HEIGHT, rot_str);
+                    display_driver::eg::utils::draw_rotation_scene(&mut fb, P_WIDTH, P_HEIGHT, rot_str);
 
                     // STM32's DMA can send at most 0xFFFF length data at a time.
                     // So we need to split the transfer into two chunks.
@@ -139,7 +139,7 @@ async fn main(_spawner: Spawner) {
                         P_WIDTH,
                         { buffer_size::<Rgb565>(P_HEIGHT, P_WIDTH) },
                     >::new();
-                    stm32h7b0_examples::draw_rotation_scene(&mut fb, P_HEIGHT, P_WIDTH, rot_str);
+                    display_driver::eg::utils::draw_rotation_scene(&mut fb, P_HEIGHT, P_WIDTH, rot_str);
 
                     // STM32's DMA can send at most 0xFFFF length data at a time.
                     // So we need to split the transfer into two chunks.

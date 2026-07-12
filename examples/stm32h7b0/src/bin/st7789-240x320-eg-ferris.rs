@@ -118,7 +118,7 @@ async fn main(_spawner: Spawner) {
 
     // Draw L-shaped markers at the corners to verify offsets
     // Drawn after the grid so they are on top!
-    stm32h7b0_examples::LShapedMarkers::new(
+    display_driver::eg::utils::LShapedMarkers::new(
         SCREEN_WIDTH as i32,
         SCREEN_HEIGHT as i32,
         10,
