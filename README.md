@@ -77,8 +77,29 @@ check [Examples](./examples) for more.
 ## Display framework
 
 - embedded-graphics
+
+  `DisplayDriver` is optimized for asynchronous, batched transfers and does not implement `embedded-graphics`'s `DrawTarget` directly. For framebuffer-based drawing, wrap it in [`FrameBufferedDisplayDriver`](https://docs.rs/display-driver/latest/display_driver/eg/struct.FrameBufferedDisplayDriver.html). The wrapper implements `DrawTarget`, so `embedded-graphics` primitives can draw into the framebuffer and then be transferred to the panel asynchronously.
+
+  ```rust
+  // Import...
+  let mut framebuffer: Framebuffer<
+      Rgb565,
+      RawU16,
+      BigEndian,
+      WIDTH,
+      HEIGHT,
+      { embedded_graphics::framebuffer::buffer_size::<Rgb565>(WIDTH, HEIGHT) },
+  > = Framebuffer::new();
+
+  let mut display = FrameBufferedDisplayDriver::new(driver, &mut framebuffer);
+  display.clear(Rgb565::BLACK)?;
+  // Draw embedded-graphics primitives with `&mut display`.
+  display.flush().await?;
+  ```
+
+  For a framebuffer that represents a screen sub-region, use `new_partial(driver, area, &mut framebuffer)`; its `Area` dimensions must exactly match the framebuffer dimensions. `set_area` can move that region later under the same constraint. 
   
-  `display-driver` is built around async operation and efficient batched transfers, so it does not implement `embedded-graphics`'s `DrawTarget` directly. Use a framebuffer or a tiled buffer when integrating with `embedded-graphics`; see the [Examples](./examples) for practical patterns.
+  Use `flush_lines` to transfer an inclusive range of framebuffer rows, or the `*_with_frame_control` variants when coordinating multi-part writes, double buffering, or TE synchronization. See the [Examples](./examples) for complete targets.
 
 - Slint
 

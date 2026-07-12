@@ -1,5 +1,6 @@
 {
     "rust-analyzer.linkedProjects": [
-        "examples/stm32h7b0/Cargo.toml"
+        "examples/stm32h7b0/Cargo.toml",
+        "examples/rp2040/Cargo.toml"
     ]
 }

@@ -29,7 +29,7 @@ use embedded_graphics::{
 use micromath::F32Ext;
 
 use display_driver::{panel::reset::LCDResetOption, ColorFormat};
-use display_driver::{Area, DisplayDriver, FrameControl, Orientation};
+use display_driver::{DisplayDriver, FrameControl, Orientation};
 use display_driver::eg::FrameBufferedDisplayDriver;
 use display_driver_gc9a01::{spec::Generic240x240Type1, Gc9a01};
 use display_driver_spi::SpiDisplayBus;
