@@ -60,6 +60,11 @@ async fn main(_spawner: Spawner) {
     // Initialize peripherals
     let p = embassy_stm32::init(config);
 
+    // Wiring (STM32H7B0 -> ST7789 240x320 display)
+    // 3V3  -> VCC     | GND -> GND
+    // PE12 -> SCL/CLK | PE14 -> SDA/DIN
+    // PE9  -> CS      | PE13 -> DC
+    // PE15 -> RST     | PE10 -> BL/LED
     let dc = Output::new(p.PE13, Level::Low, Speed::High);
     let cs = Output::new(p.PE9, Level::High, Speed::High);
     let rst = Output::new(p.PE15, Level::High, Speed::High);
