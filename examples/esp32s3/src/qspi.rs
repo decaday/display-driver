@@ -64,7 +64,10 @@ impl<'d> QspiDevice for EspHalQspiDevice<'d> {
             .take()
             .unwrap()
             .half_duplex_write(data_mode, cmd, addr, transaction.dummy_cycles, data.len(), tx_buf)
-            .map_err(|_| esp_hal::spi::Error::Unsupported)?;
+            .map_err(|e| {
+                esp_println::println!("half_duplex_write error: {:?}", e);
+                esp_hal::spi::Error::Unsupported
+            })?;
 
         transfer.wait_for_done().await;
         

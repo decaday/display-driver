@@ -37,6 +37,7 @@ embedded-hal-async = "1.0"
 display-driver = { path = "../../display-driver" }
 display-driver-qspi = { path = "../../buses/qspi" }
 display-driver-co5300 = { path = "../../panels/co5300" }
+display-driver-st77916 = { path = "../../panels/st77916" }
 
 # Drawing / framebuffer
 embedded-graphics = "0.8.1"
