@@ -1,0 +1,17 @@
+[package]
+name = "display-driver-st77916"
+version = "0.1.0"
+edition = "2021"
+authors = ["Decaday <myDecaday@outlook.com>"]
+categories = ["embedded", "hardware-support", "no-std"]
+keywords = ["st77916", "display", "display-driver"]
+repository = "https://github.com/decaday/display-driver"
+description = "Display Driver for ST77916"
+license = "Apache-2.0"
+
+[dependencies]
+display-driver = { version = "0.1.0", path = "../../display-driver" }
+display-driver-mipidcs = { version = "0.1.1", path = "../../mipidcs" }
+embedded-hal = "1.0"
+embedded-hal-async = "1.0"
+delegate = "0.13"
