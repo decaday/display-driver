@@ -41,6 +41,8 @@ display-driver-st77916 = { path = "../../panels/st77916" }
 
 # Drawing / framebuffer
 embedded-graphics = "0.8.1"
+tjpgd-rs = { version = "0.1.0", git = "https://github.com/decaday/tjpgd-rs.git", rev = "b2feafee" }
+
 static_cell = "2"
 
 # cargo build/run
