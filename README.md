@@ -68,6 +68,8 @@ display.write_frame(fb).await.unwrap();
 
 - [st7789](./panels/st7789): ST7789, commonly used in TFT LCD.
 
+- [st77916](./panels/st77916): ST77916, commonly used in QSPI round screens.
+
 - [gc9a01](./panels/gc9a01): GC9A01, commonly used in round screens.
 
 - [co5300](./panels/co5300): CO5300, commonly used in AMOLED.
@@ -113,7 +115,7 @@ check [Examples](./examples) for more.
 
 - Use Macros to replace `InitStep::maybe_cmd_with`
 
-- Tearing Effect Control
+- Tearing Effect Control ( #6 )
 
 ## License
 
