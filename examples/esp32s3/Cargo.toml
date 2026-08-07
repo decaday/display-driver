@@ -1,0 +1,65 @@
+[workspace]
+
+[package]
+name = "display-driver-esp32s3-examples"
+edition = "2021"
+version = "0.1.0"
+license = "Apache-2.0"
+publish = false
+
+[dependencies]
+# ESP-HAL
+esp-hal = { version = "1.1.1", features = [
+    "esp32s3",
+    "unstable",
+    "rt",
+] }
+esp-backtrace = { version = "0.19.0", features = [
+    "esp32s3",
+    "println",
+    "panic-handler",
+] }
+esp-println = { version = "0.17.0", features = [
+    "esp32s3",
+] }
+esp-bootloader-esp-idf = { version = "0.5.0", features = ["esp32s3"] }
+
+# Async runtime
+embassy-executor = "0.10.0"
+embassy-time = "0.5.0"
+esp-rtos = { version = "0.3.0", features = ["esp32s3", "embassy"] }
+
+# Embedded HAL traits
+embedded-hal = "1.0"
+embedded-hal-async = "1.0"
+
+# Display driver ecosystem
+display-driver = { path = "../../display-driver" }
+display-driver-qspi = { path = "../../buses/qspi" }
+display-driver-co5300 = { path = "../../panels/co5300" }
+display-driver-st77916 = { path = "../../panels/st77916" }
+
+# Drawing / framebuffer
+embedded-graphics = "0.8.1"
+tjpgd-rs = { version = "0.1.0", git = "https://github.com/decaday/tjpgd-rs.git", rev = "b2feafee" }
+
+static_cell = "2"
+
+# cargo build/run
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true
+incremental = false
+opt-level = 3
+overflow-checks = true
+
+# cargo build/run --release
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false
+incremental = false
+lto = "fat"
+opt-level = 3
+overflow-checks = false

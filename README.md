@@ -54,7 +54,9 @@ display.write_frame(fb).await.unwrap();
 
 ## Display Bus Implementations
 
-- [spi](./buses/spi): SPI bus implementation.
+- [SPI](./buses/spi): SPI bus implementation.
+
+- [QSPI](./buses/qspi): QSPI bus implementation.
 
 - [SF32 LCDC](https://github.com/OpenSiFli/sifli-rs/tree/main/sifli-hal): Bus Implementation for SF32LB52x LCDC Hardware.
 
@@ -65,6 +67,8 @@ display.write_frame(fb).await.unwrap();
 - [st7735](./panels/st7735): ST7735, commonly used in TFT LCD.
 
 - [st7789](./panels/st7789): ST7789, commonly used in TFT LCD.
+
+- [st77916](./panels/st77916): ST77916, commonly used in QSPI round screens.
 
 - [gc9a01](./panels/gc9a01): GC9A01, commonly used in round screens.
 
@@ -111,7 +115,7 @@ check [Examples](./examples) for more.
 
 - Use Macros to replace `InitStep::maybe_cmd_with`
 
-- Tearing Effect Control
+- Tearing Effect Control ( #6 )
 
 ## License
 
