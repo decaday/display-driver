@@ -32,21 +32,21 @@ pub const INITR_GMCTRN1: [u8; 16] = [
 #[macro_export]
 macro_rules! impl_st7735_initr {
     ($type:ty) => {
-        impl crate::St7735Spec for $type {
-            const FRMCTR1_PARAMS: [u8; 3] = crate::spec::generic::INITR_FRMCTR1;
-            const FRMCTR2_PARAMS: [u8; 3] = crate::spec::generic::INITR_FRMCTR2;
-            const FRMCTR3_PARAMS: [u8; 6] = crate::spec::generic::INITR_FRMCTR3;
-            const INVCTR_PARAM: u8 = crate::spec::generic::INITR_INVCTR;
-            const PWCTR1_PARAMS: [u8; 3] = crate::spec::generic::INITR_PWCTR1;
-            const PWCTR2_PARAM: u8 = crate::spec::generic::INITR_PWCTR2;
-            const PWCTR3_PARAMS: [u8; 2] = crate::spec::generic::INITR_PWCTR3;
-            const PWCTR4_PARAMS: [u8; 2] = crate::spec::generic::INITR_PWCTR4;
-            const PWCTR5_PARAMS: [u8; 2] = crate::spec::generic::INITR_PWCTR5;
-            const VMCTR1_PARAM: u8 = crate::spec::generic::INITR_VMCTR1;
+        impl $crate::St7735Spec for $type {
+            const FRMCTR1_PARAMS: [u8; 3] = $crate::spec::generic::INITR_FRMCTR1;
+            const FRMCTR2_PARAMS: [u8; 3] = $crate::spec::generic::INITR_FRMCTR2;
+            const FRMCTR3_PARAMS: [u8; 6] = $crate::spec::generic::INITR_FRMCTR3;
+            const INVCTR_PARAM: u8 = $crate::spec::generic::INITR_INVCTR;
+            const PWCTR1_PARAMS: [u8; 3] = $crate::spec::generic::INITR_PWCTR1;
+            const PWCTR2_PARAM: u8 = $crate::spec::generic::INITR_PWCTR2;
+            const PWCTR3_PARAMS: [u8; 2] = $crate::spec::generic::INITR_PWCTR3;
+            const PWCTR4_PARAMS: [u8; 2] = $crate::spec::generic::INITR_PWCTR4;
+            const PWCTR5_PARAMS: [u8; 2] = $crate::spec::generic::INITR_PWCTR5;
+            const VMCTR1_PARAM: u8 = $crate::spec::generic::INITR_VMCTR1;
             const GMCTRP1_PARAMS: Option<&'static [u8; 16]> =
-                Some(&crate::spec::generic::INITR_GMCTRP1);
+                Some(&$crate::spec::generic::INITR_GMCTRP1);
             const GMCTRN1_PARAMS: Option<&'static [u8; 16]> =
-                Some(&crate::spec::generic::INITR_GMCTRN1);
+                Some(&$crate::spec::generic::INITR_GMCTRN1);
         }
     };
 }

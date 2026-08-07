@@ -21,7 +21,7 @@ impl GammaSet {
     /// Create a GammaSet from a generic integer index (0-3).
     pub fn gc(n: u8) -> Option<Self> {
         match n {
-            0..=3 => unsafe { mem::transmute(1u8 << n) },
+            0..=3 => Some(unsafe { mem::transmute::<u8, GammaSet>(1u8 << n) }),
             _ => None,
         }
     }
@@ -211,17 +211,13 @@ impl AddressRange {
     pub const fn new(start: u16, end: u16) -> Self {
         let s = start.to_be_bytes();
         let e = end.to_be_bytes();
-        Self {
-            0: [s[0], s[1], e[0], e[1]],
-        }
+        Self([s[0], s[1], e[0], e[1]])
     }
 
     pub const fn new_with_offset(start: u16, end: u16, offset: u16) -> Self {
         let s = (start + offset).to_be_bytes();
         let e = (end + offset).to_be_bytes();
-        Self {
-            0: [s[0], s[1], e[0], e[1]],
-        }
+        Self([s[0], s[1], e[0], e[1]])
     }
 
     pub const fn as_bytes(&self) -> &[u8; 4] {

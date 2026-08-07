@@ -64,7 +64,7 @@ mod eg_impls {
         raw::ToBytes, PixelColor, Rgb565, Rgb666, Rgb888, RgbColor,
     };
 
-    impl<'a> From<Rgb565> for SolidColor {
+    impl From<Rgb565> for SolidColor {
         fn from(value: Rgb565) -> Self {
             let mut raw = [0u8; 3];
             raw[0..2].copy_from_slice(&<Rgb565 as PixelColor>::Raw::from(value).to_be_bytes());
@@ -77,7 +77,7 @@ mod eg_impls {
     }
 
     #[cfg(feature = "embedded-graphics")]
-    impl<'a> From<Rgb666> for SolidColor {
+    impl From<Rgb666> for SolidColor {
         fn from(value: Rgb666) -> Self {
             let raw = [
                 (value.r() & 0x3F) << 2,
@@ -93,7 +93,7 @@ mod eg_impls {
     }
 
     #[cfg(feature = "embedded-graphics")]
-    impl<'a> From<Rgb888> for SolidColor {
+    impl From<Rgb888> for SolidColor {
         fn from(value: Rgb888) -> Self {
             let mut raw = [0u8; 3];
             raw.copy_from_slice(&<Rgb888 as PixelColor>::Raw::from(value).to_be_bytes());

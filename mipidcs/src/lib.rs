@@ -144,7 +144,7 @@ where
     /// * `bus` - The display bus to write to.
     /// * `mode` - The new address mode to set.
     /// * `orientation_if_changed` - Set the orientation in state machine if it has changed
-    /// by your self for correct offset handling.
+    ///   by your self for correct offset handling.
     ///
     /// # Note
     ///

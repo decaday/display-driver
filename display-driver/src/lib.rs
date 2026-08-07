@@ -160,15 +160,14 @@ impl<B: DisplayBus, P: Panel<B>> DisplayDriver<B, P> {
     /// Use `write_pixels` or `write_frame` if you just want to draw a buffer.
     /// Use `fill_solid_xxx` if you just want to fill an Area.
     pub async fn set_window(&mut self, area: Area) -> Result<(), DisplayError<B::Error>> {
-        if self.panel.x_alignment() > 1 || self.panel.y_alignment() > 1 {
-            if area.x % self.panel.x_alignment() != 0
-                || area.y % self.panel.y_alignment() != 0
-                || area.w % self.panel.x_alignment() != 0
-                || area.h % self.panel.y_alignment() != 0
+        if (self.panel.x_alignment() > 1 || self.panel.y_alignment() > 1)
+            && (!area.x.is_multiple_of(self.panel.x_alignment())
+                || !area.y.is_multiple_of(self.panel.y_alignment())
+                || !area.w.is_multiple_of(self.panel.x_alignment())
+                || !area.h.is_multiple_of(self.panel.y_alignment()))
             {
                 return Err(DisplayError::UnalignedArea);
             }
-        }
 
         if area.w == 0 || area.h == 0 {
             return Err(DisplayError::InvalidArgs);
