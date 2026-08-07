@@ -112,11 +112,7 @@ async fn main(_spawner: Spawner) {
     let cat_buf = unsafe { &mut *core::ptr::addr_of_mut!(CAT_SRC.0) };
     let fb_buf = unsafe { &mut *core::ptr::addr_of_mut!(FB.0) };
 
-    unsafe {
-        let mut cp = cortex_m::Peripherals::steal();
-        cp.SCB.enable_icache();
-        cp.SCB.enable_dcache(&mut cp.CPUID);
-    }
+    stm32h7b0_examples::enable_cache();
 
     let start_time = embassy_time::Instant::now();
     decoder.decode_to_framebuffer(
@@ -132,10 +128,7 @@ async fn main(_spawner: Spawner) {
     info!("JPEG Decoded in {} ms!", elapsed);
 
     // Disable D-Cache before animation loop to ensure DMA coherence!
-    unsafe {
-        let mut cp = cortex_m::Peripherals::steal();
-        cp.SCB.disable_dcache(&mut cp.CPUID);
-    }
+    stm32h7b0_examples::disable_cache();
 
     let mut frames = 0;
     let mut last_time = embassy_time::Instant::now();

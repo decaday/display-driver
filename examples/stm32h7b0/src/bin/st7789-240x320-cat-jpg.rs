@@ -96,11 +96,7 @@ async fn main(_spawner: Spawner) {
     // I-Cache and D-Cache give a ~4x speedup on Cortex-M7.
     // We will enable caches later, right before decoding the JPEG, 
     // to avoid corrupting SPI DMA transfers during display initialization.
-    unsafe {
-        let mut cp = cortex_m::Peripherals::steal();
-        cp.SCB.enable_icache();
-        cp.SCB.enable_dcache(&mut cp.CPUID);
-    }
+    stm32h7b0_examples::enable_cache();
 
     let start_time = embassy_time::Instant::now();
     decoder.decode_to_framebuffer(
@@ -119,10 +115,7 @@ async fn main(_spawner: Spawner) {
     // because display-driver uses stack-allocated buffers for commands.
     // If D-Cache is left on, DMA will read stale data from SRAM.
     // disable_dcache() automatically cleans (flushes) all dirty cache lines back to SRAM first!
-    unsafe {
-        let mut cp = cortex_m::Peripherals::steal();
-        cp.SCB.disable_dcache(&mut cp.CPUID);
-    }
+    stm32h7b0_examples::disable_cache();
     
     // Send to display in multiple chunks due to STM32 DMA limit (0xFFFF bytes)
     // 320 * 240 * 2 = 153600 bytes

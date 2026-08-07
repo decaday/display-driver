@@ -33,3 +33,32 @@ pub fn configure_rcc() -> embassy_stm32::Config {
     config.rcc.voltage_scale = VoltageScale::Scale0;
     config
 }
+
+/// Enable the instruction and data caches.
+///
+/// `#[inline(never)]` is crucial. The `cortex-m` crate uses inline assembly that can cause an
+/// `out of range pc-relative fixup value` compilation error. Interestingly, it always compiles
+/// successfully locally, but fails on GitHub CI.
+///
+/// See: https://github.com/rust-embedded/cortex-m/issues/682
+#[inline(never)]
+pub fn enable_cache() {
+    unsafe {
+        let mut scb: cortex_m::peripheral::SCB = core::mem::transmute(());
+        let mut cpuid: cortex_m::peripheral::CPUID = core::mem::transmute(());
+        scb.enable_icache();
+        scb.enable_dcache(&mut cpuid);
+    }
+}
+
+/// Disable the data cache.
+///
+/// See `enable_cache()` for why this is marked `#[inline(never)]`.
+#[inline(never)]
+pub fn disable_cache() {
+    unsafe {
+        let mut scb: cortex_m::peripheral::SCB = core::mem::transmute(());
+        let mut cpuid: cortex_m::peripheral::CPUID = core::mem::transmute(());
+        scb.disable_dcache(&mut cpuid);
+    }
+}

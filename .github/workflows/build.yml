@@ -76,7 +76,3 @@ jobs:
       - name: Build Example
         working-directory: examples/${{ matrix.example.name }}
         run: cargo build --release
-        env:
-          # Use Thin LTO on CI to bypass the 'out of range pc-relative fixup value' bug
-          # caused by overly long absolute paths embedded in CI environments during Fat LTO.
-          CARGO_PROFILE_RELEASE_LTO: thin
