@@ -1,0 +1,82 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_workspace:
+    name: Build Workspace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Clippy
+        run: cargo clippy --all --all-targets -- -D warnings
+
+      - name: Build Workspace
+        run: cargo build --all
+
+  find_examples:
+    name: Find Examples
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate matrix
+        id: set-matrix
+        run: |
+          EXAMPLES=()
+          for dir in examples/*; do
+            if [ -d "$dir" ] && [ -f "$dir/Cargo.toml" ]; then
+              basename=$(basename "$dir")
+              # Exclude esp32
+              if [[ $basename == esp32* ]]; then
+                continue
+              fi
+              target=""
+              if [ -f "$dir/.cargo/config.toml" ]; then
+                target=$(grep 'target = ' "$dir/.cargo/config.toml" | head -n 1 | cut -d '"' -f 2)
+              fi
+              if [ -z "$target" ]; then
+                target="x86_64-unknown-linux-gnu"
+              fi
+              EXAMPLES+=("{\"name\": \"$basename\", \"target\": \"$target\"}")
+            fi
+          done
+          JSON="[$(IFS=,; echo "${EXAMPLES[*]}")]"
+          echo "matrix=$JSON" >> $GITHUB_OUTPUT
+
+  build_examples:
+    name: Build ${{ matrix.example.name }}
+    needs: find_examples
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.find_examples.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.example.target }}
+          
+      - name: Build Example
+        working-directory: examples/${{ matrix.example.name }}
+        run: cargo build --release
+        env:
+          # Use Thin LTO on CI to bypass the 'out of range pc-relative fixup value' bug
+          # caused by overly long absolute paths embedded in CI environments during Fat LTO.
+          CARGO_PROFILE_RELEASE_LTO: thin
