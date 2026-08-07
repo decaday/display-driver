@@ -21,15 +21,21 @@ panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 static_cell = "2"
 portable-atomic = { version = "1.5", features = ["critical-section"] }
 micromath = "2.1.0"
+fixed = "1.28.0"
+embassy-futures = "0.1.1"
+embedded-hal = "1.0"
 
 embedded-graphics = { version = "0.8.1", features = ["defmt"] }
 embedded-hal-bus = { version = "0.3.0", features = ["async"] }
 
 display-driver = { version = "0.1.0", path = "../../display-driver" }
 display-driver-spi = { version = "0.1.1", path = "../../buses/spi" }
+display-driver-qspi = { version = "0.1.0", path = "../../buses/qspi" }
 display-driver-st7735 = { version = "0.1.0", path = "../../panels/st7735" }
 display-driver-st7789 = { version = "0.1.0", path = "../../panels/st7789" }
 display-driver-gc9a01 = { version = "0.1.0", path = "../../panels/gc9a01" }
+display-driver-st77916 = { version = "0.1.0", path = "../../panels/st77916" }
+display-driver-co5300 = { version = "0.1.0", path = "../../panels/co5300" }
 # tjpgd-rs = { version = "0.1.0", path = "../../../tjpgd-rs" }
 tjpgd-rs = { version = "0.1.0", git = "https://github.com/decaday/tjpgd-rs.git", rev = "b2feafee" }
 
