@@ -1,5 +1,7 @@
 use display_driver::bus::DisplayBus;
-use display_driver::panel::{initseq::sequenced_init, reset::LCDResetHandler, Orientation, Panel};
+use display_driver::panel::{
+    initseq::sequenced_init, reset::LCDResetHandler, Orientation, Panel, PanelTeControl,
+};
 
 use display_driver::{ColorFormat, DisplayError};
 use embedded_hal::digital::OutputPin;
@@ -100,5 +102,29 @@ where
         self.set_address_mode(bus, mode, Some(orientation))
             .await
             .map_err(DisplayError::BusError)
+    }
+}
+
+impl<B, S, RST> PanelTeControl<B> for GenericMipidcs<B, S, RST>
+where
+    B: DisplayBus,
+    S: PanelSpec,
+    RST: OutputPin,
+{
+    async fn set_tearing_effect(
+        &mut self,
+        bus: &mut B,
+        enable: bool,
+    ) -> Result<(), DisplayError<B::Error>> {
+        if enable {
+            // V-Blanking mode (0x00)
+            bus.write_cmd_with_params(&[SET_TEAR_ON], &[0x00])
+                .await
+                .map_err(DisplayError::BusError)
+        } else {
+            bus.write_cmd(&[SET_TEAR_OFF])
+                .await
+                .map_err(DisplayError::BusError)
+        }
     }
 }

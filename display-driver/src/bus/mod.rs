@@ -5,6 +5,9 @@ mod display_interface_impl;
 pub mod simple;
 pub use simple::SimpleDisplayBus;
 
+pub mod gpio_te;
+pub use gpio_te::GpioTeBus;
+
 use crate::{Area, DisplayError, SolidColor};
 
 /// Error type trait.
