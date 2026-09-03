@@ -24,7 +24,7 @@ micromath = "2.1.0"
 embedded-graphics = { version = "0.8.1", features = ["defmt"] }
 embedded-hal-bus = { version = "0.3.0", features = ["async"] }
 
-display-driver = { version = "0.1.0", path = "../../display-driver" }
+display-driver = { version = "0.1.1", path = "../../display-driver" }
 display-driver-spi = { version = "0.1.1", path = "../../buses/spi" }
 display-driver-st7735 = { version = "0.1.0", path = "../../panels/st7735" }
 display-driver-st7789 = { version = "0.1.0", path = "../../panels/st7789" }

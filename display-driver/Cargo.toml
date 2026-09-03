@@ -1,6 +1,6 @@
 [package]
 name = "display-driver"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Decaday <myDecaday@outlook.com>"]
 categories = ["embedded", "hardware-support", "no-std"]

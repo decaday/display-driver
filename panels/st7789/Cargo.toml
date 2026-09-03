@@ -11,7 +11,7 @@ description = "Display Driver for ST7789"
 license = "Apache-2.0"
 
 [dependencies]
-display-driver = { version = "0.1.0", path = "../../display-driver" }
+display-driver = { version = "0.1.1", path = "../../display-driver" }
 display-driver-mipidcs = { version = "0.1.1", path = "../../mipidcs" }
 embedded-hal = "1.0"
 embedded-hal-async = "1.0"

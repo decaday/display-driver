@@ -20,7 +20,7 @@ cortex-m = { version = "0.7.6", features = ["inline-asm", "critical-section-sing
 cortex-m-rt = { version = "0.7.0", features = ["set-sp", "set-vtor"]}
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 
-display-driver = { version = "0.1.0", path = "../../display-driver" }
+display-driver = { version = "0.1.1", path = "../../display-driver" }
 display-driver-qspi = { version = "0.1.0", path = "../../buses/qspi" }
 display-driver-st77916 = { version = "0.1.0", path = "../../panels/st77916" }
 tjpgd-rs = { version = "0.1.0", git = "https://github.com/decaday/tjpgd-rs.git", rev = "b2feafee" }
