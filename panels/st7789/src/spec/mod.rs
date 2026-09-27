@@ -20,8 +20,11 @@ pub trait St7789Spec: PanelSpec {
     /// VRH Set (0xC3) - 1 byte
     const VRHS_PARAM: u8;
 
-    /// VDV Set (0xC4) - 1 byte
-    const VDVS_PARAM: u8;
+    /// VDV Set (0xC4) - 1 byte, available on V/VW only, not P3.
+    const VDVS_PARAMS: Option<&'static [u8; 1]> = None;
+
+    /// VCOM Offset Set (0xC5) - 1 byte, separate from VDV Set.
+    const VCMOFSET_PARAMS: Option<&'static [u8; 1]> = None;
 
     /// Frame Rate Control in Normal Mode (0xC6) - 1 byte
     const FRCTRL2_PARAM: u8;

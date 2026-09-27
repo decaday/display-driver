@@ -84,8 +84,10 @@ where
         InitStep::CommandWithParams(VDVVRHEN, &[0x01, 0xFF]),
         // VRH Set
         InitStep::CommandWithParams(VRHS, &[Spec::VRHS_PARAM]),
-        // VDV Set
-        InitStep::CommandWithParams(VDVS, &[Spec::VDVS_PARAM]),
+        // VDV Set (V/VW only)
+        InitStep::maybe_cmd_with(VDVS, Spec::VDVS_PARAMS),
+        // VCOM Offset Set (Optional)
+        InitStep::maybe_cmd_with(VCMOFSET, Spec::VCMOFSET_PARAMS),
         // Frame Rate Control
         InitStep::CommandWithParams(FRCTRL2, &[Spec::FRCTRL2_PARAM]),
         // Power Control 1

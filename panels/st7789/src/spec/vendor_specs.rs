@@ -21,7 +21,7 @@ impl St7789Spec for CL28CK1083 {
     const VCOMS_PARAM: u8 = 0x28;
     const LCMCTRL_PARAM: u8 = 0x2C;
     const VRHS_PARAM: u8 = 0x0B;
-    const VDVS_PARAM: u8 = 0x20;
+    const VDVS_PARAMS: Option<&'static [u8; 1]> = Some(&[0x20]);
     const FRCTRL2_PARAM: u8 = 0x0F;
     const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
     const PVGAMCTRL_PARAMS: [u8; 14] = [
@@ -55,7 +55,7 @@ impl St7789Spec for TB154 {
     const VCOMS_PARAM: u8 = 0x19;
     const LCMCTRL_PARAM: u8 = 0x2C;
     const VRHS_PARAM: u8 = 0x12;
-    const VDVS_PARAM: u8 = 0x20;
+    const VDVS_PARAMS: Option<&'static [u8; 1]> = Some(&[0x20]);
     const FRCTRL2_PARAM: u8 = 0x0F;
     const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
     const PVGAMCTRL_PARAMS: [u8; 14] = [
@@ -90,7 +90,7 @@ impl St7789Spec for GMT114_02 {
     const VCOMS_PARAM: u8 = 0x3F;
     const LCMCTRL_PARAM: u8 = 0x2C;
     const VRHS_PARAM: u8 = 0x0F;
-    const VDVS_PARAM: u8 = 0x20;
+    const VDVS_PARAMS: Option<&'static [u8; 1]> = Some(&[0x20]);
     const FRCTRL2_PARAM: u8 = 0x01;
     const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
     const PVGAMCTRL_PARAMS: [u8; 14] = [
@@ -127,7 +127,7 @@ impl St7789Spec for N114_2413THBIG01_H13 {
     const VCOMS_PARAM: u8 = 0x22;
     const LCMCTRL_PARAM: u8 = 0x2C;
     const VRHS_PARAM: u8 = 0x13;
-    const VDVS_PARAM: u8 = 0x20;
+    const VDVS_PARAMS: Option<&'static [u8; 1]> = Some(&[0x20]);
     const FRCTRL2_PARAM: u8 = 0x0F;
     const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
     const GATESEL_PARAMS: Option<&'static [u8; 1]> = Some(&[0xA1]);
