@@ -10,7 +10,7 @@ macro_rules! impl_st7789_generic {
             const VCOMS_PARAM: u8 = 0x19;
             const LCMCTRL_PARAM: u8 = 0x2C;
             const VRHS_PARAM: u8 = 0x12;
-            const VDVS_PARAM: u8 = 0x20;
+            const VDVS_PARAMS: Option<&'static [u8; 1]> = Some(&[0x20]);
             const FRCTRL2_PARAM: u8 = 0x0F;
             const PWCTRL1_PARAMS: [u8; 2] = [0xA4, 0xA1];
             const PVGAMCTRL_PARAMS: [u8; 14] = [
@@ -38,6 +38,33 @@ impl PanelSpec for Generic240x320Type1 {
 }
 
 impl_st7789_generic!(Generic240x320Type1);
+
+/// ST7789P3 spec.
+pub struct Generic240x320P3Type1;
+
+impl PanelSpec for Generic240x320P3Type1 {
+    const PHYSICAL_WIDTH: u16 = 240;
+    const PHYSICAL_HEIGHT: u16 = 320;
+    const PHYSICAL_X_OFFSET: u16 = 0;
+    const PHYSICAL_Y_OFFSET: u16 = 0;
+
+    const INVERTED: bool = true;
+    const BGR: bool = false;
+}
+
+impl St7789Spec for Generic240x320P3Type1 {
+    const PORCTRL_PARAMS: [u8; 5] = <Generic240x320Type1 as St7789Spec>::PORCTRL_PARAMS;
+    const GCTRL_PARAM: u8 = <Generic240x320Type1 as St7789Spec>::GCTRL_PARAM;
+    const VCOMS_PARAM: u8 = <Generic240x320Type1 as St7789Spec>::VCOMS_PARAM;
+    const LCMCTRL_PARAM: u8 = <Generic240x320Type1 as St7789Spec>::LCMCTRL_PARAM;
+    const VRHS_PARAM: u8 = <Generic240x320Type1 as St7789Spec>::VRHS_PARAM;
+    const VDVS_PARAMS: Option<&'static [u8; 1]> = None;
+    const VCMOFSET_PARAMS: Option<&'static [u8; 1]> = Some(&[0x20]);
+    const FRCTRL2_PARAM: u8 = <Generic240x320Type1 as St7789Spec>::FRCTRL2_PARAM;
+    const PWCTRL1_PARAMS: [u8; 2] = <Generic240x320Type1 as St7789Spec>::PWCTRL1_PARAMS;
+    const PVGAMCTRL_PARAMS: [u8; 14] = <Generic240x320Type1 as St7789Spec>::PVGAMCTRL_PARAMS;
+    const NVGAMCTRL_PARAMS: [u8; 14] = <Generic240x320Type1 as St7789Spec>::NVGAMCTRL_PARAMS;
+}
 
 /// Generic ST7789 spec for 240x320 displays (Type 2)
 /// 240x320, offset = (0, 0), Inverted = false, RGB

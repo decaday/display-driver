@@ -68,10 +68,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install Rust
+      - name: Install Rust (Built-in targets)
+        if: ${{ !endsWith(matrix.example.target, '.json') }}
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.example.target }}
+
+      - name: Install Rust (Custom JSON targets)
+        if: ${{ endsWith(matrix.example.target, '.json') }}
+        uses: dtolnay/rust-toolchain@stable
           
       - name: Build Example
         working-directory: examples/${{ matrix.example.name }}

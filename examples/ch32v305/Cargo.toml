@@ -1,0 +1,29 @@
+[package]
+name = "ch32v305-examples"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+ch32-hal = { git = "https://github.com/ch32-rs/ch32-hal", rev = "07663312c9da6b9962e8699a917c623bc833972e", default-features = false, features = ["ch32v305rbt6", "memory-x", "embassy", "rt"] }
+embassy-executor = { version = "0.10.0", features = ["platform-spin", "executor-thread"] }
+embassy-time = "0.5.1"
+qingke-rt = "0.7"
+panic-halt = "1.0"
+portable-atomic = { version = "1", default-features = false, features = ["critical-section"] }
+embedded-hal = "1.0"
+embedded-hal-bus = { version = "0.3.0", features = ["async"] }
+embedded-graphics = "0.8.1"
+display-driver = { path = "../../display-driver" }
+display-driver-spi = { path = "../../buses/spi" }
+display-driver-st7789 = { path = "../../panels/st7789" }
+
+[profile.dev]
+opt-level = 2
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = false

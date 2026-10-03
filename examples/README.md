@@ -43,6 +43,10 @@
 | [st77916-360x360-qspi-eg](./esp32s3/src/bin/st77916-360x360-qspi-eg.rs) | QSPI | Framebuffer | NT150XV | embedded-graphics | ST77916 QSPI round display demo with embedded-graphics. |
 | [st77916-360x360-qspi-jpg](./esp32s3/src/bin/st77916-360x360-qspi-jpg.rs) | QSPI | Framebuffer | NT150XV | tjpgd-rs | Decode and display a JPEG image of a cat. |
 
+## CH32V305 Examples
+
+| [st7789p3-240x320-eg-ferris](./ch32v305/src/bin/st7789p3-240x320-eg-ferris.rs) | SPI | Partial Framebuffer | Generic240x320P3Type1 | Draw a Ferris picture |
+
 ## External Examples
 
 CO5300 AMOLED display driver example for SF32LB52x LCDC hardware: 
