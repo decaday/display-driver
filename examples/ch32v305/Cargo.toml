@@ -19,6 +19,9 @@ embedded-graphics = "0.8.1"
 display-driver = { path = "../../display-driver" }
 display-driver-spi = { path = "../../buses/spi" }
 display-driver-st7789 = { path = "../../panels/st7789" }
+embassy-usb = { version = "0.6.0", default-features = false }
+embassy-sync = "0.8.0"
+embassy-futures = "0.1.2"
 
 [profile.dev]
 opt-level = 2
